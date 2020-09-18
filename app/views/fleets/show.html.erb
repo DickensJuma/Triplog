@@ -1,0 +1,14 @@
+<h1><%= @fleet.title %></h1>
+
+
+
+<section class="user-section">
+  <h2><%= "Title: #{@fleet.title}" %></h2>
+  <article class="timeline">
+    <h3>Recent fleets:</h3>
+    <ul class="fleets">
+      <%= render @fleets %>
+    </ul>
+  </article>
+  <%= link_to "<< Back to Fleets List", fleets_path %>
+</section>
