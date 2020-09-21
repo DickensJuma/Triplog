@@ -7,7 +7,7 @@ class FleetsController < ApplicationController
   end
 
   def create
-    @fleet = current_user.fleets.new(fleet_params)
+    @fleet = current_user.fleets.build(fleet_params)
 
     if @fleet.save
       redirect_to fleets_path, notice: 'fleet was successfully created.'
@@ -18,6 +18,8 @@ class FleetsController < ApplicationController
   end
 
   private
+
+ 
 
   def timeline_fleets
     @timeline_fleets ||= Fleet.all.ordered_by_most_recent.includes(:user)

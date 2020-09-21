@@ -10,8 +10,12 @@ class MileagesController < ApplicationController
           redirect_to fleets_path, alert: @mileage.errors.full_messages.join('. ').to_s
         end
       end
+
+
+      
     
       private
+
     
       def mileage_params
         params.require(:mileage).permit(:distance)
