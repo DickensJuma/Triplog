@@ -26,6 +26,6 @@ class FleetsController < ApplicationController
   end
 
   def fleet_params
-    params.require(:fleet).permit(:title)
+    params.require(:fleet).permit(:title, :image)
   end
 end

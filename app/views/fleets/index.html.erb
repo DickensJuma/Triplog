@@ -1,7 +1,14 @@
 <h2>Create Fleet</h2>
-<%= form_for(@fleet) do |form| %>
+<%= form_for(@fleet, html: {multipart: true}) do |form| %>
   <%= form.label :title %>
-  <%= form.text_field :title, id: :fleet_title, class: 'form-control', placeholder: 'Add New Fleet' %><br><br>
+  <%= form.text_field :title, id: :fleet_title, class: 'form-control', placeholder: 'Add New Fleet' %> <%= form.label :image, "Attach an Image" %>
+  <%= form.file_field :image , class: 'form-control-input' %>
+  <p>
+   <% if @fleet.image.exists? %>
+      <%= image_tag fleet.image.url class:'custom-file-input' %><br/>
+  <% end %>
+ 
+</p>
   <% if @fleet.errors.full_messages.any? %>
     <p class="errors">
       <%= "Fleet could not be saved. #{@fleet.errors.full_messages.join('. ')}" %>
@@ -12,7 +19,7 @@
 
 <article class="timeline">
   <h3>
-    All my fleets
+    All Fleet
   </h3>
   <ul class="fleets">
     <%= render @timeline_fleets %>

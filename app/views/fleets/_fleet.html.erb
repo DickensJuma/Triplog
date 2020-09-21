@@ -1,6 +1,7 @@
 <li class="fleet">
   <div>
     <div class='fleet-attribution' >
+    <%= fleet.title %><br>
       <%= link_to fleet.user.name, user_path(fleet.user), class: 'fleet-author' %>
     </div>
     <div class='fleet-liking'>
@@ -10,7 +11,10 @@
     </div>
   </div>
   <p class="fleet-content">
-    <%= fleet.title %>
+  
+   <%= image_tag fleet.image.url(:medium), class:'icon'  %>
+      
+  
   </p>
 
   <div class='fleet-mileages-section'>

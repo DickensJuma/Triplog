@@ -110,7 +110,15 @@ a {
   }
 
   .form-control {
-    width: 70%;
+    width: 50%;
+    border: 1px solid $divider-color;
+    height: 44px;
+    padding: 8px;
+    margin: 4px 0;
+    border-radius: 4px;
+  }
+  .form-control-input {
+    width: 30%;
     border: 1px solid $divider-color;
     height: 34px;
     padding: 8px;
@@ -346,4 +354,10 @@ form {
   .user-section {
     width: 50%;
   }
+}
+.icon{
+  height:150px;
+  border-radius:70%;
+  border: 5px solid #FEDE00;
+
 }
