@@ -1,24 +1,52 @@
-# README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
 
-Things you may want to cover:
+# Triplog
+Its enables registered users to create fleet group and register their mileages
+## Live Link
+[Live](https://triplogig.herokuapp.com/)
 
-* Ruby version
+![code3](https://user-images.githubusercontent.com/48822462/94014169-db64a180-fdb3-11ea-96fc-50bdce562db4.png )
 
-* System dependencies
+# Build with
 
-* Configuration
+- Ruby
+- Rails
+- CSS
+- Sass
+- pg
+- VS Code
 
-* Database creation
 
-* Database initialization
+# Tested with
+- RSpec
+- Rubocop
 
-* How to run the test suite
+# Get Started
 
-* Services (job queues, cache servers, search engines, etc.)
+- You first need to clone the repository
+- install the dependencies (gems) by running `bundle install --without production` in your terminal
+- Run `rails db:migrate`
+- Run `rails s` to start your rails server. You can now view the app by navigating to `http://localhost:3000` in your browser.
 
-* Deployment instructions
 
-* ...
+
+👤 Dickens Juma
+
+- Github: [@DickensJuma](https://github.com/DickensJuma)
+- Twitter: [@DickensJuma](https://twitter.com/juma_dickens)
+- Linkedln: [Dickens Juma](https://www.linkedin.com/in/dickens-juma/)
+# 🤝 Contributing
+
+Contributions, issues and feature requests are welcome!
+
+Feel free to check the issues page.
+
+# Show your support
+
+Give a ⭐️ if you like this project!
+
+# Acknowledgments
+
+- Microverse
+- The Odin Project
+
