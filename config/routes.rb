@@ -5,9 +5,15 @@ Rails.application.routes.draw do
     resources :mileages, only: [:create]
   end
 
-  devise_for :users
+  get 'sessions/new'
+  get 'sessions/create'
+  get 'sessions/destroy'
+  resources :sessions, only: [:create, :new, :destroy]
 
-  resources :users, only: [:index, :show]
+  get 'login', to: 'sessions#new'
+
+  delete 'logout', to: 'sessions#destroy'
+  resources :users
   
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
