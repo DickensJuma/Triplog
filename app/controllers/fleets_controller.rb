@@ -2,6 +2,7 @@ class FleetsController < ApplicationController
   before_action :authenticate_user!, only: [:index]
   def index
     @fleet = Fleet.new
+    @fleets = Fleet.includes(:mileages).order(created_at: :desc)
     timeline_fleets
   end
 
