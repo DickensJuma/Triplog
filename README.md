@@ -5,7 +5,7 @@ Its enables registered users to create fleet group and register their mileages
 ## Live Link
 [Live](https://triplogig.herokuapp.com/)
 
-![code3](https://user-images.githubusercontent.com/48822462/94014169-db64a180-fdb3-11ea-96fc-50bdce562db4.png )
+![code3](https://user-images.githubusercontent.com/48822462/94166280-cc552080-fe93-11ea-858e-211eb67d035d.png )
 
 # Build with
 
