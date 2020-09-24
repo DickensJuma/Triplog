@@ -13,6 +13,8 @@ class UsersController < ApplicationController
   def show
     @user = User.find(params[:id])
     @fleets = @user.fleets.ordered_by_most_recent
+    @fleets = @user.fleets.per_page(20).page(params[:page])
+    @fleets = @fleets.includes(:mileages)
   end
 
   # GET /users/new

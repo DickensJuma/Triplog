@@ -2,8 +2,6 @@
   <div>
     <div class='fleet-attribution' >
     <%= fleet.title %><br>
-      <%= link_to fleet.user.name, user_path(fleet.user), class: 'fleet-author' %>
-    </div>
     <div class='fleet-liking'>
       <span class='fleet-date'> <%= fleet.created_at.strftime("%Y/%m/%d") %> </span>
 
@@ -21,9 +19,10 @@
   <%= "Total: " + fleet.mileages.map(&:distance).inject(:+).to_s + "KM"%>
     <% fleet.mileages.each do |mileage| %>
       <div class="fleet-mileages">
+      
         <p>
           <b><%= mileage.user.name %>:</b> <%= mileage.distance %><%= 'KM' %>
-         
+        
         </p>
         <span> <%= mileage.created_at.strftime("%Y/%m/%d") %> </span>
       </div>
