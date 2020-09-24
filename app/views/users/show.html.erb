@@ -1,14 +1,9 @@
 <p id="notice"><%= notice %></p>
 
+<p>
+  <strong>Name:</strong>
+  <%= @user.name %>
+</p>
 
-<div class="container">
-    <div class="fb-profile">
-        
-        <img align="left" class="fb-image-profile thumbnail" src="http://lorempixel.com/180/180/people/1/" alt="Profile image example"/>
-        <div class="fb-profile-text">
-            <h1><%=@user.name%></h1>
-            
+<%= link_to 'Edit', edit_user_path(@user) %> |
 <%= link_to 'Back', users_path %>
-        </div>
-    </div>
-</div>  
