@@ -7,7 +7,7 @@ class SessionsController < ApplicationController
       redirect_to root_path
     else
       redirect_to '/login'
-      flash[:alert] =  'User does not exist'
+      flash[:alert] = 'User does not exist'
 
     end
   end

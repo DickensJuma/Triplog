@@ -6,10 +6,16 @@ AllCops:
     - "Guardfile"
     - "Rakefile"
     - "node_modules/**/*"
+   Documentation:
+       Enabled: false
 
   DisplayCopNames: true
 
+require: rubocop-rails 
+
+
 Layout/LineLength:
+  Enabled: false
   Max: 120
 Metrics/MethodLength:
   Include:

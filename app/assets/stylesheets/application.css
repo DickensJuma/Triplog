@@ -13,9 +13,4 @@
  *= require_tree .
  *= require_self
  */
- #image_id {
-    
-    height: 50px;
-    width: 60px; 
-    margin-right: 20px;
-  }
+

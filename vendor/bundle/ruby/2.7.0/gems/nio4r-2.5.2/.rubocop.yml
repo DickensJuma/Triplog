@@ -79,3 +79,5 @@ Style/StringLiterals:
 
 Style/TrivialAccessors:
   Enabled: false
+
+
