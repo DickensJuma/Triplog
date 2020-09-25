@@ -1,32 +1,40 @@
 /* Override this file with custom rules */
+/* stylelint-disable no-descending-specificity */
 
 body {
   line-height: 18px;
 }
 
-.docstring code,
-.docstring .object_link a,
-#filecontents code {
-  padding: 0 3px 1px 3px;
-  border: 1px solid #eef;
-  background: #f5f5ff;
+pre.code {
+  color: #000;
 }
 
-#filecontents pre code,
-.docstring pre code {
+pre.code a {
+  border-bottom: 1px dotted #bbf;
+}
+
+.docstring pre.code,
+.docstring code,
+#filecontents pre.code,
+#filecontents code,
+.tags pre.example,
+.docstring .object_link a {
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+}
+
+.docstring pre code,
+#filecontents pre code {
   border: none;
   background: none;
   padding: 0;
 }
 
-#filecontents pre.code,
-.docstring pre.code,
-.tags pre.example,
-.docstring code,
-.docstring .object_link a,
-#filecontents code {
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
+#filecontents code .docstring code,
+.docstring .object_link a {
+  padding: 0 3px 1px 3px;
+  border: 1px solid #eef;
+  background: #f5f5ff;
 }
 
 /* syntax highlighting */
@@ -37,8 +45,8 @@ body {
   margin-top: 5px;
 }
 
-#filecontents pre.code,
 .docstring pre.code,
+#filecontents pre.code,
 .source_code pre {
   font-family: monospace;
 }
@@ -61,10 +69,6 @@ body {
   margin-top: 4px;
   border: 1px solid #eef;
   background: #f5f5ff;
-}
-
-pre.code {
-  color: #000;
 }
 
 pre.code .info.file {
@@ -135,6 +139,4 @@ pre.code .regexp,
   color: #036a07;
 }
 
-pre.code a {
-  border-bottom: 1px dotted #bbf;
-}
+/* stylelint-enable no-descending-specificity */

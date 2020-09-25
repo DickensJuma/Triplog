@@ -1,6 +1,6 @@
 /* Forked from the Darkfish templates rdoc.css file, much hacked, probably
  * imperfect */
-
+ /* stylelint-disable no-descending-specificity */
 html {
   max-width: 960px;
   margin: 0 auto;
@@ -452,3 +452,4 @@ ul.link-list .type {
 #search-results pre {
   margin: 0.5em;
 }
+/* stylelint-enable no-descending-specificity */

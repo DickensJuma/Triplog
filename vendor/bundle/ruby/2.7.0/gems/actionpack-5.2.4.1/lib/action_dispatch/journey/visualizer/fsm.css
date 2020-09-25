@@ -1,3 +1,4 @@
+/* stylelint-disable no-descending-specificity */
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   margin: 0;
@@ -32,3 +33,5 @@ h2 {
 .form form { padding: 0 10px 5px; }
 .form .fun_routes { font-size: 0.9em; }
 .form .fun_routes a { margin: 0 5px 0 0; }
+
+/* stylelint-enable no-descending-specificity */
