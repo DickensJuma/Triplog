@@ -1,5 +1,5 @@
 AllCops:
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.7
   DisplayCopNames: true
 
 Layout/SpaceInsideBlockBraces:
@@ -12,7 +12,7 @@ Style/IfUnlessModifier:
 # Lint
 #
 
-Lint/HandleExceptions:
+Lint/SuppressedException:
   Enabled: false
 
 Lint/Loop:
@@ -32,7 +32,7 @@ Metrics/BlockLength:
 Metrics/ClassLength:
   Max: 128
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 128
 
 Metrics/MethodLength:
