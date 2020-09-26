@@ -43,6 +43,7 @@ module BCrypt
       def create(secret, options = {})
         cost = options[:cost] || BCrypt::Engine.cost
         raise ArgumentError if cost > 31
+
         Password.new(BCrypt::Engine.hash_secret(secret, BCrypt::Engine.generate_salt(cost)))
       end
 
@@ -67,7 +68,7 @@ module BCrypt
     end
     alias_method :is_password?, :==
 
-  private
+    private
 
     # Returns true if +h+ is a valid hash.
     def valid_hash?(h)
@@ -83,5 +84,4 @@ module BCrypt
       return v.to_str, c.to_i, h[0, 29].to_str, mash[-31, 31].to_str
     end
   end
-
 end

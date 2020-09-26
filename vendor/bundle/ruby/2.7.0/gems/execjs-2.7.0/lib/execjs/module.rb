@@ -2,9 +2,9 @@ require "execjs/version"
 require "rbconfig"
 
 module ExecJS
-  class Error           < ::StandardError; end
-  class RuntimeError              < Error; end
-  class ProgramError              < Error; end
+  class Error < ::StandardError; end
+  class RuntimeError < Error; end
+  class ProgramError < Error; end
   class RuntimeUnavailable < RuntimeError; end
 
   class << self
@@ -12,6 +12,7 @@ module ExecJS
 
     def runtime=(runtime)
       raise RuntimeUnavailable, "#{runtime.name} is unavailable on this system" unless runtime.available?
+
       @runtime = runtime
     end
 

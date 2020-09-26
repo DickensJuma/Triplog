@@ -9,7 +9,7 @@ module ActiveSupport
       attr_reader :id
 
       def initialize(notifier)
-        @id       = unique_id
+        @id = unique_id
         @notifier = notifier
       end
 
@@ -46,9 +46,9 @@ module ActiveSupport
 
       private
 
-        def unique_id
-          SecureRandom.hex(10)
-        end
+      def unique_id
+        SecureRandom.hex(10)
+      end
     end
 
     class Event
@@ -56,13 +56,13 @@ module ActiveSupport
       attr_accessor :end
 
       def initialize(name, start, ending, transaction_id, payload)
-        @name           = name
-        @payload        = payload.dup
-        @time           = start
+        @name = name
+        @payload = payload.dup
+        @time = start
         @transaction_id = transaction_id
-        @end            = ending
-        @children       = []
-        @duration       = nil
+        @end = ending
+        @children = []
+        @duration = nil
       end
 
       # Returns the difference in milliseconds between when the execution of the

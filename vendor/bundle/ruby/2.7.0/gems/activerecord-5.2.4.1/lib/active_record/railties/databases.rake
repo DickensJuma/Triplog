@@ -14,7 +14,7 @@ db_namespace = namespace :db do
   end
 
   task load_config: :environment do
-    ActiveRecord::Base.configurations       = ActiveRecord::Tasks::DatabaseTasks.database_configuration || {}
+    ActiveRecord::Base.configurations = ActiveRecord::Tasks::DatabaseTasks.database_configuration || {}
     ActiveRecord::Migrator.migrations_paths = ActiveRecord::Tasks::DatabaseTasks.migrations_paths
   end
 
@@ -66,7 +66,7 @@ db_namespace = namespace :db do
     if ActiveRecord::Base.dump_schema_after_migration
       case ActiveRecord::Base.schema_format
       when :ruby then db_namespace["schema:dump"].invoke
-      when :sql  then db_namespace["structure:dump"].invoke
+      when :sql then db_namespace["structure:dump"].invoke
       else
         raise "unknown schema format #{ActiveRecord::Base.schema_format}"
       end
@@ -151,7 +151,7 @@ db_namespace = namespace :db do
   end
 
   # desc 'Drops and recreates the database from db/schema.rb for the current environment and loads the seeds.'
-  task reset: [ "db:drop", "db:setup" ]
+  task reset: ["db:drop", "db:setup"]
 
   # desc "Retrieves the charset for the current environment's database"
   task charset: :load_config do
@@ -202,17 +202,17 @@ db_namespace = namespace :db do
       base_dir = ActiveRecord::Tasks::DatabaseTasks.fixtures_path
 
       fixtures_dir = if ENV["FIXTURES_DIR"]
-        File.join base_dir, ENV["FIXTURES_DIR"]
-      else
-        base_dir
-      end
+                       File.join base_dir, ENV["FIXTURES_DIR"]
+                     else
+                       base_dir
+                     end
 
       fixture_files = if ENV["FIXTURES"]
-        ENV["FIXTURES"].split(",")
-      else
-        # The use of String#[] here is to support namespaced fixtures.
-        Dir["#{fixtures_dir}/**/*.yml"].map { |f| f[(fixtures_dir.size + 1)..-5] }
-      end
+                        ENV["FIXTURES"].split(",")
+                      else
+                        # The use of String#[] here is to support namespaced fixtures.
+                        Dir["#{fixtures_dir}/**/*.yml"].map { |f| f[(fixtures_dir.size + 1)..-5] }
+                      end
 
       ActiveRecord::FixtureSet.create_fixtures(fixtures_dir, fixture_files)
     end
@@ -276,7 +276,6 @@ db_namespace = namespace :db do
         rm_f filename, verbose: false
       end
     end
-
   end
 
   namespace :structure do
@@ -371,7 +370,7 @@ namespace :railties do
       end
 
       ActiveRecord::Migration.copy(ActiveRecord::Tasks::DatabaseTasks.migrations_paths.first, railties,
-                                    on_skip: on_skip, on_copy: on_copy)
+                                   on_skip: on_skip, on_copy: on_copy)
     end
   end
 end

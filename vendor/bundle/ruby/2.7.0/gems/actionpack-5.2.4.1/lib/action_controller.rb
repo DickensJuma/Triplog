@@ -53,7 +53,7 @@ module ActionController
     autoload :ApiRendering
   end
 
-  autoload :TestCase,           "action_controller/test_case"
+  autoload :TestCase, "action_controller/test_case"
   autoload :TemplateAssertions, "action_controller/test_case"
 end
 

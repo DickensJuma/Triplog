@@ -19,39 +19,38 @@ module ExecJS
     MiniRacer = MiniRacerRuntime.new
 
     Node = ExternalRuntime.new(
-      name:        "Node.js (V8)",
-      command:     ["nodejs", "node"],
+      name: "Node.js (V8)",
+      command: ["nodejs", "node"],
       runner_path: ExecJS.root + "/support/node_runner.js",
-      encoding:    'UTF-8'
+      encoding: 'UTF-8'
     )
 
     JavaScriptCore = ExternalRuntime.new(
-      name:        "JavaScriptCore",
-      command:     "/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc",
+      name: "JavaScriptCore",
+      command: "/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc",
       runner_path: ExecJS.root + "/support/jsc_runner.js"
     )
 
     SpiderMonkey = Spidermonkey = ExternalRuntime.new(
-      name:        "SpiderMonkey",
-      command:     "js",
+      name: "SpiderMonkey",
+      command: "js",
       runner_path: ExecJS.root + "/support/spidermonkey_runner.js",
-      deprecated:  true
+      deprecated: true
     )
 
     JScript = ExternalRuntime.new(
-      name:        "JScript",
-      command:     "cscript //E:jscript //Nologo //U",
+      name: "JScript",
+      command: "cscript //E:jscript //Nologo //U",
       runner_path: ExecJS.root + "/support/jscript_runner.js",
-      encoding:    'UTF-16LE' # CScript with //U returns UTF-16LE
+      encoding: 'UTF-16LE' # CScript with //U returns UTF-16LE
     )
 
     V8 = ExternalRuntime.new(
-      name:        "V8",
-      command:     "d8",
+      name: "V8",
+      command: "d8",
       runner_path: ExecJS.root + "/support/v8_runner.js",
-      encoding:    'UTF-8'
+      encoding: 'UTF-8'
     )
-
 
     def self.autodetect
       from_environment || best_available ||
@@ -66,9 +65,11 @@ module ExecJS
     def self.from_environment
       if name = ENV["EXECJS_RUNTIME"]
         raise RuntimeUnavailable, "#{name} runtime is not defined" unless const_defined?(name)
+
         runtime = const_get(name)
 
         raise RuntimeUnavailable, "#{runtime.name} runtime is not available on this system" unless runtime.available?
+
         runtime
       end
     end

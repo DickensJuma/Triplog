@@ -17,14 +17,17 @@ module Diff::LCS
       def match(event)
         event
       end
+
       # Called when the old value is discarded in favour of the new value.
       def discard_a(event)
         event
       end
+
       # Called when the new value is discarded in favour of the old value.
       def discard_b(event)
         event
       end
+
       # Called when both the old and new values have changed.
       def change(event)
         event
@@ -241,7 +244,7 @@ end
 # will compute and display the necessary components to show two sequences
 # and their minimized differences side by side, just like the Unix utility
 # +sdiff+.
-# 
+#
 #     same             same
 #     before     |     after
 #     old        <     -

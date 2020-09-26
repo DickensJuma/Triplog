@@ -6,16 +6,10 @@ AllCops:
     - "Guardfile"
     - "Rakefile"
     - "node_modules/**/*"
-   Documentation:
-       Enabled: false
 
   DisplayCopNames: true
 
-require: rubocop-rails 
-
-
 Layout/LineLength:
-  Enabled: false
   Max: 120
 Metrics/MethodLength:
   Include:
@@ -45,12 +39,7 @@ Style/DefWithParentheses:
   Enabled: false
 Style/FrozenStringLiteralComment:
   EnforcedStyle: never
-Layout/IndentationStyle:
-  Enabled: false
-Layout/TrailingEmptyLines:
-  Enabled: true
-Style/RedundantPercentQ:
-  Enabled: false
+
 Layout/HashAlignment:
   EnforcedColonStyle: key
 Layout/ExtraSpacing:
@@ -68,4 +57,3 @@ Style/HashTransformKeys:
   Enabled: false
 Style/HashTransformValues:
   Enabled: false
-

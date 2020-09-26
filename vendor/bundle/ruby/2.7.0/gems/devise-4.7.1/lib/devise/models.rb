@@ -80,7 +80,7 @@ module Devise
       options = modules.extract_options!.dup
 
       selected_modules = modules.map(&:to_sym).uniq.sort_by do |s|
-        Devise::ALL.index(s) || -1  # follow Devise::ALL order
+        Devise::ALL.index(s) || -1 # follow Devise::ALL order
       end
 
       devise_modules_hook! do
@@ -97,6 +97,7 @@ module Devise
               available_configs = class_mod.available_configs
               available_configs.each do |config|
                 next unless options.key?(config)
+
                 send(:"#{config}=", options.delete(config))
               end
             end

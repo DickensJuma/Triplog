@@ -18,6 +18,7 @@ module ActiveRecord
       # creates the migration file for the model.
       def create_migration_file
         return unless options[:migration] && options[:parent].nil?
+
         attributes.each { |a| a.attr_options.delete(:index) if a.reference? && !a.has_index? } if options[:indexes] == false
         migration_template "../../migration/templates/create_table_migration.rb", File.join(db_migrate_path, "create_#{table_name}.rb")
       end
@@ -28,6 +29,7 @@ module ActiveRecord
 
       def create_module_file
         return if regular_class_path.empty?
+
         template "module.rb", File.join("app/models", "#{class_path.join('/')}.rb") if behavior == :invoke
       end
 
@@ -35,14 +37,14 @@ module ActiveRecord
 
       private
 
-        def attributes_with_index
-          attributes.select { |a| !a.reference? && a.has_index? }
-        end
+      def attributes_with_index
+        attributes.select { |a| !a.reference? && a.has_index? }
+      end
 
-        # Used by the migration template to determine the parent name of the model
-        def parent_class_name
-          options[:parent] || "ApplicationRecord"
-        end
+      # Used by the migration template to determine the parent name of the model
+      def parent_class_name
+        options[:parent] || "ApplicationRecord"
+      end
     end
   end
 end

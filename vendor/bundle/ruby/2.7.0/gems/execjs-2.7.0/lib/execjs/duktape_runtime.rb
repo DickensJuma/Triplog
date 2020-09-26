@@ -13,6 +13,7 @@ module ExecJS
 
       def exec(source, options = {})
         return unless /\S/ =~ source
+
         @ctx.eval_string("(function(){#{encode(source)}})()", '(execjs)')
       rescue Exception => e
         raise wrap_error(e)
@@ -20,6 +21,7 @@ module ExecJS
 
       def eval(source, options = {})
         return unless /\S/ =~ source
+
         @ctx.eval_string("(#{encode(source)})", '(execjs)')
       rescue Exception => e
         raise wrap_error(e)
@@ -32,26 +34,27 @@ module ExecJS
       end
 
       private
-        def wrap_error(e)
-          klass = case e
-          when Duktape::SyntaxError
-            RuntimeError
-          when Duktape::Error
-            ProgramError
-          when Duktape::InternalError
-            RuntimeError
-          end
 
-          if klass
-            re = / \(line (\d+)\)$/
-            lineno = e.message[re, 1] || 1
-            error = klass.new(e.message.sub(re, ""))
-            error.set_backtrace(["(execjs):#{lineno}"] + e.backtrace)
-            error
-          else
-            e
-          end
+      def wrap_error(e)
+        klass = case e
+                when Duktape::SyntaxError
+                  RuntimeError
+                when Duktape::Error
+                  ProgramError
+                when Duktape::InternalError
+                  RuntimeError
+                end
+
+        if klass
+          re = / \(line (\d+)\)$/
+          lineno = e.message[re, 1] || 1
+          error = klass.new(e.message.sub(re, ""))
+          error.set_backtrace(["(execjs):#{lineno}"] + e.backtrace)
+          error
+        else
+          e
         end
+      end
     end
 
     def name

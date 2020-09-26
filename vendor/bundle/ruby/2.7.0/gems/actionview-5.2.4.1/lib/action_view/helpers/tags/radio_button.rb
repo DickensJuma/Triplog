@@ -15,8 +15,8 @@ module ActionView
 
         def render
           options = @options.stringify_keys
-          options["type"]     = "radio"
-          options["value"]    = @tag_value
+          options["type"] = "radio"
+          options["value"] = @tag_value
           options["checked"] = "checked" if input_checked?(options)
           add_default_name_and_id_for_value(@tag_value, options)
           tag("input", options)
@@ -24,9 +24,9 @@ module ActionView
 
         private
 
-          def checked?(value)
-            value.to_s == @tag_value.to_s
-          end
+        def checked?(value)
+          value.to_s == @tag_value.to_s
+        end
       end
     end
   end

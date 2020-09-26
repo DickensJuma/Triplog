@@ -8,7 +8,6 @@ require 'concurrent/utility/monotonic_time'
 require 'concurrent/options'
 
 module Concurrent
-
   # `ScheduledTask` is a close relative of `Concurrent::Future` but with one
   # important difference: A `Future` is set to execute as soon as possible
   # whereas a `ScheduledTask` is set to execute after a specified delay. This
@@ -235,7 +234,7 @@ module Concurrent
     #
     # @return [Boolean] true if successfully rescheduled else false
     def reset
-      synchronize{ ns_reschedule(@delay) }
+      synchronize { ns_reschedule(@delay) }
     end
 
     # Reschedule the task using the given delay and the current time.
@@ -249,7 +248,8 @@ module Concurrent
     def reschedule(delay)
       delay = delay.to_f
       raise ArgumentError.new('seconds must be greater than zero') if delay < 0.0
-      synchronize{ ns_reschedule(delay) }
+
+      synchronize { ns_reschedule(delay) }
     end
 
     # Execute an `:unscheduled` `ScheduledTask`. Immediately sets the state to `:pending`
@@ -259,7 +259,7 @@ module Concurrent
     # @return [ScheduledTask] a reference to `self`
     def execute
       if compare_and_set_state(:pending, :unscheduled)
-        synchronize{ ns_schedule(@delay) }
+        synchronize { ns_schedule(@delay) }
       end
       self
     end
@@ -312,6 +312,7 @@ module Concurrent
     # @!visibility private
     def ns_reschedule(delay)
       return false unless ns_check_state?(:pending)
+
       @parent.send(:remove_task, self) && ns_schedule(delay)
     end
   end

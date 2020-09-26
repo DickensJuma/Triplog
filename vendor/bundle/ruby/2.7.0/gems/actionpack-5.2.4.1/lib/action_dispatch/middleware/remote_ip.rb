@@ -33,11 +33,11 @@ module ActionDispatch
     # not be the ultimate client IP in production, and so are discarded. See
     # https://en.wikipedia.org/wiki/Private_network for details.
     TRUSTED_PROXIES = [
-      "127.0.0.1",      # localhost IPv4
-      "::1",            # localhost IPv6
-      "fc00::/7",       # private IPv6 range fc00::/7
-      "10.0.0.0/8",     # private IPv4 range 10.x.x.x
-      "172.16.0.0/12",  # private IPv4 range 172.16.0.0 .. 172.31.255.255
+      "127.0.0.1", # localhost IPv4
+      "::1", # localhost IPv6
+      "fc00::/7", # private IPv6 range fc00::/7
+      "10.0.0.0/8", # private IPv4 range 10.x.x.x
+      "172.16.0.0/12", # private IPv4 range 172.16.0.0 .. 172.31.255.255
       "192.168.0.0/16", # private IPv4 range 192.168.x.x
     ].map { |proxy| IPAddr.new(proxy) }
 
@@ -63,12 +63,12 @@ module ActionDispatch
       @app = app
       @check_ip = ip_spoofing_check
       @proxies = if custom_proxies.blank?
-        TRUSTED_PROXIES
-      elsif custom_proxies.respond_to?(:any?)
-        custom_proxies
-      else
-        Array(custom_proxies) + TRUSTED_PROXIES
-      end
+                   TRUSTED_PROXIES
+                 elsif custom_proxies.respond_to?(:any?)
+                   custom_proxies
+                 else
+                   Array(custom_proxies) + TRUSTED_PROXIES
+                 end
     end
 
     # Since the IP address may not be needed, we store the object here
@@ -86,9 +86,9 @@ module ActionDispatch
     # is called, this class will calculate the value and then memoize it.
     class GetIp
       def initialize(req, check_ip, proxies)
-        @req      = req
+        @req = req
         @check_ip = check_ip
-        @proxies  = proxies
+        @proxies = proxies
       end
 
       # Sort through the various IP address headers, looking for the IP most
@@ -114,7 +114,7 @@ module ActionDispatch
         remote_addr = ips_from(@req.remote_addr).last
 
         # Could be a CSV list and/or repeated headers that were concatenated.
-        client_ips    = ips_from(@req.client_ip).reverse
+        client_ips = ips_from(@req.client_ip).reverse
         forwarded_ips = ips_from(@req.x_forwarded_for).reverse
 
         # +Client-Ip+ and +X-Forwarded-For+ should not, generally, both be set.
@@ -155,10 +155,11 @@ module ActionDispatch
         @ip ||= calculate_ip
       end
 
-    private
+      private
 
       def ips_from(header) # :doc:
         return [] unless header
+
         # Split the comma-separated list into an array of strings.
         ips = header.strip.split(/[,\s]+/)
         ips.select do |ip|

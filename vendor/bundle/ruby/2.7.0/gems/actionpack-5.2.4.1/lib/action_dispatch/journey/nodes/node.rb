@@ -40,10 +40,15 @@ module ActionDispatch
         end
 
         def symbol?; false; end
+
         def literal?; false; end
+
         def terminal?; false; end
+
         def star?; false; end
+
         def cat?; false; end
+
         def group?; false; end
       end
 
@@ -54,6 +59,7 @@ module ActionDispatch
 
       class Literal < Terminal # :nodoc:
         def literal?; true; end
+
         def type; :LITERAL; end
       end
 
@@ -65,7 +71,7 @@ module ActionDispatch
         def literal?; false; end
       end
 
-      %w{ Symbol Slash Dot }.each do |t|
+      %w{Symbol Slash Dot}.each do |t|
         class_eval <<-eoruby, __FILE__, __LINE__ + 1
           class #{t} < Terminal;
             def type; :#{t.upcase}; end
@@ -98,11 +104,13 @@ module ActionDispatch
 
       class Group < Unary # :nodoc:
         def type; :GROUP; end
+
         def group?; true; end
       end
 
       class Star < Unary # :nodoc:
         def star?; true; end
+
         def type; :STAR; end
 
         def name
@@ -123,6 +131,7 @@ module ActionDispatch
 
       class Cat < Binary # :nodoc:
         def cat?; true; end
+
         def type; :CAT; end
       end
 

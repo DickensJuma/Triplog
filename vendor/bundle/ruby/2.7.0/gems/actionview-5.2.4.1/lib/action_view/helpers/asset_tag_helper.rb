@@ -189,10 +189,10 @@ module ActionView
 
         tag(
           "link",
-          "rel"   => tag_options[:rel] || "alternate",
-          "type"  => tag_options[:type] || Template::Types[type].to_s,
+          "rel" => tag_options[:rel] || "alternate",
+          "type" => tag_options[:type] || Template::Types[type].to_s,
           "title" => tag_options[:title] || type.to_s.upcase,
-          "href"  => url_options.is_a?(Hash) ? url_for(url_options.merge(only_path: false)) : url_options
+          "href" => url_options.is_a?(Hash) ? url_for(url_options.merge(only_path: false)) : url_options
         )
       end
 
@@ -453,59 +453,60 @@ module ActionView
       end
 
       private
-        def multiple_sources_tag_builder(type, sources)
-          options       = sources.extract_options!.symbolize_keys
-          skip_pipeline = options.delete(:skip_pipeline)
-          sources.flatten!
 
-          yield options if block_given?
+      def multiple_sources_tag_builder(type, sources)
+        options = sources.extract_options!.symbolize_keys
+        skip_pipeline = options.delete(:skip_pipeline)
+        sources.flatten!
 
-          if sources.size > 1
-            content_tag(type, options) do
-              safe_join sources.map { |source| tag("source", src: send("path_to_#{type}", source, skip_pipeline: skip_pipeline)) }
-            end
-          else
-            options[:src] = send("path_to_#{type}", sources.first, skip_pipeline: skip_pipeline)
-            content_tag(type, nil, options)
+        yield options if block_given?
+
+        if sources.size > 1
+          content_tag(type, options) do
+            safe_join sources.map { |source| tag("source", src: send("path_to_#{type}", source, skip_pipeline: skip_pipeline)) }
           end
+        else
+          options[:src] = send("path_to_#{type}", sources.first, skip_pipeline: skip_pipeline)
+          content_tag(type, nil, options)
         end
+      end
 
-        def resolve_image_source(source, skip_pipeline)
-          if source.is_a?(Symbol) || source.is_a?(String)
-            path_to_image(source, skip_pipeline: skip_pipeline)
-          else
-            polymorphic_url(source)
-          end
-        rescue NoMethodError => e
-          raise ArgumentError, "Can't resolve image into URL: #{e}"
+      def resolve_image_source(source, skip_pipeline)
+        if source.is_a?(Symbol) || source.is_a?(String)
+          path_to_image(source, skip_pipeline: skip_pipeline)
+        else
+          polymorphic_url(source)
         end
+      rescue NoMethodError => e
+        raise ArgumentError, "Can't resolve image into URL: #{e}"
+      end
 
-        def extract_dimensions(size)
-          size = size.to_s
-          if /\A\d+x\d+\z/.match?(size)
-            size.split("x")
-          elsif /\A\d+\z/.match?(size)
-            [size, size]
-          end
+      def extract_dimensions(size)
+        size = size.to_s
+        if /\A\d+x\d+\z/.match?(size)
+          size.split("x")
+        elsif /\A\d+\z/.match?(size)
+          [size, size]
         end
+      end
 
-        def check_for_image_tag_errors(options)
-          if options[:size] && (options[:height] || options[:width])
-            raise ArgumentError, "Cannot pass a :size option with a :height or :width option"
-          end
+      def check_for_image_tag_errors(options)
+        if options[:size] && (options[:height] || options[:width])
+          raise ArgumentError, "Cannot pass a :size option with a :height or :width option"
         end
+      end
 
-        def resolve_link_as(extname, mime_type)
-          if extname == "js"
-            "script"
-          elsif extname == "css"
-            "style"
-          elsif extname == "vtt"
-            "track"
-          elsif (type = mime_type.to_s.split("/")[0]) && type.in?(%w(audio video font))
-            type
-          end
+      def resolve_link_as(extname, mime_type)
+        if extname == "js"
+          "script"
+        elsif extname == "css"
+          "style"
+        elsif extname == "vtt"
+          "track"
+        elsif (type = mime_type.to_s.split("/")[0]) && type.in?(%w(audio video font))
+          type
         end
+      end
     end
   end
 end

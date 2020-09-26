@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Nodes
     class UpdateStatement < Arel::Nodes::Node
@@ -7,11 +8,11 @@ module Arel
 
       def initialize
         @relation = nil
-        @wheres   = []
-        @values   = []
-        @orders   = []
-        @limit    = nil
-        @key      = nil
+        @wheres = []
+        @values = []
+        @orders = []
+        @limit = nil
+        @key = nil
       end
 
       def initialize_copy other

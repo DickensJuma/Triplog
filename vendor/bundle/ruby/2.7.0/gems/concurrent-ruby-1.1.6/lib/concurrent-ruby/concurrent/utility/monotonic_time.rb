@@ -1,7 +1,6 @@
 require 'concurrent/synchronization'
 
 module Concurrent
-
   class_definition = Class.new(Synchronization::LockableObject) do
     def initialize
       @last_time = Time.now.to_f

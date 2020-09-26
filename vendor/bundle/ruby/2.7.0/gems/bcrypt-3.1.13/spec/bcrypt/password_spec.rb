@@ -1,7 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), "..", "spec_helper"))
 
 describe "Creating a hashed password" do
-
   before :each do
     @secret = "wheedle"
     @password = BCrypt::Password.create(@secret, :cost => 4)
@@ -17,14 +16,14 @@ describe "Creating a hashed password" do
 
   specify "should behave normally if the secret is not a string" do
     expect { BCrypt::Password.create(nil) }.not_to raise_error
-    expect { BCrypt::Password.create({:woo => "yeah"}) }.not_to raise_error
+    expect { BCrypt::Password.create({ :woo => "yeah" }) }.not_to raise_error
     expect { BCrypt::Password.create(false) }.not_to raise_error
   end
 
   specify "should tolerate empty string secrets" do
-    expect { BCrypt::Password.create( "\n".chop  ) }.not_to raise_error
-    expect { BCrypt::Password.create( ""         ) }.not_to raise_error
-    expect { BCrypt::Password.create( String.new ) }.not_to raise_error
+    expect { BCrypt::Password.create("\n".chop) }.not_to raise_error
+    expect { BCrypt::Password.create("") }.not_to raise_error
+    expect { BCrypt::Password.create(String.new) }.not_to raise_error
   end
 end
 

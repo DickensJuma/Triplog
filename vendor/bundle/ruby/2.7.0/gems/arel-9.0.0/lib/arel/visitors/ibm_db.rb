@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Visitors
     class IBM_DB < Arel::Visitors::ToSql
@@ -9,7 +10,6 @@ module Arel
         collector = visit o.expr, collector
         collector << " ROWS ONLY"
       end
-
     end
   end
 end

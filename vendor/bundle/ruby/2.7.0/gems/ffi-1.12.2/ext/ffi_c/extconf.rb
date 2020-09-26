@@ -7,12 +7,12 @@ if !defined?(RUBY_ENGINE) || RUBY_ENGINE == 'ruby' || RUBY_ENGINE == 'rbx'
   def system_libffi_usable?
     # We need pkg_config or ffi.h
     libffi_ok = pkg_config("libffi") ||
-        have_header("ffi.h") ||
-        find_header("ffi.h", "/usr/local/include", "/usr/include/ffi")
+                have_header("ffi.h") ||
+                find_header("ffi.h", "/usr/local/include", "/usr/include/ffi")
 
     # Ensure we can link to ffi_call
-    libffi_ok &&= have_library("ffi", "ffi_call", [ "ffi.h" ]) ||
-                  have_library("libffi", "ffi_call", [ "ffi.h" ])
+    libffi_ok &&= have_library("ffi", "ffi_call", ["ffi.h"]) ||
+                  have_library("libffi", "ffi_call", ["ffi.h"])
 
     # And we need a libffi version recent enough to provide ffi_closure_alloc
     libffi_ok &&= have_func("ffi_closure_alloc")

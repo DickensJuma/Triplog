@@ -17,8 +17,8 @@ module ActiveRecord::Associations::Builder # :nodoc:
     def self.define_callbacks(model, reflection)
       super
       add_counter_cache_callbacks(model, reflection) if reflection.options[:counter_cache]
-      add_touch_callbacks(model, reflection)         if reflection.options[:touch]
-      add_default_callbacks(model, reflection)       if reflection.options[:default]
+      add_touch_callbacks(model, reflection) if reflection.options[:touch]
+      add_default_callbacks(model, reflection) if reflection.options[:default]
     end
 
     def self.define_accessors(mixin, reflection)
@@ -31,22 +31,22 @@ module ActiveRecord::Associations::Builder # :nodoc:
 
       mixin.class_eval do
         def belongs_to_counter_cache_after_update(reflection)
-          foreign_key  = reflection.foreign_key
+          foreign_key = reflection.foreign_key
           cache_column = reflection.counter_cache_column
 
           if (@_after_replace_counter_called ||= false)
             @_after_replace_counter_called = false
           elsif association(reflection.name).target_changed?
             if reflection.polymorphic?
-              model     = attribute_in_database(reflection.foreign_type).try(:constantize)
+              model = attribute_in_database(reflection.foreign_type).try(:constantize)
               model_was = attribute_before_last_save(reflection.foreign_type).try(:constantize)
             else
-              model     = reflection.klass
+              model = reflection.klass
               model_was = reflection.klass
             end
 
             foreign_key_was = attribute_before_last_save foreign_key
-            foreign_key     = attribute_in_database foreign_key
+            foreign_key = attribute_in_database foreign_key
 
             if foreign_key && model.respond_to?(:increment_counter)
               foreign_key = counter_cache_target(reflection, model, foreign_key)
@@ -61,10 +61,11 @@ module ActiveRecord::Associations::Builder # :nodoc:
         end
 
         private
-          def counter_cache_target(reflection, model, foreign_key)
-            primary_key = reflection.association_primary_key(model)
-            model.unscoped.where!(primary_key => foreign_key)
-          end
+
+        def counter_cache_target(reflection, model, foreign_key)
+          primary_key = reflection.association_primary_key(model)
+          model.unscoped.where!(primary_key => foreign_key)
+        end
       end
     end
 
@@ -116,12 +117,14 @@ module ActiveRecord::Associations::Builder # :nodoc:
 
     def self.add_touch_callbacks(model, reflection)
       foreign_key = reflection.foreign_key
-      n           = reflection.name
-      touch       = reflection.options[:touch]
+      n = reflection.name
+      touch = reflection.options[:touch]
 
-      callback = lambda { |changes_method| lambda { |record|
-        BelongsTo.touch_record(record, record.send(changes_method), foreign_key, n, touch, belongs_to_touch_method)
-      }}
+      callback = lambda { |changes_method|
+        lambda { |record|
+          BelongsTo.touch_record(record, record.send(changes_method), foreign_key, n, touch, belongs_to_touch_method)
+        }
+      }
 
       unless reflection.counter_cache_column
         model.after_create callback.(:saved_changes), if: :saved_changes?

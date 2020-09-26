@@ -6,7 +6,6 @@ require 'concurrent/utility/engine'
 module Concurrent
   # @!visibility private
   module Collection
-
     # @!visibility private
     MapImplementation = case
                         when Concurrent.on_jruby?
@@ -32,7 +31,6 @@ module Concurrent
   # does. For most uses it should do fine though, and we recommend you consider
   # `Concurrent::Map` instead of `Concurrent::Hash` for your concurrency-safe hash needs.
   class Map < Collection::MapImplementation
-
     # @!macro map.atomic_method
     #   This method is atomic.
 
@@ -113,7 +111,6 @@ module Concurrent
     #   @param [Object] value
     #   @return [true, false] true if deleted
     #   @!macro map.atomic_method
-
 
     def initialize(options = nil, &block)
       if options.kind_of?(::Hash)
@@ -200,7 +197,7 @@ module Concurrent
     # @return [Object, nil] the previous value when key was present or nil when there was no key
     def put_if_absent(key, value)
       computed = false
-      result   = compute_if_absent(key) do
+      result = compute_if_absent(key) do
         computed = true
         value
       end
@@ -259,6 +256,7 @@ module Concurrent
     # @!macro map.atomic_method_with_block
     def each_pair
       return enum_for :each_pair unless block_given?
+
       super
     end
 
@@ -291,6 +289,7 @@ module Concurrent
     # @!visibility private
     def marshal_dump
       raise TypeError, "can't dump hash with default proc" if @default_proc
+
       h = {}
       each_pair { |k, v| h[k] = v }
       h

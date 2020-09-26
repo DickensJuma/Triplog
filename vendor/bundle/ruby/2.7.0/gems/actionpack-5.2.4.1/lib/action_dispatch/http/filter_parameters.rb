@@ -29,13 +29,13 @@ module ActionDispatch
     module FilterParameters
       ENV_MATCH = [/RAW_POST_DATA/, "rack.request.form_vars"] # :nodoc:
       NULL_PARAM_FILTER = ParameterFilter.new # :nodoc:
-      NULL_ENV_FILTER   = ParameterFilter.new ENV_MATCH # :nodoc:
+      NULL_ENV_FILTER = ParameterFilter.new ENV_MATCH # :nodoc:
 
       def initialize
         super
         @filtered_parameters = nil
-        @filtered_env        = nil
-        @filtered_path       = nil
+        @filtered_env = nil
+        @filtered_path = nil
       end
 
       # Returns a hash of parameters with all sensitive data replaced.
@@ -53,7 +53,7 @@ module ActionDispatch
         @filtered_path ||= query_string.empty? ? path : "#{path}?#{filtered_query_string}"
       end
 
-    private
+      private
 
       def parameter_filter # :doc:
         parameter_filter_for fetch_header("action_dispatch.parameter_filter") {
@@ -72,7 +72,7 @@ module ActionDispatch
         ParameterFilter.new(filters)
       end
 
-      KV_RE   = "[^&;=]+"
+      KV_RE = "[^&;=]+"
       PAIR_RE = %r{(#{KV_RE})=(#{KV_RE})}
       def filtered_query_string # :doc:
         query_string.gsub(PAIR_RE) do |_|

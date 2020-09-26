@@ -108,66 +108,67 @@ module ActionView
       private :name, :template
 
       private
-        def source
-          template.source
+
+      def source
+        template.source
+      end
+
+      def directory
+        name.split("/")[0..-2].join("/")
+      end
+
+      def render_dependencies
+        render_dependencies = []
+        render_calls = source.split(/\brender\b/).drop(1)
+
+        render_calls.each do |arguments|
+          add_dependencies(render_dependencies, arguments, LAYOUT_DEPENDENCY)
+          add_dependencies(render_dependencies, arguments, RENDER_ARGUMENTS)
         end
 
-        def directory
-          name.split("/")[0..-2].join("/")
+        render_dependencies.uniq
+      end
+
+      def add_dependencies(render_dependencies, arguments, pattern)
+        arguments.scan(pattern) do
+          add_dynamic_dependency(render_dependencies, Regexp.last_match[:dynamic])
+          add_static_dependency(render_dependencies, Regexp.last_match[:static])
         end
+      end
 
-        def render_dependencies
-          render_dependencies = []
-          render_calls = source.split(/\brender\b/).drop(1)
+      def add_dynamic_dependency(dependencies, dependency)
+        if dependency
+          dependencies << "#{dependency.pluralize}/#{dependency.singularize}"
+        end
+      end
 
-          render_calls.each do |arguments|
-            add_dependencies(render_dependencies, arguments, LAYOUT_DEPENDENCY)
-            add_dependencies(render_dependencies, arguments, RENDER_ARGUMENTS)
+      def add_static_dependency(dependencies, dependency)
+        if dependency
+          if dependency.include?("/")
+            dependencies << dependency
+          else
+            dependencies << "#{directory}/#{dependency}"
           end
-
-          render_dependencies.uniq
         end
+      end
 
-        def add_dependencies(render_dependencies, arguments, pattern)
-          arguments.scan(pattern) do
-            add_dynamic_dependency(render_dependencies, Regexp.last_match[:dynamic])
-            add_static_dependency(render_dependencies, Regexp.last_match[:static])
+      def resolve_directories(wildcard_dependencies)
+        return [] unless @view_paths
+
+        wildcard_dependencies.flat_map { |query, templates|
+          @view_paths.find_all_with_query(query).map do |template|
+            "#{File.dirname(query)}/#{File.basename(template).split('.').first}"
           end
-        end
+        }.sort
+      end
 
-        def add_dynamic_dependency(dependencies, dependency)
-          if dependency
-            dependencies << "#{dependency.pluralize}/#{dependency.singularize}"
-          end
-        end
+      def explicit_dependencies
+        dependencies = source.scan(EXPLICIT_DEPENDENCY).flatten.uniq
 
-        def add_static_dependency(dependencies, dependency)
-          if dependency
-            if dependency.include?("/")
-              dependencies << dependency
-            else
-              dependencies << "#{directory}/#{dependency}"
-            end
-          end
-        end
+        wildcards, explicits = dependencies.partition { |dependency| dependency[-1] == "*" }
 
-        def resolve_directories(wildcard_dependencies)
-          return [] unless @view_paths
-
-          wildcard_dependencies.flat_map { |query, templates|
-            @view_paths.find_all_with_query(query).map do |template|
-              "#{File.dirname(query)}/#{File.basename(template).split('.').first}"
-            end
-          }.sort
-        end
-
-        def explicit_dependencies
-          dependencies = source.scan(EXPLICIT_DEPENDENCY).flatten.uniq
-
-          wildcards, explicits = dependencies.partition { |dependency| dependency[-1] == "*" }
-
-          (explicits + resolve_directories(wildcards)).uniq
-        end
+        (explicits + resolve_directories(wildcards)).uniq
+      end
     end
 
     register_tracker :erb, ERBTracker

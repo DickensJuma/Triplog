@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Nodes
     class Binary < Arel::Nodes::Node
@@ -6,13 +7,13 @@ module Arel
 
       def initialize left, right
         super()
-        @left  = left
+        @left = left
         @right = right
       end
 
       def initialize_copy other
         super
-        @left  = @left.clone if @left
+        @left = @left.clone if @left
         @right = @right.clone if @right
       end
 

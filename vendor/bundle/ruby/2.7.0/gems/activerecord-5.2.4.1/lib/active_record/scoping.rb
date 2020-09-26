@@ -79,11 +79,13 @@ module ActiveRecord
       def value_for(scope_type, model, skip_inherited_scope = false)
         raise_invalid_scope_type!(scope_type)
         return @registry[scope_type][model.name] if skip_inherited_scope
+
         klass = model
         base = model.base_class
         while klass <= base
           value = @registry[scope_type][klass.name]
           return value if value
+
           klass = klass.superclass
         end
       end
@@ -96,11 +98,11 @@ module ActiveRecord
 
       private
 
-        def raise_invalid_scope_type!(scope_type)
-          if !VALID_SCOPE_TYPES.include?(scope_type)
-            raise ArgumentError, "Invalid scope type '#{scope_type}' sent to the registry. Scope types must be included in VALID_SCOPE_TYPES"
-          end
+      def raise_invalid_scope_type!(scope_type)
+        if !VALID_SCOPE_TYPES.include?(scope_type)
+          raise ArgumentError, "Invalid scope type '#{scope_type}' sent to the registry. Scope types must be included in VALID_SCOPE_TYPES"
         end
+      end
     end
   end
 end

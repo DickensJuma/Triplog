@@ -67,7 +67,7 @@ module ActionDispatch # :nodoc:
     # Get headers for this response.
     attr_reader :header
 
-    alias_method :headers,  :header
+    alias_method :headers, :header
 
     delegate :[], :[]=, to: :@header
 
@@ -79,8 +79,8 @@ module ActionDispatch # :nodoc:
     end
 
     CONTENT_TYPE = "Content-Type".freeze
-    SET_COOKIE   = "Set-Cookie".freeze
-    LOCATION     = "Location".freeze
+    SET_COOKIE = "Set-Cookie".freeze
+    LOCATION = "Location".freeze
     NO_CONTENT_CODES = [100, 101, 102, 204, 205, 304]
 
     cattr_accessor :default_charset, default: "utf-8"
@@ -98,8 +98,8 @@ module ActionDispatch # :nodoc:
     class Buffer # :nodoc:
       def initialize(response, buf)
         @response = response
-        @buf      = buf
-        @closed   = false
+        @buf = buf
+        @closed = false
         @str_body = nil
       end
 
@@ -143,9 +143,9 @@ module ActionDispatch # :nodoc:
 
       private
 
-        def each_chunk(&block)
-          @buf.each(&block)
-        end
+      def each_chunk(&block)
+        @buf.each(&block)
+      end
     end
 
     def self.create(status = 200, header = {}, body = [], default_headers: self.default_headers)
@@ -167,19 +167,22 @@ module ActionDispatch # :nodoc:
 
       self.body, self.status = body, status
 
-      @cv           = new_cond
-      @committed    = false
-      @sending      = false
-      @sent         = false
+      @cv = new_cond
+      @committed = false
+      @sending = false
+      @sent = false
 
       prepare_cache_control!
 
       yield self if block_given?
     end
 
-    def has_header?(key);   headers.key? key;   end
-    def get_header(key);    headers[key];       end
-    def set_header(key, v); headers[key] = v;   end
+    def has_header?(key); headers.key? key; end
+
+    def get_header(key); headers[key]; end
+
+    def set_header(key, v); headers[key] = v; end
+
     def delete_header(key); headers.delete key; end
 
     def await_commit
@@ -215,9 +218,11 @@ module ActionDispatch # :nodoc:
       end
     end
 
-    def sending?;   synchronize { @sending };   end
+    def sending?; synchronize { @sending }; end
+
     def committed?; synchronize { @committed }; end
-    def sent?;      synchronize { @sent };      end
+
+    def sent?; synchronize { @sent }; end
 
     # Sets the HTTP status code.
     def status=(status)
@@ -227,6 +232,7 @@ module ActionDispatch # :nodoc:
     # Sets the HTTP content type.
     def content_type=(content_type)
       return unless content_type
+
       new_header_info = parse_content_type(content_type.to_s)
       prev_header_info = parsed_content_type_header
       charset = new_header_info.charset || prev_header_info.charset
@@ -403,7 +409,7 @@ module ActionDispatch # :nodoc:
       cookies
     end
 
-  private
+    private
 
     ContentTypeHeader = Struct.new :mime_type, :charset
     NullContentTypeHeader = ContentTypeHeader.new nil, nil
@@ -432,6 +438,7 @@ module ActionDispatch # :nodoc:
 
     def before_committed
       return if committed?
+
       assign_default_content_type_and_charset!
       merge_and_normalize_cache_control!(@cache_control)
       handle_conditional_get!

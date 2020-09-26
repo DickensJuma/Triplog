@@ -47,8 +47,8 @@ module ActiveModel
       attr_name = attr_name.to_s
       forced_changes.include?(attr_name) ||
         attributes[attr_name].changed? &&
-        (OPTION_NOT_GIVEN == from || attributes[attr_name].original_value == from) &&
-        (OPTION_NOT_GIVEN == to || attributes[attr_name].value == to)
+          (OPTION_NOT_GIVEN == from || attributes[attr_name].original_value == from) &&
+          (OPTION_NOT_GIVEN == to || attributes[attr_name].value == to)
     end
 
     def changed_in_place?(attr_name)
@@ -73,13 +73,13 @@ module ActiveModel
     # Workaround for Ruby 2.2 "private attribute?" warning.
     protected
 
-      attr_reader :attributes, :forced_changes
+    attr_reader :attributes, :forced_changes
 
     private
 
-      def attr_names
-        attributes.keys
-      end
+    def attr_names
+      attributes.keys
+    end
   end
 
   class NullMutationTracker # :nodoc:

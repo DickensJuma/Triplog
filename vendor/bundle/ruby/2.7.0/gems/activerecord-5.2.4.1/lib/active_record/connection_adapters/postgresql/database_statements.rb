@@ -28,7 +28,7 @@ module ActiveRecord
 
           typehash = ftypes.group_by { |_, type| type }
           binaries = typehash[BYTEA_COLUMN_TYPE_OID] || []
-          monies   = typehash[MONEY_COLUMN_TYPE_OID] || []
+          monies = typehash[MONEY_COLUMN_TYPE_OID] || []
 
           rows.each do |row|
             # unescape string passed BYTEA field (OID == 17)
@@ -47,9 +47,9 @@ module ActiveRecord
               #  (1) $12,345,678.12
               #  (2) $12.345.678,12
               case data
-              when /^-?\D+[\d,]+\.\d{2}$/  # (1)
+              when /^-?\D+[\d,]+\.\d{2}$/ # (1)
                 data.gsub!(/[^-\d.]/, "")
-              when /^-?\D+[\d.]+,\d{2}$/  # (2)
+              when /^-?\D+[\d.]+,\d{2}$/ # (2)
                 data.gsub!(/[^-\d,]/, "").sub!(/,/, ".")
               end
             end
@@ -83,7 +83,7 @@ module ActiveRecord
             fields = result.fields
             fields.each_with_index do |fname, i|
               ftype = result.ftype i
-              fmod  = result.fmod i
+              fmod = result.fmod i
               types[fname] = get_oid_type(ftype, fmod, fname)
             end
             ActiveRecord::Result.new(fields, result.values, types)
@@ -149,14 +149,15 @@ module ActiveRecord
         end
 
         private
-          # Returns the current ID of a table's sequence.
-          def last_insert_id_result(sequence_name)
-            exec_query("SELECT currval(#{quote(sequence_name)})", "SQL")
-          end
 
-          def suppress_composite_primary_key(pk)
-            pk unless pk.is_a?(Array)
-          end
+        # Returns the current ID of a table's sequence.
+        def last_insert_id_result(sequence_name)
+          exec_query("SELECT currval(#{quote(sequence_name)})", "SQL")
+        end
+
+        def suppress_composite_primary_key(pk)
+          pk unless pk.is_a?(Array)
+        end
       end
     end
   end

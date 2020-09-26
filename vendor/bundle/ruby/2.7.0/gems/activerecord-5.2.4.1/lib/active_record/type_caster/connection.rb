@@ -10,6 +10,7 @@ module ActiveRecord
 
       def type_cast_for_database(attribute_name, value)
         return value if value.is_a?(Arel::Nodes::BindParam)
+
         column = column_for(attribute_name)
         connection.type_cast_from_column(column, value)
       end
@@ -18,16 +19,16 @@ module ActiveRecord
       # Workaround for Ruby 2.2 "private attribute?" warning.
       protected
 
-        attr_reader :table_name
-        delegate :connection, to: :@klass
+      attr_reader :table_name
+      delegate :connection, to: :@klass
 
       private
 
-        def column_for(attribute_name)
-          if connection.schema_cache.data_source_exists?(table_name)
-            connection.schema_cache.columns_hash(table_name)[attribute_name.to_s]
-          end
+      def column_for(attribute_name)
+        if connection.schema_cache.data_source_exists?(table_name)
+          connection.schema_cache.columns_hash(table_name)[attribute_name.to_s]
         end
+      end
     end
   end
 end

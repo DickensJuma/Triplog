@@ -61,32 +61,33 @@ module ActiveRecord
       end
 
       private
-        def timestamp_attributes_for_create_in_model
-          timestamp_attributes_for_create.select { |c| column_names.include?(c) }
-        end
 
-        def timestamp_attributes_for_update_in_model
-          timestamp_attributes_for_update.select { |c| column_names.include?(c) }
-        end
+      def timestamp_attributes_for_create_in_model
+        timestamp_attributes_for_create.select { |c| column_names.include?(c) }
+      end
 
-        def all_timestamp_attributes_in_model
-          timestamp_attributes_for_create_in_model + timestamp_attributes_for_update_in_model
-        end
+      def timestamp_attributes_for_update_in_model
+        timestamp_attributes_for_update.select { |c| column_names.include?(c) }
+      end
 
-        def timestamp_attributes_for_create
-          ["created_at", "created_on"]
-        end
+      def all_timestamp_attributes_in_model
+        timestamp_attributes_for_create_in_model + timestamp_attributes_for_update_in_model
+      end
 
-        def timestamp_attributes_for_update
-          ["updated_at", "updated_on"]
-        end
+      def timestamp_attributes_for_create
+        ["created_at", "created_on"]
+      end
 
-        def current_time_from_proper_timezone
-          default_timezone == :utc ? Time.now.utc : Time.now
-        end
+      def timestamp_attributes_for_update
+        ["updated_at", "updated_on"]
+      end
+
+      def current_time_from_proper_timezone
+        default_timezone == :utc ? Time.now.utc : Time.now
+      end
     end
 
-  private
+    private
 
     def _create_record
       if record_timestamps
@@ -108,6 +109,7 @@ module ActiveRecord
 
         timestamp_attributes_for_update_in_model.each do |column|
           next if will_save_change_to_attribute?(column)
+
           _write_attribute(column, current_time)
         end
       end

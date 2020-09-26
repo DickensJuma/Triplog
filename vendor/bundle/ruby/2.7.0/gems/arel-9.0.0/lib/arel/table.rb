@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   class Table
     include Arel::Crud
@@ -13,7 +14,7 @@ module Arel
     alias :table_name :name
 
     def initialize(name, as: nil, type_caster: nil)
-      @name    = name.to_s
+      @name = name.to_s
       @type_caster = type_caster
 
       # Sometime AR sends an :as parameter to table, to let the table know
@@ -39,6 +40,7 @@ module Arel
       case relation
       when String, Nodes::SqlLiteral
         raise EmptyJoinError if relation.empty?
+
         klass = Nodes::StringJoin
       end
 

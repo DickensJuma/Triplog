@@ -83,10 +83,15 @@ module ActiveRecord
 
     class NullTransaction #:nodoc:
       def initialize; end
+
       def state; end
+
       def closed?; true; end
+
       def open?; false; end
+
       def joinable?; false; end
+
       def add_record(record); end
     end
 
@@ -136,8 +141,11 @@ module ActiveRecord
       end
 
       def full_rollback?; true; end
+
       def joinable?; @joinable; end
+
       def closed?; false; end
+
       def open?; !closed?; end
     end
 
@@ -150,6 +158,7 @@ module ActiveRecord
         if options[:isolation]
           raise ActiveRecord::TransactionIsolationError, "cannot set transaction isolation in a nested transaction"
         end
+
         connection.create_savepoint(@savepoint_name = savepoint_name)
       end
 
@@ -270,14 +279,15 @@ module ActiveRecord
 
       private
 
-        NULL_TRANSACTION = NullTransaction.new
+      NULL_TRANSACTION = NullTransaction.new
 
-        # Deallocate invalidated prepared statements outside of the transaction
-        def after_failure_actions(transaction, error)
-          return unless transaction.is_a?(RealTransaction)
-          return unless error.is_a?(ActiveRecord::PreparedStatementCacheExpired)
-          @connection.clear_cache!
-        end
+      # Deallocate invalidated prepared statements outside of the transaction
+      def after_failure_actions(transaction, error)
+        return unless transaction.is_a?(RealTransaction)
+        return unless error.is_a?(ActiveRecord::PreparedStatementCacheExpired)
+
+        @connection.clear_cache!
+      end
     end
   end
 end

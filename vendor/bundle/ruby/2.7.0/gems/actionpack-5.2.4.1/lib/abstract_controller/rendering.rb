@@ -63,7 +63,7 @@ module AbstractController
     # You can overwrite this configuration per controller.
     def view_assigns
       protected_vars = _protected_ivars
-      variables      = instance_variables
+      variables = instance_variables
 
       variables.reject! { |s| protected_vars.include? s }
       variables.each_with_object({}) { |name, hash|
@@ -71,7 +71,8 @@ module AbstractController
       }
     end
 
-  private
+    private
+
     # Normalize args by converting <tt>render "foo"</tt> to
     # <tt>render :action => "foo"</tt> and <tt>render "foo/bar"</tt> to
     # <tt>render :file => "foo/bar"</tt>.

@@ -30,7 +30,6 @@
 #
 
 module FFI
-
   # Build a {StructLayout struct layout}.
   class StructLayoutBuilder
     attr_reader :size
@@ -95,7 +94,6 @@ module FFI
       end
     end
 
-
     # List of number types
     NUMBER_TYPES = [
       Type::INT8,
@@ -121,9 +119,8 @@ module FFI
     # Add a field to the builder.
     # @note Setting +offset+ to +nil+ or +-1+ is equivalent to +0+.
     def add(name, type, offset = nil)
-
       if offset.nil? || offset == -1
-        offset = @union ? 0 : align(@size, @packed ? [ @packed, type.alignment ].min : [ @min_alignment, type.alignment ].max)
+        offset = @union ? 0 : align(@size, @packed ? [@packed, type.alignment].min : [@min_alignment, type.alignment].max)
       end
 
       #
@@ -131,8 +128,8 @@ module FFI
       #
       field = type.is_a?(StructLayout::Field) ? type : field_for_type(name, offset, type)
       @fields << field
-      @alignment = [ @alignment, field.alignment ].max unless @packed
-      @size = [ @size, field.size + (@union ? 0 : field.offset) ].max
+      @alignment = [@alignment, field.alignment].max unless @packed
+      @size = [@size, field.size + (@union ? 0 : field.offset)].max
 
       return self
     end
@@ -186,42 +183,41 @@ module FFI
     # @return [StructLayout::Field]
     def field_for_type(name, offset, type)
       field_class = case
-      when type.is_a?(Type::Function)
-        StructLayout::Function
+                    when type.is_a?(Type::Function)
+                      StructLayout::Function
 
-      when type.is_a?(Type::Struct)
-        StructLayout::InnerStruct
+                    when type.is_a?(Type::Struct)
+                      StructLayout::InnerStruct
 
-      when type.is_a?(Type::Array)
-        StructLayout::Array
+                    when type.is_a?(Type::Array)
+                      StructLayout::Array
 
-      when type.is_a?(FFI::Enum)
-        StructLayout::Enum
+                    when type.is_a?(FFI::Enum)
+                      StructLayout::Enum
 
-      when NUMBER_TYPES.include?(type)
-        StructLayout::Number
+                    when NUMBER_TYPES.include?(type)
+                      StructLayout::Number
 
-      when type == Type::POINTER
-        StructLayout::Pointer
+                    when type == Type::POINTER
+                      StructLayout::Pointer
 
-      when type == Type::STRING
-        StructLayout::String
+                    when type == Type::STRING
+                      StructLayout::String
 
-      when type.is_a?(Class) && type < StructLayout::Field
-        type
+                    when type.is_a?(Class) && type < StructLayout::Field
+                      type
 
-      when type.is_a?(DataConverter)
-        return StructLayout::Mapped.new(name, offset, Type::Mapped.new(type), field_for_type(name, offset, type.native_type))
+                    when type.is_a?(DataConverter)
+                      return StructLayout::Mapped.new(name, offset, Type::Mapped.new(type), field_for_type(name, offset, type.native_type))
 
-      when type.is_a?(Type::Mapped)
-        return StructLayout::Mapped.new(name, offset, type, field_for_type(name, offset, type.native_type))
+                    when type.is_a?(Type::Mapped)
+                      return StructLayout::Mapped.new(name, offset, type, field_for_type(name, offset, type.native_type))
 
-      else
-        raise TypeError, "invalid struct field type #{type.inspect}"
-      end
+                    else
+                      raise TypeError, "invalid struct field type #{type.inspect}"
+                    end
 
       field_class.new(name, offset, type)
     end
   end
-
 end

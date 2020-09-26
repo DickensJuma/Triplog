@@ -2,9 +2,9 @@ module BCrypt
   # A Ruby wrapper for the bcrypt() C extension calls and the Java calls.
   class Engine
     # The default computational expense parameter.
-    DEFAULT_COST    = 12
+    DEFAULT_COST = 12
     # The minimum cost supported by the algorithm.
-    MIN_COST        = 4
+    MIN_COST = 4
     # Maximum possible size of bcrypt() salts.
     MAX_SALT_LENGTH = 16
 
@@ -101,7 +101,7 @@ module BCrypt
     def self.calibrate(upper_time_limit_in_ms)
       40.times do |i|
         start_time = Time.now
-        Password.create("testing testing", :cost => i+1)
+        Password.create("testing testing", :cost => i + 1)
         end_time = Time.now - start_time
         return i if end_time * 1_000 > upper_time_limit_in_ms
       end
@@ -112,5 +112,4 @@ module BCrypt
       salt[4..5].to_i
     end
   end
-
 end

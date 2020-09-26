@@ -1,7 +1,7 @@
 # frozen_string_literal: true
+
 module Arel
   module Nodes
-
     class UnaryOperation < Unary
       include Arel::Expressions
       include Arel::Predications

@@ -2,7 +2,6 @@ require 'set'
 require 'concurrent/synchronization'
 
 module Concurrent
-
   # A `TVar` is a transactional variable - a single-element container that
   # is used as part of a transaction - see `Concurrent::atomically`.
   #
@@ -57,7 +56,6 @@ module Concurrent
     def unsafe_lock # :nodoc:
       @lock
     end
-
   end
 
   # Run a block that reads and writes `TVar`s as a single atomic transaction.
@@ -106,7 +104,6 @@ module Concurrent
         # Retry loop
 
         loop do
-
           # Create a new transaction
 
           transaction = Transaction.new
@@ -161,7 +158,6 @@ module Concurrent
   private
 
   class Transaction
-
     ABORTED = ::Object.new
 
     ReadLogEntry = Struct.new(:tvar, :version)
@@ -170,7 +166,7 @@ module Concurrent
     LeaveError = Class.new(StandardError)
 
     def initialize
-      @read_log  = []
+      @read_log = []
       @write_log = {}
     end
 
@@ -252,7 +248,5 @@ module Concurrent
     def self.current=(transaction)
       Thread.current[:current_tvar_transaction] = transaction
     end
-
   end
-
 end

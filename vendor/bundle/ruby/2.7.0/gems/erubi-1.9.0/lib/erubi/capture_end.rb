@@ -18,7 +18,7 @@ module Erubi
     #                          and therefore a different object will be returned.
     def initialize(input, properties={})
       properties = Hash[properties]
-      escape = properties.fetch(:escape){properties.fetch(:escape_html, false)}
+      escape = properties.fetch(:escape) {properties.fetch(:escape_html, false)}
       @escape_capture = properties.fetch(:escape_capture, escape)
       @yield_returns_buffer = properties.fetch(:yield_returns_buffer, false)
       @bufval = properties[:bufval] ||= '::String.new'

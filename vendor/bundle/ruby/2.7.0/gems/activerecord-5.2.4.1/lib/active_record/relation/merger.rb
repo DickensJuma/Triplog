@@ -11,7 +11,7 @@ module ActiveRecord
         hash.assert_valid_keys(*Relation::VALUE_METHODS)
 
         @relation = relation
-        @hash     = hash
+        @hash = hash
       end
 
       def merge #:nodoc:
@@ -50,8 +50,8 @@ module ActiveRecord
 
       def initialize(relation, other)
         @relation = relation
-        @values   = other.values
-        @other    = other
+        @values = other.values
+        @other = other
       end
 
       NORMAL_VALUES = Relation::VALUE_METHODS -
@@ -90,104 +90,104 @@ module ActiveRecord
 
       private
 
-        def merge_preloads
-          return if other.preload_values.empty? && other.includes_values.empty?
+      def merge_preloads
+        return if other.preload_values.empty? && other.includes_values.empty?
 
-          if other.klass == relation.klass
-            relation.preload!(*other.preload_values) unless other.preload_values.empty?
-            relation.includes!(other.includes_values) unless other.includes_values.empty?
-          else
-            reflection = relation.klass.reflect_on_all_associations.find do |r|
-              r.class_name == other.klass.name
-            end || return
+        if other.klass == relation.klass
+          relation.preload!(*other.preload_values) unless other.preload_values.empty?
+          relation.includes!(other.includes_values) unless other.includes_values.empty?
+        else
+          reflection = relation.klass.reflect_on_all_associations.find do |r|
+            r.class_name == other.klass.name
+          end || return
 
-            unless other.preload_values.empty?
-              relation.preload! reflection.name => other.preload_values
+          unless other.preload_values.empty?
+            relation.preload! reflection.name => other.preload_values
+          end
+
+          unless other.includes_values.empty?
+            relation.includes! reflection.name => other.includes_values
+          end
+        end
+      end
+
+      def merge_joins
+        return if other.joins_values.blank?
+
+        if other.klass == relation.klass
+          relation.joins!(*other.joins_values)
+        else
+          joins_dependency = other.joins_values.map do |join|
+            case join
+            when Hash, Symbol, Array
+              ActiveRecord::Associations::JoinDependency.new(
+                other.klass, other.table, join
+              )
+            else
+              join
             end
+          end
 
-            unless other.includes_values.empty?
-              relation.includes! reflection.name => other.includes_values
+          relation.joins!(*joins_dependency)
+        end
+      end
+
+      def merge_outer_joins
+        return if other.left_outer_joins_values.blank?
+
+        if other.klass == relation.klass
+          relation.left_outer_joins!(*other.left_outer_joins_values)
+        else
+          joins_dependency = other.left_outer_joins_values.map do |join|
+            case join
+            when Hash, Symbol, Array
+              ActiveRecord::Associations::JoinDependency.new(
+                other.klass, other.table, join
+              )
+            else
+              join
             end
           end
+
+          relation.left_outer_joins!(*joins_dependency)
+        end
+      end
+
+      def merge_multi_values
+        if other.reordering_value
+          # override any order specified in the original relation
+          relation.reorder!(*other.order_values)
+        elsif other.order_values.any?
+          # merge in order_values from relation
+          relation.order!(*other.order_values)
         end
 
-        def merge_joins
-          return if other.joins_values.blank?
+        extensions = other.extensions - relation.extensions
+        relation.extending!(*extensions) if extensions.any?
+      end
 
-          if other.klass == relation.klass
-            relation.joins!(*other.joins_values)
-          else
-            joins_dependency = other.joins_values.map do |join|
-              case join
-              when Hash, Symbol, Array
-                ActiveRecord::Associations::JoinDependency.new(
-                  other.klass, other.table, join
-                )
-              else
-                join
-              end
-            end
+      def merge_single_values
+        relation.lock_value ||= other.lock_value if other.lock_value
 
-            relation.joins!(*joins_dependency)
-          end
+        unless other.create_with_value.blank?
+          relation.create_with_value = (relation.create_with_value || {}).merge(other.create_with_value)
         end
+      end
 
-        def merge_outer_joins
-          return if other.left_outer_joins_values.blank?
+      def merge_clauses
+        relation.from_clause = other.from_clause if replace_from_clause?
 
-          if other.klass == relation.klass
-            relation.left_outer_joins!(*other.left_outer_joins_values)
-          else
-            joins_dependency = other.left_outer_joins_values.map do |join|
-              case join
-              when Hash, Symbol, Array
-                ActiveRecord::Associations::JoinDependency.new(
-                  other.klass, other.table, join
-                )
-              else
-                join
-              end
-            end
+        where_clause = relation.where_clause.merge(other.where_clause)
+        relation.where_clause = where_clause unless where_clause.empty?
 
-            relation.left_outer_joins!(*joins_dependency)
-          end
-        end
+        having_clause = relation.having_clause.merge(other.having_clause)
+        relation.having_clause = having_clause unless having_clause.empty?
+      end
 
-        def merge_multi_values
-          if other.reordering_value
-            # override any order specified in the original relation
-            relation.reorder!(*other.order_values)
-          elsif other.order_values.any?
-            # merge in order_values from relation
-            relation.order!(*other.order_values)
-          end
-
-          extensions = other.extensions - relation.extensions
-          relation.extending!(*extensions) if extensions.any?
-        end
-
-        def merge_single_values
-          relation.lock_value ||= other.lock_value if other.lock_value
-
-          unless other.create_with_value.blank?
-            relation.create_with_value = (relation.create_with_value || {}).merge(other.create_with_value)
-          end
-        end
-
-        def merge_clauses
-          relation.from_clause = other.from_clause if replace_from_clause?
-
-          where_clause = relation.where_clause.merge(other.where_clause)
-          relation.where_clause = where_clause unless where_clause.empty?
-
-          having_clause = relation.having_clause.merge(other.having_clause)
-          relation.having_clause = having_clause unless having_clause.empty?
-        end
-
-        def replace_from_clause?
-          relation.from_clause.empty? && !other.from_clause.empty? &&
-            relation.klass.base_class == other.klass.base_class
-        end
+      def replace_from_clause?
+        relation.from_clause.empty? && !other.from_clause.empty? &&
+          relation.klass.base_class == other.klass.base_class
+      end
     end
   end
 end

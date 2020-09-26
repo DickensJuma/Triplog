@@ -24,6 +24,7 @@ module ActiveRecord
 
       def register_type(key, value = nil, &block)
         raise ::ArgumentError unless value || block
+
         @cache.clear
 
         if block
@@ -46,17 +47,17 @@ module ActiveRecord
 
       private
 
-        def perform_fetch(lookup_key, *args)
-          matching_pair = @mapping.reverse_each.detect do |key, _|
-            key === lookup_key
-          end
-
-          if matching_pair
-            matching_pair.last.call(lookup_key, *args)
-          else
-            yield lookup_key, *args
-          end
+      def perform_fetch(lookup_key, *args)
+        matching_pair = @mapping.reverse_each.detect do |key, _|
+          key === lookup_key
         end
+
+        if matching_pair
+          matching_pair.last.call(lookup_key, *args)
+        else
+          yield lookup_key, *args
+        end
+      end
     end
   end
 end

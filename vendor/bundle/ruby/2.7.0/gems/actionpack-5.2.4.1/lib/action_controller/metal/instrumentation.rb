@@ -50,7 +50,7 @@ module ActionController
 
     def send_file(path, options = {})
       ActiveSupport::Notifications.instrument("send_file.action_controller",
-        options.merge(path: path)) do
+                                              options.merge(path: path)) do
         super
       end
     end
@@ -64,13 +64,13 @@ module ActionController
     def redirect_to(*args)
       ActiveSupport::Notifications.instrument("redirect_to.action_controller") do |payload|
         result = super
-        payload[:status]   = response.status
+        payload[:status] = response.status
         payload[:location] = response.filtered_location
         result
       end
     end
 
-  private
+    private
 
     # A hook invoked every time a before callback is halted.
     def halted_callback_hook(filter)

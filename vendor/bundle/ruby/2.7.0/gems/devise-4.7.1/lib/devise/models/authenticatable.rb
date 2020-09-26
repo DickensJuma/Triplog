@@ -56,9 +56,9 @@ module Devise
       extend ActiveSupport::Concern
 
       BLACKLIST_FOR_SERIALIZATION = [:encrypted_password, :reset_password_token, :reset_password_sent_at,
-        :remember_created_at, :sign_in_count, :current_sign_in_at, :last_sign_in_at, :current_sign_in_ip,
-        :last_sign_in_ip, :password_salt, :confirmation_token, :confirmed_at, :confirmation_sent_at,
-        :remember_token, :unconfirmed_email, :failed_attempts, :unlock_token, :locked_at]
+                                     :remember_created_at, :sign_in_count, :current_sign_in_at, :last_sign_in_at, :current_sign_in_ip,
+                                     :last_sign_in_ip, :password_salt, :confirmation_token, :confirmed_at, :confirmation_sent_at,
+                                     :remember_token, :unconfirmed_email, :failed_attempts, :unlock_token, :locked_at]
 
       included do
         class_attribute :devise_modules, instance_writer: false
@@ -118,7 +118,7 @@ module Devise
       # Redefine inspect using serializable_hash, to ensure we don't accidentally
       # leak passwords into exceptions.
       def inspect
-        inspection = serializable_hash.collect do |k,v|
+        inspection = serializable_hash.collect do |k, v|
           "#{k}: #{respond_to?(:attribute_for_inspect) ? attribute_for_inspect(k) : v.inspect}"
         end
         "#<#{self.class} #{inspection.join(", ")}>"
@@ -226,8 +226,8 @@ module Devise
 
       module ClassMethods
         Devise::Models.config(self, :authentication_keys, :request_keys, :strip_whitespace_keys,
-          :case_insensitive_keys, :http_authenticatable, :params_authenticatable, :skip_session_storage,
-          :http_authentication_key)
+                              :case_insensitive_keys, :http_authenticatable, :params_authenticatable, :skip_session_storage,
+                              :http_authentication_key)
 
         def serialize_into_session(record)
           [record.to_key, record.authenticatable_salt]
@@ -284,8 +284,8 @@ module Devise
         def find_or_initialize_with_errors(required_attributes, attributes, error=:invalid) #:nodoc:
           attributes.try(:permit!)
           attributes = attributes.to_h.with_indifferent_access
-                                 .slice(*required_attributes)
-                                 .delete_if { |key, value| value.blank? }
+            .slice(*required_attributes)
+            .delete_if { |key, value| value.blank? }
 
           if attributes.size == required_attributes.size
             record = find_first_by_auth_conditions(attributes) and return record

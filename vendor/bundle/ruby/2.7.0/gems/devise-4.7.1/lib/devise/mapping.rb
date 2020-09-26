@@ -130,13 +130,13 @@ module Devise
 
     def default_controllers(options)
       mod = options[:module] || "devise"
-      @controllers = Hash.new { |h,k| h[k] = "#{mod}/#{k}" }
+      @controllers = Hash.new { |h, k| h[k] = "#{mod}/#{k}" }
       @controllers.merge!(options[:controllers]) if options[:controllers]
-      @controllers.each { |k,v| @controllers[k] = v.to_s }
+      @controllers.each { |k, v| @controllers[k] = v.to_s }
     end
 
     def default_path_names(options)
-      @path_names = Hash.new { |h,k| h[k] = k.to_s }
+      @path_names = Hash.new { |h, k| h[k] = k.to_s }
       @path_names[:registration] = ""
       @path_names.merge!(options[:path_names]) if options[:path_names]
     end

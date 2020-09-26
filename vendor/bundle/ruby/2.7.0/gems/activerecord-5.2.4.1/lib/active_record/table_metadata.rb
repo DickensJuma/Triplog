@@ -77,6 +77,6 @@ module ActiveRecord
     # Workaround for Ruby 2.2 "private attribute?" warning.
     protected
 
-      attr_reader :klass, :arel_table, :association
+    attr_reader :klass, :arel_table, :association
   end
 end

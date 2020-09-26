@@ -1,6 +1,5 @@
 module Concurrent
   module Utility
-
     # @!visibility private
     module EngineDetector
       def on_jruby?
@@ -40,12 +39,12 @@ module Concurrent
       end
 
       def ruby_version(version = RUBY_VERSION, comparison, major, minor, patch)
-        result      = (version.split('.').map(&:to_i) <=> [major, minor, patch])
+        result = (version.split('.').map(&:to_i) <=> [major, minor, patch])
         comparisons = { :== => [0],
                         :>= => [1, 0],
                         :<= => [-1, 0],
-                        :>  => [1],
-                        :<  => [-1] }
+                        :> => [1],
+                        :< => [-1] }
         comparisons.fetch(comparison).include? result
       end
     end

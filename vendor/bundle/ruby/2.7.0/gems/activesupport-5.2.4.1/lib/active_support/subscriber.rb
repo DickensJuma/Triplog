@@ -28,9 +28,9 @@ module ActiveSupport
     class << self
       # Attach the subscriber to a namespace.
       def attach_to(namespace, subscriber = new, notifier = ActiveSupport::Notifications)
-        @namespace  = namespace
+        @namespace = namespace
         @subscriber = subscriber
-        @notifier   = notifier
+        @notifier = notifier
 
         subscribers << subscriber
 
@@ -63,7 +63,7 @@ module ActiveSupport
       private
 
       def add_event_subscriber(event) # :doc:
-        return if %w{ start finish }.include?(event.to_s)
+        return if %w{start finish}.include?(event.to_s)
 
         pattern = "#{event}.#{namespace}"
 
@@ -79,7 +79,7 @@ module ActiveSupport
 
     def initialize
       @queue_key = [self.class.name, object_id].join "-"
-      @patterns  = []
+      @patterns = []
       super
     end
 
@@ -92,8 +92,8 @@ module ActiveSupport
     end
 
     def finish(name, id, payload)
-      finished  = now
-      event     = event_stack.pop
+      finished = now
+      event = event_stack.pop
       event.end = finished
       event.payload.merge!(payload)
 
@@ -103,13 +103,13 @@ module ActiveSupport
 
     private
 
-      def event_stack
-        SubscriberQueueRegistry.instance.get_queue(@queue_key)
-      end
+    def event_stack
+      SubscriberQueueRegistry.instance.get_queue(@queue_key)
+    end
 
-      def now
-        Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      end
+    def now
+      Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    end
   end
 
   # This is a registry for all the event stacks kept for subscribers.

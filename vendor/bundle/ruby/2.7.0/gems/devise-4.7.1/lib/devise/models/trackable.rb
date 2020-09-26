@@ -19,12 +19,12 @@ module Devise
 
       def update_tracked_fields(request)
         old_current, new_current = self.current_sign_in_at, Time.now.utc
-        self.last_sign_in_at     = old_current || new_current
-        self.current_sign_in_at  = new_current
+        self.last_sign_in_at = old_current || new_current
+        self.current_sign_in_at = new_current
 
         old_current, new_current = self.current_sign_in_ip, extract_ip_from(request)
-        self.last_sign_in_ip     = old_current || new_current
-        self.current_sign_in_ip  = new_current
+        self.last_sign_in_ip = old_current || new_current
+        self.current_sign_in_ip = new_current
 
         self.sign_in_count ||= 0
         self.sign_in_count += 1
@@ -45,7 +45,6 @@ module Devise
       def extract_ip_from(request)
         request.remote_ip
       end
-
     end
   end
 end

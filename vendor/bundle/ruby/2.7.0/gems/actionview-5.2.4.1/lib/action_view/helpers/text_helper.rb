@@ -93,7 +93,7 @@ module ActionView
       #   # => "Once upon a time in a wo...<a href="#">Continue</a>"
       def truncate(text, options = {}, &block)
         if text
-          length  = options.fetch(:length, 30)
+          length = options.fetch(:length, 30)
 
           content = text.truncate(length, options)
           content = options[:escape] == false ? content.html_safe : ERB::Util.html_escape(content)
@@ -184,6 +184,7 @@ module ActionView
         end
 
         return unless matches = text.match(regex)
+
         phrase = matches[0]
 
         unless separator.empty?
@@ -197,7 +198,7 @@ module ActionView
 
         first_part, second_part = text.split(phrase, 2)
 
-        prefix, first_part   = cut_excerpt_part(:first, first_part, separator, options)
+        prefix, first_part = cut_excerpt_part(:first, first_part, separator, options)
         postfix, second_part = cut_excerpt_part(:second, second_part, separator, options)
 
         affix = [first_part, separator, phrase, separator, second_part].join.strip
@@ -229,10 +230,10 @@ module ActionView
       #   # => 2 Personen
       def pluralize(count, singular, plural_arg = nil, plural: plural_arg, locale: I18n.locale)
         word = if (count == 1 || count.to_s =~ /^1(\.0+)?$/)
-          singular
-        else
-          plural || singular.pluralize(locale)
-        end
+                 singular
+               else
+                 plural || singular.pluralize(locale)
+               end
 
         "#{count || 0} #{word}"
       end
@@ -427,60 +428,61 @@ module ActionView
 
         private
 
-          def next_index
-            step_index(1)
-          end
+        def next_index
+          step_index(1)
+        end
 
-          def previous_index
-            step_index(-1)
-          end
+        def previous_index
+          step_index(-1)
+        end
 
-          def step_index(n)
-            (@index + n) % @values.size
-          end
+        def step_index(n)
+          (@index + n) % @values.size
+        end
       end
 
       private
-        # The cycle helpers need to store the cycles in a place that is
-        # guaranteed to be reset every time a page is rendered, so it
-        # uses an instance variable of ActionView::Base.
-        def get_cycle(name)
-          @_cycles = Hash.new unless defined?(@_cycles)
-          @_cycles[name]
+
+      # The cycle helpers need to store the cycles in a place that is
+      # guaranteed to be reset every time a page is rendered, so it
+      # uses an instance variable of ActionView::Base.
+      def get_cycle(name)
+        @_cycles = Hash.new unless defined?(@_cycles)
+        @_cycles[name]
+      end
+
+      def set_cycle(name, cycle_object)
+        @_cycles = Hash.new unless defined?(@_cycles)
+        @_cycles[name] = cycle_object
+      end
+
+      def split_paragraphs(text)
+        return [] if text.blank?
+
+        text.to_str.gsub(/\r\n?/, "\n").split(/\n\n+/).map! do |t|
+          t.gsub!(/([^\n]\n)(?=[^\n])/, '\1<br />') || t
         end
+      end
 
-        def set_cycle(name, cycle_object)
-          @_cycles = Hash.new unless defined?(@_cycles)
-          @_cycles[name] = cycle_object
-        end
+      def cut_excerpt_part(part_position, part, separator, options)
+        return "", "" unless part
 
-        def split_paragraphs(text)
-          return [] if text.blank?
+        radius = options.fetch(:radius, 100)
+        omission = options.fetch(:omission, "...")
 
-          text.to_str.gsub(/\r\n?/, "\n").split(/\n\n+/).map! do |t|
-            t.gsub!(/([^\n]\n)(?=[^\n])/, '\1<br />') || t
-          end
-        end
+        part = part.split(separator)
+        part.delete("")
+        affix = part.size > radius ? omission : ""
 
-        def cut_excerpt_part(part_position, part, separator, options)
-          return "", "" unless part
+        part = if part_position == :first
+                 drop_index = [part.length - radius, 0].max
+                 part.drop(drop_index)
+               else
+                 part.first(radius)
+               end
 
-          radius   = options.fetch(:radius, 100)
-          omission = options.fetch(:omission, "...")
-
-          part = part.split(separator)
-          part.delete("")
-          affix = part.size > radius ? omission : ""
-
-          part = if part_position == :first
-            drop_index = [part.length - radius, 0].max
-            part.drop(drop_index)
-          else
-            part.first(radius)
-          end
-
-          return affix, part.join(separator)
-        end
+        return affix, part.join(separator)
+      end
     end
   end
 end

@@ -16,7 +16,7 @@ module ActionDispatch
       #   post :change_avatar, avatar: fixture_file_upload('files/spongebob.png', 'image/png', :binary)
       def fixture_file_upload(path, mime_type = nil, binary = false)
         if self.class.respond_to?(:fixture_path) && self.class.fixture_path &&
-            !File.exist?(path)
+           !File.exist?(path)
           path = File.join(self.class.fixture_path, path)
         end
         Rack::Test::UploadedFile.new(path, mime_type, binary)
@@ -27,7 +27,7 @@ module ActionDispatch
 
     def assigns(key = nil)
       raise NoMethodError,
-        "assigns has been extracted to a gem. To continue using it,
+            "assigns has been extracted to a gem. To continue using it,
         add `gem 'rails-controller-testing'` to your Gemfile."
     end
 

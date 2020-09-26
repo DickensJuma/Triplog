@@ -13,9 +13,9 @@ module ActionView
 
             # Dup properties so that we don't modify argument
             properties = Hash[properties]
-            properties[:preamble]   = "@output_buffer = output_buffer || ActionView::OutputBuffer.new;"
-            properties[:postamble]  = "@output_buffer.to_s"
-            properties[:bufvar]     = "@output_buffer"
+            properties[:preamble] = "@output_buffer = output_buffer || ActionView::OutputBuffer.new;"
+            properties[:postamble] = "@output_buffer.to_s"
+            properties[:bufvar] = "@output_buffer"
             properties[:escapefunc] = ""
 
             super
@@ -26,7 +26,8 @@ module ActionView
             action_view_erb_handler_context.instance_eval(&pr)
           end
 
-        private
+          private
+
           def add_text(text)
             return if text.empty?
 

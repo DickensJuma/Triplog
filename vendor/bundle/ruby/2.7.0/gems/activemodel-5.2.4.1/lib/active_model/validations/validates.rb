@@ -113,6 +113,7 @@ module ActiveModel
 
         validations.each do |key, options|
           next unless options
+
           key = "#{key.to_s.camelize}Validator"
 
           begin
@@ -149,7 +150,7 @@ module ActiveModel
         validates(*(attributes << options))
       end
 
-    private
+      private
 
       # When creating custom validators, it might be useful to be able to specify
       # additional default keys. This can be done by overwriting this method.

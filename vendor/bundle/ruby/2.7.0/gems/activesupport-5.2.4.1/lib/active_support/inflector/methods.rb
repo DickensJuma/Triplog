@@ -91,8 +91,9 @@ module ActiveSupport
     #   camelize(underscore('SSLError'))  # => "SslError"
     def underscore(camel_cased_word)
       return camel_cased_word unless /[A-Z-]|::/.match?(camel_cased_word)
+
       word = camel_cased_word.to_s.gsub("::".freeze, "/".freeze)
-      word.gsub!(inflections.acronyms_underscore_regex) { "#{$1 && '_'.freeze }#{$2.downcase}" }
+      word.gsub!(inflections.acronyms_underscore_regex) { "#{$1 && '_'.freeze}#{$2.downcase}" }
       word.gsub!(/([A-Z\d]+)([A-Z][a-z])/, '\1_\2'.freeze)
       word.gsub!(/([a-z\d])([A-Z])/, '\1_\2'.freeze)
       word.tr!("-".freeze, "_".freeze)
@@ -289,8 +290,9 @@ module ActiveSupport
           # Go down the ancestors to check if it is owned directly. The check
           # stops when we reach Object or the end of ancestors tree.
           constant = constant.ancestors.inject(constant) do |const, ancestor|
-            break const    if ancestor == Object
+            break const if ancestor == Object
             break ancestor if ancestor.const_defined?(name, false)
+
             const
           end
 
@@ -352,7 +354,7 @@ module ActiveSupport
         when 1; "st"
         when 2; "nd"
         when 3; "rd"
-        else    "th"
+        else "th"
         end
       end
     end
@@ -372,39 +374,39 @@ module ActiveSupport
 
     private
 
-      # Mounts a regular expression, returned as a string to ease interpolation,
-      # that will match part by part the given constant.
-      #
-      #   const_regexp("Foo::Bar::Baz") # => "Foo(::Bar(::Baz)?)?"
-      #   const_regexp("::")            # => "::"
-      def const_regexp(camel_cased_word)
-        parts = camel_cased_word.split("::".freeze)
+    # Mounts a regular expression, returned as a string to ease interpolation,
+    # that will match part by part the given constant.
+    #
+    #   const_regexp("Foo::Bar::Baz") # => "Foo(::Bar(::Baz)?)?"
+    #   const_regexp("::")            # => "::"
+    def const_regexp(camel_cased_word)
+      parts = camel_cased_word.split("::".freeze)
 
-        return Regexp.escape(camel_cased_word) if parts.blank?
+      return Regexp.escape(camel_cased_word) if parts.blank?
 
-        last = parts.pop
+      last = parts.pop
 
-        parts.reverse.inject(last) do |acc, part|
-          part.empty? ? acc : "#{part}(::#{acc})?"
-        end
+      parts.reverse.inject(last) do |acc, part|
+        part.empty? ? acc : "#{part}(::#{acc})?"
       end
+    end
 
-      # Applies inflection rules for +singularize+ and +pluralize+.
-      #
-      # If passed an optional +locale+ parameter, the uncountables will be
-      # found for that locale.
-      #
-      #  apply_inflections('post', inflections.plurals, :en)    # => "posts"
-      #  apply_inflections('posts', inflections.singulars, :en) # => "post"
-      def apply_inflections(word, rules, locale = :en)
-        result = word.to_s.dup
+    # Applies inflection rules for +singularize+ and +pluralize+.
+    #
+    # If passed an optional +locale+ parameter, the uncountables will be
+    # found for that locale.
+    #
+    #  apply_inflections('post', inflections.plurals, :en)    # => "posts"
+    #  apply_inflections('posts', inflections.singulars, :en) # => "post"
+    def apply_inflections(word, rules, locale = :en)
+      result = word.to_s.dup
 
-        if word.empty? || inflections(locale).uncountables.uncountable?(result)
-          result
-        else
-          rules.each { |(rule, replacement)| break if result.sub!(rule, replacement) }
-          result
-        end
+      if word.empty? || inflections(locale).uncountables.uncountable?(result)
+        result
+      else
+        rules.each { |(rule, replacement)| break if result.sub!(rule, replacement) }
+        result
       end
+    end
   end
 end

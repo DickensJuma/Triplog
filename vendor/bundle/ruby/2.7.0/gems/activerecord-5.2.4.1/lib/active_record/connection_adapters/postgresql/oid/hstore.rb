@@ -47,23 +47,23 @@ module ActiveRecord
 
           private
 
-            HstorePair = begin
-              quoted_string = /"[^"\\]*(?:\\.[^"\\]*)*"/
-              unquoted_string = /(?:\\.|[^\s,])[^\s=,\\]*(?:\\.[^\s=,\\]*|=[^,>])*/
-              /(#{quoted_string}|#{unquoted_string})\s*=>\s*(#{quoted_string}|#{unquoted_string})/
-            end
+          HstorePair = begin
+            quoted_string = /"[^"\\]*(?:\\.[^"\\]*)*"/
+            unquoted_string = /(?:\\.|[^\s,])[^\s=,\\]*(?:\\.[^\s=,\\]*|=[^,>])*/
+            /(#{quoted_string}|#{unquoted_string})\s*=>\s*(#{quoted_string}|#{unquoted_string})/
+          end
 
-            def escape_hstore(value)
-              if value.nil?
-                "NULL"
+          def escape_hstore(value)
+            if value.nil?
+              "NULL"
+            else
+              if value == ""
+                '""'
               else
-                if value == ""
-                  '""'
-                else
-                  '"%s"' % value.to_s.gsub(/(["\\])/, '\\\\\1')
-                end
+                '"%s"' % value.to_s.gsub(/(["\\])/, '\\\\\1')
               end
             end
+          end
         end
       end
     end

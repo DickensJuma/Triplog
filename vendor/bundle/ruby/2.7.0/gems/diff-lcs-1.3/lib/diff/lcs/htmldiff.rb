@@ -52,44 +52,44 @@ class Diff::LCS::HTMLDiff
     :title => nil,
   }
 
-  DEFAULT_CSS = <<-CSS
-body { margin: 0; }
-.diff
-{
-  border: 1px solid black;
-  margin: 1em 2em;
-}
-p
-{
-  margin-left: 2em;
-}
-pre
-{
-  padding-left: 1em;
-  margin: 0;
-  font-family: Inconsolata, Consolas, Lucida, Courier, monospaced;
-	white-space: pre;
-}
-.match { }
-.only_a
-{
-  background-color: #fdd;
-  color: red;
-  text-decoration: line-through;
-}
-.only_b
-{
-  background-color: #ddf;
-  color: blue;
-  border-left: 3px solid blue
-}
-h1 { margin-left: 2em; }
+  DEFAULT_CSS = <<~CSS
+    body { margin: 0; }
+    .diff
+    {
+      border: 1px solid black;
+      margin: 1em 2em;
+    }
+    p
+    {
+      margin-left: 2em;
+    }
+    pre
+    {
+      padding-left: 1em;
+      margin: 0;
+      font-family: Inconsolata, Consolas, Lucida, Courier, monospaced;
+    	white-space: pre;
+    }
+    .match { }
+    .only_a
+    {
+      background-color: #fdd;
+      color: red;
+      text-decoration: line-through;
+    }
+    .only_b
+    {
+      background-color: #ddf;
+      color: blue;
+      border-left: 3px solid blue
+    }
+    h1 { margin-left: 2em; }
   CSS
 
   def initialize(left, right, options = nil)
-    @left     = left
-    @right    = right
-    @options  = options
+    @left = left
+    @right = right
+    @options = options
 
     @options = DEFAULT_OPTIONS.dup if @options.nil?
   end
@@ -122,28 +122,28 @@ h1 { margin-left: 2em; }
     @left.map! { |line| CGI.escapeHTML(line.chomp) }
     @right.map! { |line| CGI.escapeHTML(line.chomp) }
 
-    @options[:output] << <<-OUTPUT
-<html>
-  <head>
-    <title>#{@options[:title]}</title>
-    <style type="text/css">
-    #{@options[:css]}
-    </style>
-  </head>
-  <body>
-    <h1>#{@options[:title]}</h1>
-    <p>Legend: <span class="only_a">Only in Old</span>&nbsp;
-    <span class="only_b">Only in New</span></p>
-    <div class="diff">
+    @options[:output] << <<~OUTPUT
+      <html>
+        <head>
+          <title>#{@options[:title]}</title>
+          <style type="text/css">
+          #{@options[:css]}
+          </style>
+        </head>
+        <body>
+          <h1>#{@options[:title]}</h1>
+          <p>Legend: <span class="only_a">Only in Old</span>&nbsp;
+          <span class="only_b">Only in New</span></p>
+          <div class="diff">
     OUTPUT
 
     callbacks = Callbacks.new(@options[:output])
     Diff::LCS.traverse_sequences(@left, @right, callbacks)
 
-    @options[:output] << <<-OUTPUT
-    </div>
-  </body>
-</html>
+    @options[:output] << <<~OUTPUT
+          </div>
+        </body>
+      </html>
     OUTPUT
   end
 end

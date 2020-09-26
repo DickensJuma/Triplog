@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Nodes
     class Function < Arel::Nodes::Node
@@ -10,8 +11,8 @@ module Arel
       def initialize expr, aliaz = nil
         super()
         @expressions = expr
-        @alias       = aliaz && SqlLiteral.new(aliaz)
-        @distinct    = false
+        @alias = aliaz && SqlLiteral.new(aliaz)
+        @distinct = false
       end
 
       def as aliaz
@@ -30,7 +31,6 @@ module Arel
           self.distinct == other.distinct
       end
       alias :== :eql?
-
     end
 
     %w{

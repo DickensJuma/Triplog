@@ -29,7 +29,7 @@ module ActionDispatch
         sid
       end
 
-    private
+      private
 
       def initialize_sid # :doc:
         @default_options.delete(:sidbits)
@@ -83,9 +83,10 @@ module ActionDispatch
       include SessionObject
 
       private
-        def set_cookie(request, session_id, cookie)
-          request.cookie_jar[key] = cookie
-        end
+
+      def set_cookie(request, session_id, cookie)
+        request.cookie_jar[key] = cookie
+      end
     end
 
     class AbstractSecureStore < Rack::Session::Abstract::PersistedSecure
@@ -98,9 +99,10 @@ module ActionDispatch
       end
 
       private
-        def set_cookie(request, session_id, cookie)
-          request.cookie_jar[key] = cookie
-        end
+
+      def set_cookie(request, session_id, cookie)
+        request.cookie_jar[key] = cookie
+      end
     end
   end
 end

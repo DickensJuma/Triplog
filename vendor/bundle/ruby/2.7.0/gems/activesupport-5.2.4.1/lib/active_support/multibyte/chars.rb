@@ -215,21 +215,21 @@ module ActiveSupport #:nodoc:
 
       private
 
-        def translate_offset(byte_offset)
-          return nil if byte_offset.nil?
-          return 0   if @wrapped_string == ""
+      def translate_offset(byte_offset)
+        return nil if byte_offset.nil?
+        return 0 if @wrapped_string == ""
 
-          begin
-            @wrapped_string.byteslice(0...byte_offset).unpack("U*").length
-          rescue ArgumentError
-            byte_offset -= 1
-            retry
-          end
+        begin
+          @wrapped_string.byteslice(0...byte_offset).unpack("U*").length
+        rescue ArgumentError
+          byte_offset -= 1
+          retry
         end
+      end
 
-        def chars(string)
-          self.class.new(string)
-        end
+      def chars(string)
+        self.class.new(string)
+      end
     end
   end
 end

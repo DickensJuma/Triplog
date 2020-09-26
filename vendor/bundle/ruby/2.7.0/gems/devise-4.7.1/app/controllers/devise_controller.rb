@@ -26,10 +26,10 @@ class DeviseController < Devise.parent_controller.constantize
   # itself. Changing its visibility may break other gems.
   def _prefixes #:nodoc:
     @_prefixes ||= if self.class.scoped_views? && request && devise_mapping
-      ["#{devise_mapping.scoped_path}/#{controller_name}"] + super
-    else
-      super
-    end
+                     ["#{devise_mapping.scoped_path}/#{controller_name}"] + super
+                   else
+                     super
+                   end
   end
 
   protected
@@ -62,22 +62,22 @@ class DeviseController < Devise.parent_controller.constantize
 
   # Checks whether it's a devise mapped resource or not.
   def assert_is_devise_resource! #:nodoc:
-    unknown_action! <<-MESSAGE unless devise_mapping
-Could not find devise mapping for path #{request.fullpath.inspect}.
-This may happen for two reasons:
-
-1) You forgot to wrap your route inside the scope block. For example:
-
-  devise_scope :user do
-    get "/some/route" => "some_devise_controller"
-  end
-
-2) You are testing a Devise controller bypassing the router.
-   If so, you can explicitly tell Devise which mapping to use:
-
-   @request.env["devise.mapping"] = Devise.mappings[:user]
-
-MESSAGE
+    unknown_action! <<~MESSAGE unless devise_mapping
+      Could not find devise mapping for path #{request.fullpath.inspect}.
+      This may happen for two reasons:
+      
+      1) You forgot to wrap your route inside the scope block. For example:
+      
+        devise_scope :user do
+          get "/some/route" => "some_devise_controller"
+        end
+      
+      2) You are testing a Devise controller bypassing the router.
+         If so, you can explicitly tell Devise which mapping to use:
+      
+         @request.env["devise.mapping"] = Devise.mappings[:user]
+      
+    MESSAGE
   end
 
   # Returns real navigational formats which are supported by Rails
@@ -102,14 +102,15 @@ MESSAGE
   def require_no_authentication
     assert_is_devise_resource!
     return unless is_navigational_format?
+
     no_input = devise_mapping.no_input_strategies
 
     authenticated = if no_input.present?
-      args = no_input.dup.push scope: resource_name
-      warden.authenticate?(*args)
-    else
-      warden.authenticated?(resource_name)
-    end
+                      args = no_input.dup.push scope: resource_name
+                      warden.authenticate?(*args)
+                    else
+                      warden.authenticated?(resource_name)
+                    end
 
     if authenticated && resource = warden.user(resource_name)
       flash[:alert] = I18n.t("devise.failure.already_authenticated")
@@ -122,11 +123,11 @@ MESSAGE
   # and instructions were sent.
   def successfully_sent?(resource)
     notice = if Devise.paranoid
-      resource.errors.clear
-      :send_paranoid_instructions
-    elsif resource.errors.empty?
-      :send_instructions
-    end
+               resource.errors.clear
+               :send_paranoid_instructions
+             elsif resource.errors.empty?
+               :send_instructions
+             end
 
     if notice
       set_flash_message! :notice, notice

@@ -84,12 +84,14 @@ module FFI
                     if not proc.respond_to?(:call)
                       raise RuntimeError.new("proc must be callable")
                     end
+
                     CallableReleaser.new(ptr, proc)
 
                   else
                     if not self.class.respond_to?(:release)
                       raise RuntimeError.new("no release method defined")
                     end
+
                     DefaultReleaser.new(ptr, self.class)
                   end
 
@@ -107,7 +109,7 @@ module FFI
     # @return [Boolean] +autorelease+
     # Set +autorelease+ property. See {Pointer Autorelease section at Pointer}.
     def autorelease=(autorelease)
-      @releaser.autorelease=(autorelease)
+      @releaser.autorelease = (autorelease)
     end
 
     # @return [Boolean] +autorelease+
@@ -117,7 +119,7 @@ module FFI
     end
 
     # @abstract Base class for {AutoPointer}'s releasers.
-    #  
+    #
     #  All subclasses of Releaser should define a +#release(ptr)+ method.
     # A releaser is an object in charge of release an {AutoPointer}.
     class Releaser
@@ -185,6 +187,7 @@ module FFI
       if not self.respond_to?(:release)
         raise RuntimeError.new("no release method defined for #{self.inspect}")
       end
+
       Type::POINTER
     end
 
@@ -199,5 +202,4 @@ module FFI
       self.new(val)
     end
   end
-
 end

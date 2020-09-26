@@ -7,7 +7,7 @@ require "active_support/multibyte/unicode"
 
 class ERB
   module Util
-    HTML_ESCAPE = { "&" => "&amp;",  ">" => "&gt;",   "<" => "&lt;", '"' => "&quot;", "'" => "&#39;" }
+    HTML_ESCAPE = { "&" => "&amp;", ">" => "&gt;", "<" => "&lt;", '"' => "&quot;", "'" => "&#39;" }
     JSON_ESCAPE = { "&" => '\u0026', ">" => '\u003e', "<" => '\u003c', "\u2028" => '\u2028', "\u2029" => '\u2029' }
     HTML_ESCAPE_ONCE_REGEXP = /["><']|&(?!([a-zA-Z]+|(#\d+)|(#[xX][\dA-Fa-f]+));)/
     JSON_ESCAPE_REGEXP = /[\u2028\u2029&><]/u
@@ -166,6 +166,7 @@ module ActiveSupport #:nodoc:
 
     def safe_concat(value)
       raise SafeConcatError unless html_safe?
+
       original_concat(value)
     end
 
@@ -240,9 +241,9 @@ module ActiveSupport #:nodoc:
 
     private
 
-      def html_escape_interpolated_argument(arg)
-        (!html_safe? || arg.html_safe?) ? arg : CGI.escapeHTML(arg.to_s)
-      end
+    def html_escape_interpolated_argument(arg)
+      (!html_safe? || arg.html_safe?) ? arg : CGI.escapeHTML(arg.to_s)
+    end
   end
 end
 

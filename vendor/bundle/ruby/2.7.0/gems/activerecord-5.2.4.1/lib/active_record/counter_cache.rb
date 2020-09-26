@@ -42,9 +42,9 @@ module ActiveRecord
             has_many_association = has_many_association.through_reflection
           end
 
-          foreign_key  = has_many_association.foreign_key.to_s
-          child_class  = has_many_association.klass
-          reflection   = child_class._reflections.values.find { |e| e.belongs_to? && e.foreign_key.to_s == foreign_key && e.options[:counter_cache].present? }
+          foreign_key = has_many_association.foreign_key.to_s
+          child_class = has_many_association.klass
+          reflection = child_class._reflections.values.find { |e| e.belongs_to? && e.foreign_key.to_s == foreign_key && e.options[:counter_cache].present? }
           counter_name = reflection.counter_cache_column
 
           updates = { counter_name => object.send(counter_association).count(:all) }
@@ -180,39 +180,39 @@ module ActiveRecord
 
     private
 
-      def _create_record(*)
-        id = super
+    def _create_record(*)
+      id = super
 
-        each_counter_cached_associations do |association|
-          if send(association.reflection.name)
-            association.increment_counters
-          end
+      each_counter_cached_associations do |association|
+        if send(association.reflection.name)
+          association.increment_counters
         end
-
-        id
       end
 
-      def destroy_row
-        affected_rows = super
+      id
+    end
 
-        if affected_rows > 0
-          each_counter_cached_associations do |association|
-            foreign_key = association.reflection.foreign_key.to_sym
-            unless destroyed_by_association && destroyed_by_association.foreign_key.to_sym == foreign_key
-              if send(association.reflection.name)
-                association.decrement_counters
-              end
+    def destroy_row
+      affected_rows = super
+
+      if affected_rows > 0
+        each_counter_cached_associations do |association|
+          foreign_key = association.reflection.foreign_key.to_sym
+          unless destroyed_by_association && destroyed_by_association.foreign_key.to_sym == foreign_key
+            if send(association.reflection.name)
+              association.decrement_counters
             end
           end
         end
-
-        affected_rows
       end
 
-      def each_counter_cached_associations
-        _reflections.each do |name, reflection|
-          yield association(name.to_sym) if reflection.belongs_to? && reflection.counter_cache_column
-        end
+      affected_rows
+    end
+
+    def each_counter_cached_associations
+      _reflections.each do |name, reflection|
+        yield association(name.to_sym) if reflection.belongs_to? && reflection.counter_cache_column
       end
+    end
   end
 end

@@ -25,7 +25,7 @@ module Erubi
       CGI.escapeHTML(value.to_s)
     end
   rescue LoadError
-    ESCAPE_TABLE = {'&' => '&amp;'.freeze, '<' => '&lt;'.freeze, '>' => '&gt;'.freeze, '"' => '&quot;'.freeze, "'" => '&#39;'.freeze}.freeze
+    ESCAPE_TABLE = { '&' => '&amp;'.freeze, '<' => '&lt;'.freeze, '>' => '&gt;'.freeze, '"' => '&quot;'.freeze, "'" => '&#39;'.freeze }.freeze
     if RUBY_VERSION >= '1.9'
       # Escape the following characters with their HTML/XML
       # equivalents.
@@ -34,7 +34,7 @@ module Erubi
       end
     else
       def self.h(value)
-        value.to_s.gsub(/[&<>"']/){|s| ESCAPE_TABLE[s]}
+        value.to_s.gsub(/[&<>"']/) { |s| ESCAPE_TABLE[s]}
       end
     end
   end
@@ -65,14 +65,14 @@ module Erubi
     # :src :: The initial value to use for the source code
     # :trim :: Whether to trim leading and trailing whitespace, true by default.
     def initialize(input, properties={})
-      @escape = escape = properties.fetch(:escape){properties.fetch(:escape_html, false)}
-      trim       = properties[:trim] != false
-      @filename  = properties[:filename]
+      @escape = escape = properties.fetch(:escape) {properties.fetch(:escape_html, false)}
+      trim = properties[:trim] != false
+      @filename = properties[:filename]
       @bufvar = bufvar = properties[:bufvar] || properties[:outvar] || "_buf"
       bufval = properties[:bufval] || '::String.new'
       regexp = properties[:regexp] || /<%(={1,2}|-|\#|%)?(.*?)([-=])?%>([ \t]*\r?\n)?/m
-      preamble   = properties[:preamble] || "#{bufvar} = #{bufval};"
-      postamble  = properties[:postamble] || "#{bufvar}.to_s\n"
+      preamble = properties[:preamble] || "#{bufvar} = #{bufval};"
+      postamble = properties[:postamble] || "#{bufvar}.to_s\n"
 
       @src = src = properties[:src] || String.new
       src << "# frozen_string_literal: true\n" if properties[:freeze]
@@ -93,10 +93,10 @@ module Erubi
       is_bol = true
       input.scan(regexp) do |indicator, code, tailch, rspace|
         match = Regexp.last_match
-        len  = match.begin(0) - pos
+        len = match.begin(0) - pos
         text = input[pos, len]
-        pos  = match.end(0)
-        ch   = indicator ? indicator[RANGE_FIRST] : nil
+        pos = match.end(0)
+        ch = indicator ? indicator[RANGE_FIRST] : nil
 
         lspace = nil
 
@@ -108,7 +108,7 @@ module Erubi
           else
             rindex = text.rindex("\n")
             if rindex
-              range = rindex+1..-1
+              range = rindex + 1..-1
               s = text[range]
               if s =~ /\A[ \t]*\z/
                 lspace = s
@@ -141,7 +141,7 @@ module Erubi
             add_text(rspace) if rspace
           end
         when '%'
-          add_text("#{lspace}#{prefix||='<%'}#{code}#{tailch}#{postfix||='%>'}#{rspace}")
+          add_text("#{lspace}#{prefix ||= '<%'}#{code}#{tailch}#{postfix ||= '%>'}#{rspace}")
         when nil, '-'
           if trim && lspace && rspace
             add_code("#{lspace}#{code}#{rspace}")

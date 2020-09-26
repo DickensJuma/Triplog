@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Compatibility # :nodoc:
     class Wheres # :nodoc:
@@ -16,7 +17,7 @@ module Arel
       end
 
       def initialize engine, collection
-        @engine     = engine
+        @engine = engine
         @collection = collection
       end
 

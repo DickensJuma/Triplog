@@ -21,7 +21,7 @@ module Devise
 
       def initialize_from_record(record)
         @scope_name = Devise::Mapping.find_scope!(record)
-        @resource   = instance_variable_set("@#{devise_mapping.name}", record)
+        @resource = instance_variable_set("@#{devise_mapping.name}", record)
       end
 
       def devise_mapping
@@ -86,7 +86,7 @@ module Devise
       #
       def subject_for(key)
         I18n.t(:"#{devise_mapping.name}_subject", scope: [:devise, :mailer, key],
-          default: [:subject, key.to_s.humanize])
+                                                  default: [:subject, key.to_s.humanize])
       end
     end
   end

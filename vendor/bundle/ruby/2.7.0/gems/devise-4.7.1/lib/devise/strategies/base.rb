@@ -14,6 +14,7 @@ module Devise
         @mapping ||= begin
           mapping = Devise.mappings[scope]
           raise "Could not find mapping for #{scope}" unless mapping
+
           mapping
         end
       end

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
-title = "ruby #{ARGV*" "}"
-$0    = ARGV.shift
+title = "ruby #{ARGV * " "}"
+$0 = ARGV.shift
 Process.setproctitle(title) if Process.methods.include?(:setproctitle)
 
 require 'rubygems'
@@ -14,8 +14,7 @@ end unless $0.end_with?('/executable-hooks-uninstaller')
 
 content = File.read($0)
 
-if
-  (index = content.index("\n#!ruby\n")) && index > 0
+if (index = content.index("\n#!ruby\n")) && index > 0
 then
   skipped_content = content.slice!(0..index)
   start_line = skipped_content.count("\n") + 1

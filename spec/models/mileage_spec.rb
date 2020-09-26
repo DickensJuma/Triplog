@@ -6,13 +6,13 @@ require 'rails_helper'
 RSpec.describe Mileage, :type => :model do
     
     subject {
-        described_class.new(distance:200,
+        described_class.new(distance: 200,
                             created_at: DateTime.now,
                             updated_at: DateTime.now + 1.week,
                             fleet_id: 1
                             user_id: 1)
       }
-    it "is valid with valid attributes" do
+      it "is valid with valid attributes" do
         expect(subject).to be_valid
       end
 
@@ -31,4 +31,4 @@ RSpec.describe Mileage, :type => :model do
         expect(subject).to_not be_valid
       end
   
-end
+  end

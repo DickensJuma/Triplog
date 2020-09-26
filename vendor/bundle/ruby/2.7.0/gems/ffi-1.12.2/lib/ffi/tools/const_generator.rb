@@ -2,7 +2,6 @@ require 'tempfile'
 require 'open3'
 
 module FFI
-
   # ConstGenerator turns C constants into ruby values.
   #
   # @example a simple example for stdio
@@ -49,6 +48,7 @@ module FFI
         calculate self.class.options.merge(options)
       end
     end
+
     # Set class options
     # These options are merged with {#initialize} options when it is called with a block.
     # @param [Hash] options
@@ -56,11 +56,13 @@ module FFI
     def self.options=(options)
       @options = options
     end
+
     # Get class options.
     # @return [Hash] class options
     def self.options
       @options
     end
+
     # @param [String] name
     # @return constant value (converted if a +converter+ was defined).
     # Access a constant by name.
@@ -179,12 +181,10 @@ module FFI
     def include(*i)
       @includes |= i.flatten
     end
-
   end
 
   # This class hold constants for {ConstGenerator}
   class ConstGenerator::Constant
-
     attr_reader :name, :format, :cast
     attr_accessor :value
 
@@ -224,7 +224,5 @@ module FFI
     def to_ruby
       "#{ruby_name} = #{converted_value}"
     end
-
   end
-
 end

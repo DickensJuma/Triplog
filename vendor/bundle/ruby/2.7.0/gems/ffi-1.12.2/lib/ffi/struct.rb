@@ -37,9 +37,7 @@ require 'ffi/struct_layout_builder'
 require 'ffi/struct_by_reference'
 
 module FFI
-
   class Struct
-
     # Get struct size
     # @return [Numeric]
     def size
@@ -97,6 +95,7 @@ module FFI
     # @return [size]
     def self.size=(size)
       raise ArgumentError, "Size already set" if defined?(@size) || defined?(@layout)
+
       @size = size
     end
 
@@ -145,12 +144,12 @@ module FFI
     end
 
     class ManagedStructConverter < StructByReference
-
       # @param [Struct] struct_class
       def initialize(struct_class)
         super(struct_class)
 
         raise NoMethodError, "release() not implemented for class #{struct_class}" unless struct_class.respond_to? :release
+
         @method = struct_class.method(:release)
       end
 
@@ -165,7 +164,6 @@ module FFI
     def self.auto_ptr
       @managed_type ||= Type::Mapped.new(ManagedStructConverter.new(self))
     end
-
 
     class << self
       public
@@ -223,7 +221,6 @@ module FFI
         return cspec
       end
 
-
       protected
 
       def callback(params, ret)
@@ -249,7 +246,6 @@ module FFI
           nil
         end
       end
-
 
       def find_field_type(type, mod = enclosing_module)
         if type.kind_of?(Class) && type < Struct

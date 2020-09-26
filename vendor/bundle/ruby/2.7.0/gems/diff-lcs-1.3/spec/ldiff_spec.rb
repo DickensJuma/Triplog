@@ -18,10 +18,10 @@ describe "Diff::LCS.diff" do
   it 'correctly diffs against an empty sequence' do
     diff = Diff::LCS.diff(word_sequence, [])
     correct_diff = [
-      [ [ '-', 0, 'abcd'           ],
-        [ '-', 1, 'efgh'           ],
-        [ '-', 2, 'ijkl'           ],
-        [ '-', 3, 'mnopqrstuvwxyz' ] ]
+      [['-', 0, 'abcd'],
+       ['-', 1, 'efgh'],
+       ['-', 2, 'ijkl'],
+       ['-', 3, 'mnopqrstuvwxyz']]
     ]
 
     expect(change_diff(correct_diff)).to eq(diff)

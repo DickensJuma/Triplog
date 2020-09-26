@@ -15,8 +15,8 @@ module ActiveStorage
     isolate_namespace ActiveStorage
 
     config.active_storage = ActiveSupport::OrderedOptions.new
-    config.active_storage.previewers = [ ActiveStorage::Previewer::PopplerPDFPreviewer, ActiveStorage::Previewer::MuPDFPreviewer, ActiveStorage::Previewer::VideoPreviewer ]
-    config.active_storage.analyzers = [ ActiveStorage::Analyzer::ImageAnalyzer, ActiveStorage::Analyzer::VideoAnalyzer ]
+    config.active_storage.previewers = [ActiveStorage::Previewer::PopplerPDFPreviewer, ActiveStorage::Previewer::MuPDFPreviewer, ActiveStorage::Previewer::VideoPreviewer]
+    config.active_storage.analyzers = [ActiveStorage::Analyzer::ImageAnalyzer, ActiveStorage::Analyzer::VideoAnalyzer]
     config.active_storage.paths = ActiveSupport::OrderedOptions.new
 
     config.active_storage.variable_content_types = %w(
@@ -55,11 +55,11 @@ module ActiveStorage
 
     initializer "active_storage.configs" do
       config.after_initialize do |app|
-        ActiveStorage.logger     = app.config.active_storage.logger || Rails.logger
-        ActiveStorage.queue      = app.config.active_storage.queue
+        ActiveStorage.logger = app.config.active_storage.logger || Rails.logger
+        ActiveStorage.queue = app.config.active_storage.queue
         ActiveStorage.previewers = app.config.active_storage.previewers || []
-        ActiveStorage.analyzers  = app.config.active_storage.analyzers || []
-        ActiveStorage.paths      = app.config.active_storage.paths || {}
+        ActiveStorage.analyzers = app.config.active_storage.analyzers || []
+        ActiveStorage.paths = app.config.active_storage.paths || {}
 
         ActiveStorage.variable_content_types = app.config.active_storage.variable_content_types || []
         ActiveStorage.content_types_to_serve_as_binary = app.config.active_storage.content_types_to_serve_as_binary || []
@@ -93,10 +93,10 @@ module ActiveStorage
             require "erb"
 
             YAML.load(ERB.new(config_file.read).result) || {}
-          rescue Psych::SyntaxError => e
-            raise "YAML syntax error occurred while parsing #{config_file}. " \
-                  "Please note that YAML must be consistently indented using spaces. Tabs are not allowed. " \
-                  "Error: #{e.message}"
+                                                                                  rescue Psych::SyntaxError => e
+                                                                                    raise "YAML syntax error occurred while parsing #{config_file}. " \
+                                                                                          "Please note that YAML must be consistently indented using spaces. Tabs are not allowed. " \
+                                                                                          "Error: #{e.message}"
           end
 
           ActiveStorage::Blob.service =

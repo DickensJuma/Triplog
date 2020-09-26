@@ -46,7 +46,7 @@ module ExecJS
             end
           end
         elsif Hash === value
-          value.each do |k,v|
+          value.each do |k, v|
             if MiniRacer::JavaScriptFunction === v
               value.delete k
             else
@@ -70,8 +70,8 @@ module ExecJS
             backtrace = backtrace.map { |line|
               if line =~ /JavaScript at/
                 line.sub("JavaScript at ", "")
-                    .sub("<anonymous>", "(execjs)")
-                    .strip
+                  .sub("<anonymous>", "(execjs)")
+                  .strip
               else
                 line
               end
@@ -85,7 +85,6 @@ module ExecJS
           raise ex
         end
       end
-
     end
 
     def name

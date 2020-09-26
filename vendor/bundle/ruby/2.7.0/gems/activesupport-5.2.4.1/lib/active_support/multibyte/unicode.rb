@@ -226,6 +226,7 @@ module ActiveSupport
         def tidy_bytes(string, force = false)
           return string if string.empty?
           return recode_windows1252_chars(string) if force
+
           string.scrub { |bad| recode_windows1252_chars(bad) }
         end
       else
@@ -246,6 +247,7 @@ module ActiveSupport
             reader.primitive_convert(source, out)
             _, _, _, error_bytes, _ = reader.primitive_errinfo
             break if error_bytes.nil?
+
             out << error_bytes.encode(Encoding::UTF_16LE, Encoding::Windows_1252, invalid: :replace, undef: :replace)
           end
 
@@ -370,25 +372,25 @@ module ActiveSupport
 
       private
 
-        def apply_mapping(string, mapping)
-          database.codepoints
-          string.each_codepoint.map do |codepoint|
-            cp = database.codepoints[codepoint]
-            if cp && (ncp = cp.send(mapping)) && ncp > 0
-              ncp
-            else
-              codepoint
-            end
-          end.pack("U*")
-        end
+      def apply_mapping(string, mapping)
+        database.codepoints
+        string.each_codepoint.map do |codepoint|
+          cp = database.codepoints[codepoint]
+          if cp && (ncp = cp.send(mapping)) && ncp > 0
+            ncp
+          else
+            codepoint
+          end
+        end.pack("U*")
+      end
 
-        def recode_windows1252_chars(string)
-          string.encode(Encoding::UTF_8, Encoding::Windows_1252, invalid: :replace, undef: :replace)
-        end
+      def recode_windows1252_chars(string)
+        string.encode(Encoding::UTF_8, Encoding::Windows_1252, invalid: :replace, undef: :replace)
+      end
 
-        def database
-          @database ||= UnicodeDatabase.new
-        end
+      def database
+        @database ||= UnicodeDatabase.new
+      end
     end
   end
 end

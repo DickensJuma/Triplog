@@ -63,8 +63,10 @@ module ActiveSupport
 
       I18n.transliterate(
         ActiveSupport::Multibyte::Unicode.normalize(
-          ActiveSupport::Multibyte::Unicode.tidy_bytes(string), :c),
-        replacement: replacement)
+          ActiveSupport::Multibyte::Unicode.tidy_bytes(string), :c
+        ),
+        replacement: replacement
+      )
     end
 
     # Replaces special characters in a string so that it may be used as part of
@@ -98,11 +100,11 @@ module ActiveSupport
 
       unless separator.nil? || separator.empty?
         if separator == "-".freeze
-          re_duplicate_separator        = /-{2,}/
+          re_duplicate_separator = /-{2,}/
           re_leading_trailing_separator = /^-|-$/i
         else
           re_sep = Regexp.escape(separator)
-          re_duplicate_separator        = /#{re_sep}{2,}/
+          re_duplicate_separator = /#{re_sep}{2,}/
           re_leading_trailing_separator = /^#{re_sep}|#{re_sep}$/i
         end
         # No more than one of the separator in a row.

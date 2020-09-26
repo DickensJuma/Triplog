@@ -69,10 +69,10 @@ module ActiveJob
     # Creates a new job instance. Takes the arguments that will be
     # passed to the perform method.
     def initialize(*arguments)
-      @arguments  = arguments
-      @job_id     = SecureRandom.uuid
+      @arguments = arguments
+      @job_id = SecureRandom.uuid
       @queue_name = self.class.queue_name
-      @priority   = self.class.priority
+      @priority = self.class.priority
       @executions = 0
     end
 
@@ -80,14 +80,14 @@ module ActiveJob
     # queueing adapter.
     def serialize
       {
-        "job_class"  => self.class.name,
-        "job_id"     => job_id,
+        "job_class" => self.class.name,
+        "job_id" => job_id,
         "provider_job_id" => provider_job_id,
         "queue_name" => queue_name,
-        "priority"   => priority,
-        "arguments"  => serialize_arguments_if_needed(arguments),
+        "priority" => priority,
+        "arguments" => serialize_arguments_if_needed(arguments),
         "executions" => executions,
-        "locale"     => I18n.locale.to_s
+        "locale" => I18n.locale.to_s
       }
     end
 
@@ -118,41 +118,42 @@ module ActiveJob
     #      end
     #    end
     def deserialize(job_data)
-      self.job_id               = job_data["job_id"]
-      self.provider_job_id      = job_data["provider_job_id"]
-      self.queue_name           = job_data["queue_name"]
-      self.priority             = job_data["priority"]
+      self.job_id = job_data["job_id"]
+      self.provider_job_id = job_data["provider_job_id"]
+      self.queue_name = job_data["queue_name"]
+      self.priority = job_data["priority"]
       self.serialized_arguments = job_data["arguments"]
-      self.executions           = job_data["executions"]
-      self.locale               = job_data["locale"] || I18n.locale.to_s
+      self.executions = job_data["executions"]
+      self.locale = job_data["locale"] || I18n.locale.to_s
     end
 
     private
-      def serialize_arguments_if_needed(arguments)
-        if arguments_serialized?
-          @serialized_arguments
-        else
-          serialize_arguments(arguments)
-        end
-      end
 
-      def deserialize_arguments_if_needed
-        if arguments_serialized?
-          @arguments = deserialize_arguments(@serialized_arguments)
-          @serialized_arguments = nil
-        end
+    def serialize_arguments_if_needed(arguments)
+      if arguments_serialized?
+        @serialized_arguments
+      else
+        serialize_arguments(arguments)
       end
+    end
 
-      def serialize_arguments(arguments)
-        Arguments.serialize(arguments)
+    def deserialize_arguments_if_needed
+      if arguments_serialized?
+        @arguments = deserialize_arguments(@serialized_arguments)
+        @serialized_arguments = nil
       end
+    end
 
-      def deserialize_arguments(serialized_args)
-        Arguments.deserialize(serialized_args)
-      end
+    def serialize_arguments(arguments)
+      Arguments.serialize(arguments)
+    end
 
-      def arguments_serialized?
-        defined?(@serialized_arguments) && @serialized_arguments
-      end
+    def deserialize_arguments(serialized_args)
+      Arguments.deserialize(serialized_args)
+    end
+
+    def arguments_serialized?
+      defined?(@serialized_arguments) && @serialized_arguments
+    end
   end
 end

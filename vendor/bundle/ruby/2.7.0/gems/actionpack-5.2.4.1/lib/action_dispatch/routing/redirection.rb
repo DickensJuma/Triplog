@@ -14,7 +14,7 @@ module ActionDispatch
 
       def initialize(status, block)
         @status = status
-        @block  = block
+        @block = block
       end
 
       def redirect?; true; end
@@ -35,8 +35,8 @@ module ActionDispatch
         end
 
         uri.scheme ||= req.scheme
-        uri.host   ||= req.host
-        uri.port   ||= req.port unless req.standard_port?
+        uri.host ||= req.host
+        uri.port ||= req.port unless req.standard_port?
 
         req.commit_flash
 
@@ -48,7 +48,7 @@ module ActionDispatch
           "Content-Length" => body.length.to_s
         }
 
-        [ status, headers, [body] ]
+        [status, headers, [body]]
       end
 
       def path(params, request)
@@ -60,21 +60,22 @@ module ActionDispatch
       end
 
       private
-        def relative_path?(path)
-          path && !path.empty? && path[0] != "/"
-        end
 
-        def escape(params)
-          Hash[params.map { |k, v| [k, Rack::Utils.escape(v)] }]
-        end
+      def relative_path?(path)
+        path && !path.empty? && path[0] != "/"
+      end
 
-        def escape_fragment(params)
-          Hash[params.map { |k, v| [k, Journey::Router::Utils.escape_fragment(v)] }]
-        end
+      def escape(params)
+        Hash[params.map { |k, v| [k, Rack::Utils.escape(v)] }]
+      end
 
-        def escape_path(params)
-          Hash[params.map { |k, v| [k, Journey::Router::Utils.escape_path(v)] }]
-        end
+      def escape_fragment(params)
+        Hash[params.map { |k, v| [k, Journey::Router::Utils.escape_fragment(v)] }]
+      end
+
+      def escape_path(params)
+        Hash[params.map { |k, v| [k, Journey::Router::Utils.escape_path(v)] }]
+      end
     end
 
     class PathRedirect < Redirect
@@ -82,8 +83,8 @@ module ActionDispatch
 
       def path(params, request)
         if block.match(URL_PARTS)
-          path     = interpolation_required?($1, params) ? $1 % escape_path(params)     : $1
-          query    = interpolation_required?($2, params) ? $2 % escape(params)          : $2
+          path = interpolation_required?($1, params) ? $1 % escape_path(params) : $1
+          query = interpolation_required?($2, params) ? $2 % escape(params) : $2
           fragment = interpolation_required?($3, params) ? $3 % escape_fragment(params) : $3
 
           "#{path}#{query}#{fragment}"
@@ -97,9 +98,10 @@ module ActionDispatch
       end
 
       private
-        def interpolation_required?(string, params)
-          !params.empty? && string && string.match(/%\{\w*\}/)
-        end
+
+      def interpolation_required?(string, params)
+        !params.empty? && string && string.match(/%\{\w*\}/)
+      end
     end
 
     class OptionRedirect < Redirect # :nodoc:
@@ -186,14 +188,15 @@ module ActionDispatch
       #
       def redirect(*args, &block)
         options = args.extract_options!
-        status  = options.delete(:status) || 301
-        path    = args.shift
+        status = options.delete(:status) || 301
+        path = args.shift
 
         return OptionRedirect.new(status, options) if options.any?
         return PathRedirect.new(status, path) if String === path
 
         block = path if path.respond_to? :call
         raise ArgumentError, "redirection argument not supported" unless block
+
         Redirect.new status, block
       end
     end

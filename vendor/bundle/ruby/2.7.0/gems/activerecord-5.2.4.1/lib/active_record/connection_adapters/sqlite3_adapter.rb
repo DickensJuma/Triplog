@@ -60,18 +60,18 @@ module ActiveRecord
       include SQLite3::SchemaStatements
 
       NATIVE_DATABASE_TYPES = {
-        primary_key:  "integer PRIMARY KEY AUTOINCREMENT NOT NULL",
-        string:       { name: "varchar" },
-        text:         { name: "text" },
-        integer:      { name: "integer" },
-        float:        { name: "float" },
-        decimal:      { name: "decimal" },
-        datetime:     { name: "datetime" },
-        time:         { name: "time" },
-        date:         { name: "date" },
-        binary:       { name: "blob" },
-        boolean:      { name: "boolean" },
-        json:         { name: "json" },
+        primary_key: "integer PRIMARY KEY AUTOINCREMENT NOT NULL",
+        string: { name: "varchar" },
+        text: { name: "text" },
+        integer: { name: "integer" },
+        float: { name: "float" },
+        decimal: { name: "decimal" },
+        datetime: { name: "datetime" },
+        time: { name: "time" },
+        date: { name: "date" },
+        binary: { name: "blob" },
+        boolean: { name: "boolean" },
+        json: { name: "json" },
       }
 
       ##
@@ -93,15 +93,16 @@ module ActiveRecord
 
       class StatementPool < ConnectionAdapters::StatementPool # :nodoc:
         private
-          def dealloc(stmt)
-            stmt[:stmt].close unless stmt[:stmt].closed?
-          end
+
+        def dealloc(stmt)
+          stmt[:stmt].close unless stmt[:stmt].closed?
+        end
       end
 
       def initialize(connection, logger, connection_options, config)
         super(connection, logger, config)
 
-        @active     = true
+        @active = true
         @statements = StatementPool.new(self.class.type_cast_config_to_integer(config[:statement_limit]))
 
         configure_connection
@@ -331,10 +332,10 @@ module ActiveRecord
       def change_column(table_name, column_name, type, options = {}) #:nodoc:
         alter_table(table_name) do |definition|
           definition[column_name].instance_eval do
-            self.type    = type
-            self.limit   = options[:limit] if options.include?(:limit)
+            self.type = type
+            self.limit = options[:limit] if options.include?(:limit)
             self.default = options[:default] if options.include?(:default)
-            self.null    = options[:null] if options.include?(:null)
+            self.null = options[:null] if options.include?(:null)
             self.precision = options[:precision] if options.include?(:precision)
             self.scale = options[:scale] if options.include?(:scale)
             self.collation = options[:collation] if options.include?(:collation)
@@ -387,186 +388,188 @@ module ActiveRecord
       end
 
       private
-        def initialize_type_map(m = type_map)
-          super
-          register_class_with_limit m, %r(int)i, SQLite3Integer
+
+      def initialize_type_map(m = type_map)
+        super
+        register_class_with_limit m, %r(int)i, SQLite3Integer
+      end
+
+      def table_structure(table_name)
+        structure = exec_query("PRAGMA table_info(#{quote_table_name(table_name)})", "SCHEMA")
+        raise(ActiveRecord::StatementInvalid, "Could not find table '#{table_name}'") if structure.empty?
+
+        table_structure_with_collation(table_name, structure)
+      end
+      alias column_definitions table_structure
+
+      # See: https://www.sqlite.org/lang_altertable.html
+      # SQLite has an additional restriction on the ALTER TABLE statement
+      def invalid_alter_table_type?(type, options)
+        type.to_sym == :primary_key || options[:primary_key]
+      end
+
+      def alter_table(table_name, options = {})
+        altered_table_name = "a#{table_name}"
+        caller = lambda { |definition| yield definition if block_given? }
+
+        transaction do
+          move_table(table_name, altered_table_name,
+                     options.merge(temporary: true))
+          move_table(altered_table_name, table_name, &caller)
         end
+      end
 
-        def table_structure(table_name)
-          structure = exec_query("PRAGMA table_info(#{quote_table_name(table_name)})", "SCHEMA")
-          raise(ActiveRecord::StatementInvalid, "Could not find table '#{table_name}'") if structure.empty?
-          table_structure_with_collation(table_name, structure)
+      def move_table(from, to, options = {}, &block)
+        copy_table(from, to, options, &block)
+        drop_table(from)
+      end
+
+      def copy_table(from, to, options = {})
+        from_primary_key = primary_key(from)
+        options[:id] = false
+        create_table(to, options) do |definition|
+          @definition = definition
+          if from_primary_key.is_a?(Array)
+            @definition.primary_keys from_primary_key
+          end
+          columns(from).each do |column|
+            column_name = options[:rename] ?
+              (options[:rename][column.name] ||
+               options[:rename][column.name.to_sym] ||
+               column.name) : column.name
+
+            @definition.column(column_name, column.type,
+                               limit: column.limit, default: column.default,
+                               precision: column.precision, scale: column.scale,
+                               null: column.null, collation: column.collation,
+                               primary_key: column_name == from_primary_key)
+          end
+          yield @definition if block_given?
         end
-        alias column_definitions table_structure
+        copy_table_indexes(from, to, options[:rename] || {})
+        copy_table_contents(from, to,
+                            @definition.columns.map(&:name),
+                            options[:rename] || {})
+      end
 
-        # See: https://www.sqlite.org/lang_altertable.html
-        # SQLite has an additional restriction on the ALTER TABLE statement
-        def invalid_alter_table_type?(type, options)
-          type.to_sym == :primary_key || options[:primary_key]
-        end
+      def copy_table_indexes(from, to, rename = {})
+        indexes(from).each do |index|
+          name = index.name
+          if to == "a#{from}"
+            name = "t#{name}"
+          elsif from == "a#{to}"
+            name = name[1..-1]
+          end
 
-        def alter_table(table_name, options = {})
-          altered_table_name = "a#{table_name}"
-          caller = lambda { |definition| yield definition if block_given? }
+          to_column_names = columns(to).map(&:name)
+          columns = index.columns.map { |c| rename[c] || c }.select do |column|
+            to_column_names.include?(column)
+          end
 
-          transaction do
-            move_table(table_name, altered_table_name,
-              options.merge(temporary: true))
-            move_table(altered_table_name, table_name, &caller)
+          unless columns.empty?
+            # index name can't be the same
+            opts = { name: name.gsub(/(^|_)(#{from})_/, "\\1#{to}_"), internal: true }
+            opts[:unique] = true if index.unique
+            opts[:where] = index.where if index.where
+            add_index(to, columns, opts)
           end
         end
+      end
 
-        def move_table(from, to, options = {}, &block)
-          copy_table(from, to, options, &block)
-          drop_table(from)
-        end
+      def copy_table_contents(from, to, columns, rename = {})
+        column_mappings = Hash[columns.map { |name| [name, name] }]
+        rename.each { |a| column_mappings[a.last] = a.first }
+        from_columns = columns(from).collect(&:name)
+        columns = columns.find_all { |col| from_columns.include?(column_mappings[col]) }
+        from_columns_to_copy = columns.map { |col| column_mappings[col] }
+        quoted_columns = columns.map { |col| quote_column_name(col) } * ","
+        quoted_from_columns = from_columns_to_copy.map { |col| quote_column_name(col) } * ","
 
-        def copy_table(from, to, options = {})
-          from_primary_key = primary_key(from)
-          options[:id] = false
-          create_table(to, options) do |definition|
-            @definition = definition
-            if from_primary_key.is_a?(Array)
-              @definition.primary_keys from_primary_key
-            end
-            columns(from).each do |column|
-              column_name = options[:rename] ?
-                (options[:rename][column.name] ||
-                 options[:rename][column.name.to_sym] ||
-                 column.name) : column.name
-
-              @definition.column(column_name, column.type,
-                limit: column.limit, default: column.default,
-                precision: column.precision, scale: column.scale,
-                null: column.null, collation: column.collation,
-                primary_key: column_name == from_primary_key
-              )
-            end
-            yield @definition if block_given?
-          end
-          copy_table_indexes(from, to, options[:rename] || {})
-          copy_table_contents(from, to,
-            @definition.columns.map(&:name),
-            options[:rename] || {})
-        end
-
-        def copy_table_indexes(from, to, rename = {})
-          indexes(from).each do |index|
-            name = index.name
-            if to == "a#{from}"
-              name = "t#{name}"
-            elsif from == "a#{to}"
-              name = name[1..-1]
-            end
-
-            to_column_names = columns(to).map(&:name)
-            columns = index.columns.map { |c| rename[c] || c }.select do |column|
-              to_column_names.include?(column)
-            end
-
-            unless columns.empty?
-              # index name can't be the same
-              opts = { name: name.gsub(/(^|_)(#{from})_/, "\\1#{to}_"), internal: true }
-              opts[:unique] = true if index.unique
-              opts[:where] = index.where if index.where
-              add_index(to, columns, opts)
-            end
-          end
-        end
-
-        def copy_table_contents(from, to, columns, rename = {})
-          column_mappings = Hash[columns.map { |name| [name, name] }]
-          rename.each { |a| column_mappings[a.last] = a.first }
-          from_columns = columns(from).collect(&:name)
-          columns = columns.find_all { |col| from_columns.include?(column_mappings[col]) }
-          from_columns_to_copy = columns.map { |col| column_mappings[col] }
-          quoted_columns = columns.map { |col| quote_column_name(col) } * ","
-          quoted_from_columns = from_columns_to_copy.map { |col| quote_column_name(col) } * ","
-
-          exec_query("INSERT INTO #{quote_table_name(to)} (#{quoted_columns})
+        exec_query("INSERT INTO #{quote_table_name(to)} (#{quoted_columns})
                      SELECT #{quoted_from_columns} FROM #{quote_table_name(from)}")
+      end
+
+      def sqlite_version
+        @sqlite_version ||= SQLite3Adapter::Version.new(query_value("SELECT sqlite_version(*)"))
+      end
+
+      def translate_exception(exception, message)
+        case exception.message
+        # SQLite 3.8.2 returns a newly formatted error message:
+        #   UNIQUE constraint failed: *table_name*.*column_name*
+        # Older versions of SQLite return:
+        #   column *column_name* is not unique
+        when /column(s)? .* (is|are) not unique/, /UNIQUE constraint failed: .*/
+          RecordNotUnique.new(message)
+        when /.* may not be NULL/, /NOT NULL constraint failed: .*/
+          NotNullViolation.new(message)
+        when /FOREIGN KEY constraint failed/i
+          InvalidForeignKey.new(message)
+        else
+          super
         end
+      end
 
-        def sqlite_version
-          @sqlite_version ||= SQLite3Adapter::Version.new(query_value("SELECT sqlite_version(*)"))
-        end
+      COLLATE_REGEX = /.*\"(\w+)\".*collate\s+\"(\w+)\".*/i.freeze
 
-        def translate_exception(exception, message)
-          case exception.message
-          # SQLite 3.8.2 returns a newly formatted error message:
-          #   UNIQUE constraint failed: *table_name*.*column_name*
-          # Older versions of SQLite return:
-          #   column *column_name* is not unique
-          when /column(s)? .* (is|are) not unique/, /UNIQUE constraint failed: .*/
-            RecordNotUnique.new(message)
-          when /.* may not be NULL/, /NOT NULL constraint failed: .*/
-            NotNullViolation.new(message)
-          when /FOREIGN KEY constraint failed/i
-            InvalidForeignKey.new(message)
-          else
-            super
-          end
-        end
-
-        COLLATE_REGEX = /.*\"(\w+)\".*collate\s+\"(\w+)\".*/i.freeze
-
-        def table_structure_with_collation(table_name, basic_structure)
-          collation_hash = {}
-          sql = <<-SQL
+      def table_structure_with_collation(table_name, basic_structure)
+        collation_hash = {}
+        sql = <<-SQL
             SELECT sql FROM
               (SELECT * FROM sqlite_master UNION ALL
                SELECT * FROM sqlite_temp_master)
             WHERE type = 'table' AND name = #{quote(table_name)}
-          SQL
+        SQL
 
-          # Result will have following sample string
-          # CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-          #                       "password_digest" varchar COLLATE "NOCASE");
-          result = exec_query(sql, "SCHEMA").first
+        # Result will have following sample string
+        # CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+        #                       "password_digest" varchar COLLATE "NOCASE");
+        result = exec_query(sql, "SCHEMA").first
 
-          if result
-            # Splitting with left parentheses and discarding the first part will return all
-            # columns separated with comma(,).
-            columns_string = result["sql"].split("(", 2).last
+        if result
+          # Splitting with left parentheses and discarding the first part will return all
+          # columns separated with comma(,).
+          columns_string = result["sql"].split("(", 2).last
 
-            columns_string.split(",").each do |column_string|
-              # This regex will match the column name and collation type and will save
-              # the value in $1 and $2 respectively.
-              collation_hash[$1] = $2 if COLLATE_REGEX =~ column_string
-            end
-
-            basic_structure.map! do |column|
-              column_name = column["name"]
-
-              if collation_hash.has_key? column_name
-                column["collation"] = collation_hash[column_name]
-              end
-
-              column
-            end
-          else
-            basic_structure.to_hash
+          columns_string.split(",").each do |column_string|
+            # This regex will match the column name and collation type and will save
+            # the value in $1 and $2 respectively.
+            collation_hash[$1] = $2 if COLLATE_REGEX =~ column_string
           end
-        end
 
-        def arel_visitor
-          Arel::Visitors::SQLite.new(self)
-        end
+          basic_structure.map! do |column|
+            column_name = column["name"]
 
-        def configure_connection
-          execute("PRAGMA foreign_keys = ON", "SCHEMA")
-        end
-
-        class SQLite3Integer < Type::Integer # :nodoc:
-          private
-            def _limit
-              # INTEGER storage class can be stored 8 bytes value.
-              # See https://www.sqlite.org/datatype3.html#storage_classes_and_datatypes
-              limit || 8
+            if collation_hash.has_key? column_name
+              column["collation"] = collation_hash[column_name]
             end
-        end
 
-        ActiveRecord::Type.register(:integer, SQLite3Integer, adapter: :sqlite3)
+            column
+          end
+        else
+          basic_structure.to_hash
+        end
+      end
+
+      def arel_visitor
+        Arel::Visitors::SQLite.new(self)
+      end
+
+      def configure_connection
+        execute("PRAGMA foreign_keys = ON", "SCHEMA")
+      end
+
+      class SQLite3Integer < Type::Integer # :nodoc:
+        private
+
+        def _limit
+          # INTEGER storage class can be stored 8 bytes value.
+          # See https://www.sqlite.org/datatype3.html#storage_classes_and_datatypes
+          limit || 8
+        end
+      end
+
+      ActiveRecord::Type.register(:integer, SQLite3Integer, adapter: :sqlite3)
     end
     ActiveSupport.run_load_hooks(:active_record_sqlite3adapter, SQLite3Adapter)
   end

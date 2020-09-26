@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Visitors
     class SQLite < Arel::Visitors::ToSql
@@ -21,7 +22,6 @@ module Arel
       def visit_Arel_Nodes_False o, collector
         collector << "0"
       end
-
     end
   end
 end

@@ -24,12 +24,12 @@ module ActiveSupport
 
       log: ->(message, callstack, deprecation_horizon, gem_name) {
         logger =
-            if defined?(Rails.logger) && Rails.logger
-              Rails.logger
-            else
-              require "active_support/logger"
-              ActiveSupport::Logger.new($stderr)
-            end
+          if defined?(Rails.logger) && Rails.logger
+            Rails.logger
+          else
+            require "active_support/logger"
+            ActiveSupport::Logger.new($stderr)
+          end
         logger.warn message
         logger.debug callstack.join("\n  ") if debug
       },
@@ -93,17 +93,18 @@ module ActiveSupport
       end
 
       private
-        def arity_coerce(behavior)
-          unless behavior.respond_to?(:call)
-            raise ArgumentError, "#{behavior.inspect} is not a valid deprecation behavior."
-          end
 
-          if behavior.arity == 4 || behavior.arity == -1
-            behavior
-          else
-            -> message, callstack, _, _ { behavior.call(message, callstack) }
-          end
+      def arity_coerce(behavior)
+        unless behavior.respond_to?(:call)
+          raise ArgumentError, "#{behavior.inspect} is not a valid deprecation behavior."
         end
+
+        if behavior.arity == 4 || behavior.arity == -1
+          behavior
+        else
+          ->message, callstack, _, _ { behavior.call(message, callstack) }
+        end
+      end
     end
   end
 end

@@ -57,6 +57,7 @@ module Devise
       # it exists), and save the record without validations.
       def forget_me!
         return unless persisted?
+
         self.remember_token = nil if respond_to?(:remember_token)
         self.remember_created_at = nil if self.class.expire_all_remember_me_on_sign_out
         save(validate: false)
@@ -114,9 +115,9 @@ module Devise
         # 4. the token date is bigger than the remember_created_at
         # 5. the token matches
         generated_at.is_a?(Time) &&
-         (self.class.remember_for.ago < generated_at) &&
-         (generated_at > (remember_created_at || Time.now).utc) &&
-         Devise.secure_compare(rememberable_value, token)
+          (self.class.remember_for.ago < generated_at) &&
+          (generated_at > (remember_created_at || Time.now).utc) &&
+          Devise.secure_compare(rememberable_value, token)
       end
 
       private

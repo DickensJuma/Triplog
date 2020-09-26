@@ -6,7 +6,7 @@ module ActionDispatch
   class Request
     # Session is responsible for lazily loading the session from store.
     class Session # :nodoc:
-      ENV_SESSION_KEY         = Rack::RACK_SESSION # :nodoc:
+      ENV_SESSION_KEY = Rack::RACK_SESSION # :nodoc:
       ENV_SESSION_OPTIONS_KEY = Rack::RACK_SESSION_OPTIONS # :nodoc:
 
       # Singleton object used to determine if an optional param wasn't specified.
@@ -15,7 +15,7 @@ module ActionDispatch
       # Creates a session hash, merging the properties of the previous session if any.
       def self.create(store, req, default_options)
         session_was = find req
-        session     = Request::Session.new(store, req)
+        session = Request::Session.new(store, req)
         session.merge! session_was if session_was
 
         set(req, session)
@@ -41,7 +41,7 @@ module ActionDispatch
         end
 
         def initialize(by, default_options)
-          @by       = by
+          @by = by
           @delegate = default_options.dup
         end
 
@@ -55,17 +55,19 @@ module ActionDispatch
           }
         end
 
-        def []=(k, v);        @delegate[k] = v; end
-        def to_hash;          @delegate.dup; end
+        def []=(k, v); @delegate[k] = v; end
+
+        def to_hash; @delegate.dup; end
+
         def values_at(*args); @delegate.values_at(*args); end
       end
 
       def initialize(by, req)
-        @by       = by
-        @req      = req
+        @by = by
+        @req = req
         @delegate = {}
-        @loaded   = false
-        @exists   = nil # We haven't checked yet.
+        @loaded = false
+        @exists = nil # We haven't checked yet.
       end
 
       def id
@@ -192,6 +194,7 @@ module ActionDispatch
 
       def exists?
         return @exists unless @exists.nil?
+
         @exists = @by.send(:session_exists?, @req)
       end
 
@@ -215,26 +218,26 @@ module ActionDispatch
 
       private
 
-        def load_for_read!
-          load! if !loaded? && exists?
-        end
+      def load_for_read!
+        load! if !loaded? && exists?
+      end
 
-        def load_for_write!
-          load! unless loaded?
-        end
+      def load_for_write!
+        load! unless loaded?
+      end
 
-        def load!
-          id, session = @by.load_session @req
-          options[:id] = id
-          @delegate.replace(stringify_keys(session))
-          @loaded = true
-        end
+      def load!
+        id, session = @by.load_session @req
+        options[:id] = id
+        @delegate.replace(stringify_keys(session))
+        @loaded = true
+      end
 
-        def stringify_keys(other)
-          other.each_with_object({}) { |(key, value), hash|
-            hash[key.to_s] = value
-          }
-        end
+      def stringify_keys(other)
+        other.each_with_object({}) { |(key, value), hash|
+          hash[key.to_s] = value
+        }
+      end
     end
   end
 end

@@ -293,6 +293,7 @@ class << Diff::LCS
       else
         loop do
           break unless bj < b_line
+
           bx = string ? seq2[bj, 1] : seq2[bj]
           event = Diff::LCS::ContextChange.new('+', i, ax, bj, bx)
           event = yield event if block_given?
@@ -475,6 +476,7 @@ class << Diff::LCS
       end
 
       break if ma >= matches.size # end of matches?
+
       mb = matches[ma]
 
       # Change(seq2)
@@ -612,6 +614,7 @@ class << Diff::LCS
 
     if not has_changes
       return src.dup if src.respond_to? :dup
+
       return src
     end
 
@@ -657,8 +660,8 @@ class << Diff::LCS
             bj += 1
           end
 
-        res << el
-        bj += 1
+          res << el
+          bj += 1
         when '='
           # This only appears in sdiff output with the SDiff callback.
           # Therefore, we only need to worry about dealing with a single
@@ -674,10 +677,10 @@ class << Diff::LCS
             bj += 1
           end
 
-        bj += 1
-        ai += 1
+          bj += 1
+          ai += 1
 
-        res << el
+          res << el
         end
       when Diff::LCS::Change
         case action

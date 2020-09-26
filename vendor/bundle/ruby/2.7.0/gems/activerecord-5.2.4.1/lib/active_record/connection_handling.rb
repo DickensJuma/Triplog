@@ -2,7 +2,7 @@
 
 module ActiveRecord
   module ConnectionHandling
-    RAILS_ENV   = -> { (Rails.env if defined?(Rails.env)) || ENV["RAILS_ENV"].presence || ENV["RACK_ENV"].presence }
+    RAILS_ENV = -> { (Rails.env if defined?(Rails.env)) || ENV["RAILS_ENV"].presence || ENV["RACK_ENV"].presence }
     DEFAULT_ENV = -> { RAILS_ENV.call || "default_env" }
 
     # Establishes the connection to the database. Accepts a hash as input where
@@ -73,14 +73,15 @@ module ActiveRecord
       end
 
       private
-        def config
-          @raw_config.dup.tap do |cfg|
-            if url = ENV["DATABASE_URL"]
-              cfg[@env] ||= {}
-              cfg[@env]["url"] ||= url
-            end
+
+      def config
+        @raw_config.dup.tap do |cfg|
+          if url = ENV["DATABASE_URL"]
+            cfg[@env] ||= {}
+            cfg[@env]["url"] ||= url
           end
         end
+      end
     end
 
     # Returns the connection currently associated with the class. This can
@@ -97,6 +98,7 @@ module ActiveRecord
       if !defined?(@connection_specification_name) || @connection_specification_name.nil?
         return self == Base ? "primary" : superclass.connection_specification_name
       end
+
       @connection_specification_name
     end
 
@@ -140,6 +142,6 @@ module ActiveRecord
     end
 
     delegate :clear_active_connections!, :clear_reloadable_connections!,
-      :clear_all_connections!, :flush_idle_connections!, to: :connection_handler
+             :clear_all_connections!, :flush_idle_connections!, to: :connection_handler
   end
 end

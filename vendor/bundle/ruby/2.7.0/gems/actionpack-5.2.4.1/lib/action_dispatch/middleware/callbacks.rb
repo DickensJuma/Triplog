@@ -30,6 +30,7 @@ module ActionDispatch
         end
       end
       raise error if error
+
       result
     end
   end

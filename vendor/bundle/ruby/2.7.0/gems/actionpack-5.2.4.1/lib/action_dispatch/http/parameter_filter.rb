@@ -15,7 +15,7 @@ module ActionDispatch
         compiled_filter.call(params)
       end
 
-    private
+      private
 
       def compiled_filter
         @compiled_filter ||= CompiledFilter.compile(@filters)

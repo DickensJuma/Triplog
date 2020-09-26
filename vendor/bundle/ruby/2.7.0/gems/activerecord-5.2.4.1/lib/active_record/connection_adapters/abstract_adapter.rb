@@ -101,14 +101,14 @@ module ActiveRecord
       def initialize(connection, logger = nil, config = {}) # :nodoc:
         super()
 
-        @connection          = connection
-        @owner               = nil
-        @instrumenter        = ActiveSupport::Notifications.instrumenter
-        @logger              = logger
-        @config              = config
-        @pool                = nil
-        @idle_since          = Concurrent.monotonic_time
-        @schema_cache        = SchemaCache.new self
+        @connection = connection
+        @owner = nil
+        @instrumenter = ActiveSupport::Notifications.instrumenter
+        @logger = logger
+        @config = config
+        @pool = nil
+        @idle_since = Concurrent.monotonic_time
+        @schema_cache = SchemaCache.new self
         @quoted_column_names, @quoted_table_names = {}, {}
         @visitor = arel_visitor
         @lock = ActiveSupport::Concurrency::LoadInterlockAwareMonitor.new
@@ -198,6 +198,7 @@ module ActiveRecord
       # Seconds since this connection was returned to the pool
       def seconds_idle # :nodoc:
         return 0 if in_use?
+
         Concurrent.monotonic_time - @idle_since
       end
 
@@ -482,147 +483,149 @@ module ActiveRecord
       end
 
       private
-        def type_map
-          @type_map ||= Type::TypeMap.new.tap do |mapping|
-            initialize_type_map(mapping)
+
+      def type_map
+        @type_map ||= Type::TypeMap.new.tap do |mapping|
+          initialize_type_map(mapping)
+        end
+      end
+
+      def initialize_type_map(m = type_map)
+        register_class_with_limit m, %r(boolean)i, Type::Boolean
+        register_class_with_limit m, %r(char)i, Type::String
+        register_class_with_limit m, %r(binary)i, Type::Binary
+        register_class_with_limit m, %r(text)i, Type::Text
+        register_class_with_precision m, %r(date)i, Type::Date
+        register_class_with_precision m, %r(time)i, Type::Time
+        register_class_with_precision m, %r(datetime)i, Type::DateTime
+        register_class_with_limit m, %r(float)i, Type::Float
+        register_class_with_limit m, %r(int)i, Type::Integer
+
+        m.alias_type %r(blob)i, "binary"
+        m.alias_type %r(clob)i, "text"
+        m.alias_type %r(timestamp)i, "datetime"
+        m.alias_type %r(numeric)i, "decimal"
+        m.alias_type %r(number)i, "decimal"
+        m.alias_type %r(double)i, "float"
+
+        m.register_type %r(^json)i, Type::Json.new
+
+        m.register_type(%r(decimal)i) do |sql_type|
+          scale = extract_scale(sql_type)
+          precision = extract_precision(sql_type)
+
+          if scale == 0
+            # FIXME: Remove this class as well
+            Type::DecimalWithoutScale.new(precision: precision)
+          else
+            Type::Decimal.new(precision: precision, scale: scale)
           end
         end
+      end
 
-        def initialize_type_map(m = type_map)
-          register_class_with_limit m, %r(boolean)i,       Type::Boolean
-          register_class_with_limit m, %r(char)i,          Type::String
-          register_class_with_limit m, %r(binary)i,        Type::Binary
-          register_class_with_limit m, %r(text)i,          Type::Text
-          register_class_with_precision m, %r(date)i,      Type::Date
-          register_class_with_precision m, %r(time)i,      Type::Time
-          register_class_with_precision m, %r(datetime)i,  Type::DateTime
-          register_class_with_limit m, %r(float)i,         Type::Float
-          register_class_with_limit m, %r(int)i,           Type::Integer
+      def reload_type_map
+        type_map.clear
+        initialize_type_map
+      end
 
-          m.alias_type %r(blob)i,      "binary"
-          m.alias_type %r(clob)i,      "text"
-          m.alias_type %r(timestamp)i, "datetime"
-          m.alias_type %r(numeric)i,   "decimal"
-          m.alias_type %r(number)i,    "decimal"
-          m.alias_type %r(double)i,    "float"
+      def register_class_with_limit(mapping, key, klass)
+        mapping.register_type(key) do |*args|
+          limit = extract_limit(args.last)
+          klass.new(limit: limit)
+        end
+      end
 
-          m.register_type %r(^json)i, Type::Json.new
+      def register_class_with_precision(mapping, key, klass)
+        mapping.register_type(key) do |*args|
+          precision = extract_precision(args.last)
+          klass.new(precision: precision)
+        end
+      end
 
-          m.register_type(%r(decimal)i) do |sql_type|
-            scale = extract_scale(sql_type)
-            precision = extract_precision(sql_type)
+      def extract_scale(sql_type)
+        case sql_type
+        when /\((\d+)\)/ then 0
+        when /\((\d+)(,(\d+))\)/ then $3.to_i
+        end
+      end
 
-            if scale == 0
-              # FIXME: Remove this class as well
-              Type::DecimalWithoutScale.new(precision: precision)
-            else
-              Type::Decimal.new(precision: precision, scale: scale)
-            end
-          end
+      def extract_precision(sql_type)
+        $1.to_i if sql_type =~ /\((\d+)(,\d+)?\)/
+      end
+
+      def extract_limit(sql_type)
+        $1.to_i if sql_type =~ /\((.*)\)/
+      end
+
+      def translate_exception_class(e, sql)
+        begin
+          message = "#{e.class.name}: #{e.message}: #{sql}"
+        rescue Encoding::CompatibilityError
+          message = "#{e.class.name}: #{e.message.force_encoding sql.encoding}: #{sql}"
         end
 
-        def reload_type_map
-          type_map.clear
-          initialize_type_map
-        end
+        exception = translate_exception(e, message)
+        exception.set_backtrace e.backtrace
+        exception
+      end
 
-        def register_class_with_limit(mapping, key, klass)
-          mapping.register_type(key) do |*args|
-            limit = extract_limit(args.last)
-            klass.new(limit: limit)
-          end
-        end
-
-        def register_class_with_precision(mapping, key, klass)
-          mapping.register_type(key) do |*args|
-            precision = extract_precision(args.last)
-            klass.new(precision: precision)
-          end
-        end
-
-        def extract_scale(sql_type)
-          case sql_type
-          when /\((\d+)\)/ then 0
-          when /\((\d+)(,(\d+))\)/ then $3.to_i
-          end
-        end
-
-        def extract_precision(sql_type)
-          $1.to_i if sql_type =~ /\((\d+)(,\d+)?\)/
-        end
-
-        def extract_limit(sql_type)
-          $1.to_i if sql_type =~ /\((.*)\)/
-        end
-
-        def translate_exception_class(e, sql)
+      def log(sql, name = "SQL", binds = [], type_casted_binds = [], statement_name = nil) # :doc:
+        @instrumenter.instrument(
+          "sql.active_record",
+          sql: sql,
+          name: name,
+          binds: binds,
+          type_casted_binds: type_casted_binds,
+          statement_name: statement_name,
+          connection_id: object_id
+        ) do
           begin
-            message = "#{e.class.name}: #{e.message}: #{sql}"
-          rescue Encoding::CompatibilityError
-            message = "#{e.class.name}: #{e.message.force_encoding sql.encoding}: #{sql}"
-          end
-
-          exception = translate_exception(e, message)
-          exception.set_backtrace e.backtrace
-          exception
-        end
-
-        def log(sql, name = "SQL", binds = [], type_casted_binds = [], statement_name = nil) # :doc:
-          @instrumenter.instrument(
-            "sql.active_record",
-            sql:               sql,
-            name:              name,
-            binds:             binds,
-            type_casted_binds: type_casted_binds,
-            statement_name:    statement_name,
-            connection_id:     object_id) do
-            begin
-              @lock.synchronize do
-                yield
-              end
-            rescue => e
-              raise translate_exception_class(e, sql)
+            @lock.synchronize do
+              yield
             end
+          rescue => e
+            raise translate_exception_class(e, sql)
           end
         end
+      end
 
-        def translate_exception(exception, message)
-          # override in derived class
-          case exception
-          when RuntimeError
-            exception
-          else
-            ActiveRecord::StatementInvalid.new(message)
-          end
+      def translate_exception(exception, message)
+        # override in derived class
+        case exception
+        when RuntimeError
+          exception
+        else
+          ActiveRecord::StatementInvalid.new(message)
         end
+      end
 
-        def without_prepared_statement?(binds)
-          !prepared_statements || binds.empty?
-        end
+      def without_prepared_statement?(binds)
+        !prepared_statements || binds.empty?
+      end
 
-        def column_for(table_name, column_name)
-          column_name = column_name.to_s
-          columns(table_name).detect { |c| c.name == column_name } ||
-            raise(ActiveRecordError, "No such column: #{table_name}.#{column_name}")
-        end
+      def column_for(table_name, column_name)
+        column_name = column_name.to_s
+        columns(table_name).detect { |c| c.name == column_name } ||
+          raise(ActiveRecordError, "No such column: #{table_name}.#{column_name}")
+      end
 
-        def collector
-          if prepared_statements
-            Arel::Collectors::Composite.new(
-              Arel::Collectors::SQLString.new,
-              Arel::Collectors::Bind.new,
-            )
-          else
-            Arel::Collectors::SubstituteBinds.new(
-              self,
-              Arel::Collectors::SQLString.new,
-            )
-          end
+      def collector
+        if prepared_statements
+          Arel::Collectors::Composite.new(
+            Arel::Collectors::SQLString.new,
+            Arel::Collectors::Bind.new,
+          )
+        else
+          Arel::Collectors::SubstituteBinds.new(
+            self,
+            Arel::Collectors::SQLString.new,
+          )
         end
+      end
 
-        def arel_visitor
-          Arel::Visitors::ToSql.new(self)
-        end
+      def arel_visitor
+        Arel::Visitors::ToSql.new(self)
+      end
     end
   end
 end

@@ -5,7 +5,7 @@ require "zlib"
 require "active_support/core_ext/module/attribute_accessors"
 
 module ActiveRecord
-  class MigrationError < ActiveRecordError#:nodoc:
+  class MigrationError < ActiveRecordError #:nodoc:
     def initialize(message = nil)
       message = "\n\n#{message}\n\n" if message
       super
@@ -86,7 +86,7 @@ module ActiveRecord
   class IrreversibleMigration < MigrationError
   end
 
-  class DuplicateMigrationVersionError < MigrationError#:nodoc:
+  class DuplicateMigrationVersionError < MigrationError #:nodoc:
     def initialize(version = nil)
       if version
         super("Multiple migrations have the version number #{version}.")
@@ -96,7 +96,7 @@ module ActiveRecord
     end
   end
 
-  class DuplicateMigrationNameError < MigrationError#:nodoc:
+  class DuplicateMigrationNameError < MigrationError #:nodoc:
     def initialize(name = nil)
       if name
         super("Multiple migrations have the name #{name}.")
@@ -116,7 +116,7 @@ module ActiveRecord
     end
   end
 
-  class IllegalMigrationNameError < MigrationError#:nodoc:
+  class IllegalMigrationNameError < MigrationError #:nodoc:
     def initialize(name = nil)
       if name
         super("Illegal name for migration file: #{name}\n\t(only lower case letters, numbers, and '_' allowed).")
@@ -126,7 +126,7 @@ module ActiveRecord
     end
   end
 
-  class PendingMigrationError < MigrationError#:nodoc:
+  class PendingMigrationError < MigrationError #:nodoc:
     def initialize(message = nil)
       if !message && defined?(Rails.env)
         super("Migrations are pending. To resolve this issue, run:\n\n        bin/rails db:migrate RAILS_ENV=#{::Rails.env}")
@@ -169,8 +169,8 @@ module ActiveRecord
 
   class EnvironmentMismatchError < ActiveRecordError
     def initialize(current: nil, stored: nil)
-      msg =  "You are attempting to modify a database that was last run in `#{ stored }` environment.\n".dup
-      msg << "You are running in `#{ current }` environment. "
+      msg = "You are attempting to modify a database that was last run in `#{stored}` environment.\n".dup
+      msg << "You are running in `#{current}` environment. "
       msg << "If you are sure you want to continue, first set the environment using:\n\n"
       msg << "        bin/rails db:environment:set"
       if defined?(Rails.env)
@@ -561,9 +561,9 @@ module ActiveRecord
 
       private
 
-        def connection
-          ActiveRecord::Base.connection
-        end
+      def connection
+        ActiveRecord::Base.connection
+      end
     end
 
     class << self
@@ -625,8 +625,8 @@ module ActiveRecord
     attr_accessor :name, :version
 
     def initialize(name = self.class.name, version = nil)
-      @name       = name
-      @version    = version
+      @name = name
+      @version = version
       @connection = nil
     end
 
@@ -774,12 +774,14 @@ module ActiveRecord
     def up
       self.class.delegate = self
       return unless self.class.respond_to?(:up)
+
       self.class.up
     end
 
     def down
       self.class.delegate = self
       return unless self.class.respond_to?(:down)
+
       self.class.down
     end
 
@@ -788,7 +790,7 @@ module ActiveRecord
       return unless respond_to?(direction)
 
       case direction
-      when :up   then announce "migrating"
+      when :up then announce "migrating"
       when :down then announce "reverting"
       end
 
@@ -800,7 +802,7 @@ module ActiveRecord
       end
 
       case direction
-      when :up   then announce "migrated (%.4fs)" % time.real; write
+      when :up then announce "migrated (%.4fs)" % time.real; write
       when :down then announce "reverted (%.4fs)" % time.real; write
       end
     end
@@ -862,12 +864,13 @@ module ActiveRecord
           unless arguments.empty? || [:execute, :enable_extension, :disable_extension].include?(method)
             arguments[0] = proper_table_name(arguments.first, table_name_options)
             if [:rename_table, :add_foreign_key].include?(method) ||
-              (method == :remove_foreign_key && !arguments.second.is_a?(Hash))
+               (method == :remove_foreign_key && !arguments.second.is_a?(Hash))
               arguments[1] = proper_table_name(arguments.second, table_name_options)
             end
           end
         end
         return super unless connection.respond_to?(method)
+
         connection.send(method, *arguments, &block)
       end
     end
@@ -949,13 +952,14 @@ module ActiveRecord
     end
 
     private
-      def execute_block
-        if connection.respond_to? :execute_block
-          super # use normal delegation to record the block
-        else
-          yield
-        end
+
+    def execute_block
+      if connection.respond_to? :execute_block
+        super # use normal delegation to record the block
+      else
+        yield
       end
+    end
   end
 
   # MigrationProxy is used to defer loading of the actual migration classes
@@ -978,14 +982,14 @@ module ActiveRecord
 
     private
 
-      def migration
-        @migration ||= load_migration
-      end
+    def migration
+      @migration ||= load_migration
+    end
 
-      def load_migration
-        require(File.expand_path(filename))
-        name.constantize.new(name, version)
-      end
+    def load_migration
+      require(File.expand_path(filename))
+      name.constantize.new(name, version)
+    end
   end
 
   class NullMigration < MigrationProxy #:nodoc:
@@ -1028,20 +1032,20 @@ module ActiveRecord
 
     def up(target_version = nil)
       selected_migrations = if block_given?
-        migrations.select { |m| yield m }
-      else
-        migrations
-      end
+                              migrations.select { |m| yield m }
+                            else
+                              migrations
+                            end
 
       Migrator.new(:up, selected_migrations, target_version).migrate
     end
 
     def down(target_version = nil)
       selected_migrations = if block_given?
-        migrations.select { |m| yield m }
-      else
-        migrations
-      end
+                              migrations.select { |m| yield m }
+                            else
+                              migrations
+                            end
 
       Migrator.new(:down, selected_migrations, target_version).migrate
     end
@@ -1087,6 +1091,7 @@ module ActiveRecord
       migrations = migration_files.map do |file|
         version, name, scope = parse_migration_filename(file)
         raise IllegalMigrationNameError.new(file) unless version
+
         version = version.to_i
         name = name.camelize
 
@@ -1102,6 +1107,7 @@ module ActiveRecord
       file_list = migration_files.map do |file|
         version, name, scope = parse_migration_filename(file)
         raise IllegalMigrationNameError.new(file) unless version
+
         version = ActiveRecord::SchemaMigration.normalize_migration_number(version)
         status = db_list.delete(version) ? "up" : "down"
         [status, version, (name + scope).humanize]
@@ -1133,28 +1139,30 @@ module ActiveRecord
 
       environment = ActiveRecord::InternalMetadata[:environment]
       raise NoEnvironmentInSchemaError unless environment
+
       environment
     end
 
     private
-      def move(direction, steps)
-        migrator = Migrator.new(direction, migrations)
 
-        if current_version != 0 && !migrator.current_migration
-          raise UnknownMigrationVersionError.new(current_version)
+    def move(direction, steps)
+      migrator = Migrator.new(direction, migrations)
+
+      if current_version != 0 && !migrator.current_migration
+        raise UnknownMigrationVersionError.new(current_version)
+      end
+
+      start_index =
+        if current_version == 0
+          0
+        else
+          migrator.migrations.index(migrator.current_migration)
         end
 
-        start_index =
-          if current_version == 0
-            0
-          else
-            migrator.migrations.index(migrator.current_migration)
-          end
-
-        finish = migrator.migrations[start_index + steps]
-        version = finish ? finish.version : 0
-        send(direction, version)
-      end
+      finish = migrator.migrations[start_index + steps]
+      version = finish ? finish.version : 0
+      send(direction, version)
+    end
   end
 
   class Migrator # :nodoc:
@@ -1177,10 +1185,10 @@ module ActiveRecord
     self.migrations_paths = ["db/migrate"]
 
     def initialize(direction, migrations, target_version = nil)
-      @direction         = direction
-      @target_version    = target_version
+      @direction = direction
+      @target_version = target_version
       @migrated_versions = nil
-      @migrations        = migrations
+      @migrations = migrations
 
       validate(@migrations)
 
@@ -1243,136 +1251,139 @@ module ActiveRecord
 
     private
 
-      # Used for running a specific migration.
-      def run_without_lock
-        migration = migrations.detect { |m| m.version == @target_version }
-        raise UnknownMigrationVersionError.new(@target_version) if migration.nil?
-        result = execute_migration_in_transaction(migration, @direction)
+    # Used for running a specific migration.
+    def run_without_lock
+      migration = migrations.detect { |m| m.version == @target_version }
+      raise UnknownMigrationVersionError.new(@target_version) if migration.nil?
 
-        record_environment
-        result
+      result = execute_migration_in_transaction(migration, @direction)
+
+      record_environment
+      result
+    end
+
+    # Used for running multiple migrations up to or down to a certain value.
+    def migrate_without_lock
+      if invalid_target?
+        raise UnknownMigrationVersionError.new(@target_version)
       end
 
-      # Used for running multiple migrations up to or down to a certain value.
-      def migrate_without_lock
-        if invalid_target?
-          raise UnknownMigrationVersionError.new(@target_version)
-        end
-
-        result = runnable.each do |migration|
-          execute_migration_in_transaction(migration, @direction)
-        end
-
-        record_environment
-        result
+      result = runnable.each do |migration|
+        execute_migration_in_transaction(migration, @direction)
       end
 
-      # Stores the current environment in the database.
-      def record_environment
-        return if down?
-        ActiveRecord::InternalMetadata[:environment] = ActiveRecord::Base.connection.migration_context.current_environment
+      record_environment
+      result
+    end
+
+    # Stores the current environment in the database.
+    def record_environment
+      return if down?
+
+      ActiveRecord::InternalMetadata[:environment] = ActiveRecord::Base.connection.migration_context.current_environment
+    end
+
+    def ran?(migration)
+      migrated.include?(migration.version.to_i)
+    end
+
+    # Return true if a valid version is not provided.
+    def invalid_target?
+      @target_version && @target_version != 0 && !target
+    end
+
+    def execute_migration_in_transaction(migration, direction)
+      return if down? && !migrated.include?(migration.version.to_i)
+      return if up? && migrated.include?(migration.version.to_i)
+
+      Base.logger.info "Migrating to #{migration.name} (#{migration.version})" if Base.logger
+
+      ddl_transaction(migration) do
+        migration.migrate(direction)
+        record_version_state_after_migrating(migration.version)
       end
+    rescue => e
+      msg = "An error has occurred, ".dup
+      msg << "this and " if use_transaction?(migration)
+      msg << "all later migrations canceled:\n\n#{e}"
+      raise StandardError, msg, e.backtrace
+    end
 
-      def ran?(migration)
-        migrated.include?(migration.version.to_i)
+    def target
+      migrations.detect { |m| m.version == @target_version }
+    end
+
+    def finish
+      migrations.index(target) || migrations.size - 1
+    end
+
+    def start
+      up? ? 0 : (migrations.index(current) || 0)
+    end
+
+    def validate(migrations)
+      name, = migrations.group_by(&:name).find { |_, v| v.length > 1 }
+      raise DuplicateMigrationNameError.new(name) if name
+
+      version, = migrations.group_by(&:version).find { |_, v| v.length > 1 }
+      raise DuplicateMigrationVersionError.new(version) if version
+    end
+
+    def record_version_state_after_migrating(version)
+      if down?
+        migrated.delete(version)
+        ActiveRecord::SchemaMigration.where(version: version.to_s).delete_all
+      else
+        migrated << version
+        ActiveRecord::SchemaMigration.create!(version: version.to_s)
       end
+    end
 
-      # Return true if a valid version is not provided.
-      def invalid_target?
-        @target_version && @target_version != 0 && !target
-      end
+    def up?
+      @direction == :up
+    end
 
-      def execute_migration_in_transaction(migration, direction)
-        return if down? && !migrated.include?(migration.version.to_i)
-        return if up?   &&  migrated.include?(migration.version.to_i)
+    def down?
+      @direction == :down
+    end
 
-        Base.logger.info "Migrating to #{migration.name} (#{migration.version})" if Base.logger
-
-        ddl_transaction(migration) do
-          migration.migrate(direction)
-          record_version_state_after_migrating(migration.version)
-        end
-      rescue => e
-        msg = "An error has occurred, ".dup
-        msg << "this and " if use_transaction?(migration)
-        msg << "all later migrations canceled:\n\n#{e}"
-        raise StandardError, msg, e.backtrace
-      end
-
-      def target
-        migrations.detect { |m| m.version == @target_version }
-      end
-
-      def finish
-        migrations.index(target) || migrations.size - 1
-      end
-
-      def start
-        up? ? 0 : (migrations.index(current) || 0)
-      end
-
-      def validate(migrations)
-        name, = migrations.group_by(&:name).find { |_, v| v.length > 1 }
-        raise DuplicateMigrationNameError.new(name) if name
-
-        version, = migrations.group_by(&:version).find { |_, v| v.length > 1 }
-        raise DuplicateMigrationVersionError.new(version) if version
-      end
-
-      def record_version_state_after_migrating(version)
-        if down?
-          migrated.delete(version)
-          ActiveRecord::SchemaMigration.where(version: version.to_s).delete_all
-        else
-          migrated << version
-          ActiveRecord::SchemaMigration.create!(version: version.to_s)
-        end
-      end
-
-      def up?
-        @direction == :up
-      end
-
-      def down?
-        @direction == :down
-      end
-
-      # Wrap the migration in a transaction only if supported by the adapter.
-      def ddl_transaction(migration)
-        if use_transaction?(migration)
-          Base.transaction { yield }
-        else
-          yield
-        end
-      end
-
-      def use_transaction?(migration)
-        !migration.disable_ddl_transaction && Base.connection.supports_ddl_transactions?
-      end
-
-      def use_advisory_lock?
-        Base.connection.supports_advisory_locks?
-      end
-
-      def with_advisory_lock
-        lock_id = generate_migrator_advisory_lock_id
-        connection = Base.connection
-        got_lock = connection.get_advisory_lock(lock_id)
-        raise ConcurrentMigrationError unless got_lock
-        load_migrated # reload schema_migrations to be sure it wasn't changed by another process before we got the lock
+    # Wrap the migration in a transaction only if supported by the adapter.
+    def ddl_transaction(migration)
+      if use_transaction?(migration)
+        Base.transaction { yield }
+      else
         yield
-      ensure
-        if got_lock && !connection.release_advisory_lock(lock_id)
-          raise ConcurrentMigrationError.new(
-            ConcurrentMigrationError::RELEASE_LOCK_FAILED_MESSAGE
-          )
-        end
       end
+    end
 
-      MIGRATOR_SALT = 2053462845
-      def generate_migrator_advisory_lock_id
-        db_name_hash = Zlib.crc32(Base.connection.current_database)
-        MIGRATOR_SALT * db_name_hash
+    def use_transaction?(migration)
+      !migration.disable_ddl_transaction && Base.connection.supports_ddl_transactions?
+    end
+
+    def use_advisory_lock?
+      Base.connection.supports_advisory_locks?
+    end
+
+    def with_advisory_lock
+      lock_id = generate_migrator_advisory_lock_id
+      connection = Base.connection
+      got_lock = connection.get_advisory_lock(lock_id)
+      raise ConcurrentMigrationError unless got_lock
+
+      load_migrated # reload schema_migrations to be sure it wasn't changed by another process before we got the lock
+      yield
+    ensure
+      if got_lock && !connection.release_advisory_lock(lock_id)
+        raise ConcurrentMigrationError.new(
+          ConcurrentMigrationError::RELEASE_LOCK_FAILED_MESSAGE
+        )
       end
+    end
+
+    MIGRATOR_SALT = 2053462845
+    def generate_migrator_advisory_lock_id
+      db_name_hash = Zlib.crc32(Base.connection.current_database)
+      MIGRATOR_SALT * db_name_hash
+    end
   end
 end

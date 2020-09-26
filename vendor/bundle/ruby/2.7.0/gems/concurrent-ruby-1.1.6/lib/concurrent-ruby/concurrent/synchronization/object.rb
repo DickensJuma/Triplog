@@ -1,6 +1,5 @@
 module Concurrent
   module Synchronization
-
     # @!visibility private
     # @!macro internal_implementation_note
     ObjectImplementation = case
@@ -177,7 +176,6 @@ module Concurrent
 
       def __initialize_atomic_fields__
       end
-
     end
   end
 end

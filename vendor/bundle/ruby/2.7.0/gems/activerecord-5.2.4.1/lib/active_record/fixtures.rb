@@ -447,9 +447,9 @@ module ActiveRecord
     end
 
     def self.default_fixture_table_name(fixture_set_name, config = ActiveRecord::Base) # :nodoc:
-      "#{ config.table_name_prefix }"\
-      "#{ fixture_set_name.tr('/', '_') }"\
-      "#{ config.table_name_suffix }".to_sym
+      "#{config.table_name_prefix}"\
+      "#{fixture_set_name.tr('/', '_')}"\
+      "#{config.table_name_suffix}".to_sym
     end
 
     def self.reset_cache
@@ -499,7 +499,7 @@ module ActiveRecord
     class ClassCache
       def initialize(class_names, config)
         @class_names = class_names.stringify_keys
-        @config      = config
+        @config = config
 
         # Remove string values that aren't constants or subclasses of AR
         @class_names.delete_if { |klass_name, klass| !insert_class(@class_names, klass_name, klass) }
@@ -514,18 +514,18 @@ module ActiveRecord
 
       private
 
-        def insert_class(class_names, name, klass)
-          # We only want to deal with AR objects.
-          if klass && klass < ActiveRecord::Base
-            class_names[name] = klass
-          else
-            class_names[name] = nil
-          end
+      def insert_class(class_names, name, klass)
+        # We only want to deal with AR objects.
+        if klass && klass < ActiveRecord::Base
+          class_names[name] = klass
+        else
+          class_names[name] = nil
         end
+      end
 
-        def default_fixture_model(fs_name, config)
-          ActiveRecord::FixtureSet.default_fixture_model_name(fs_name, config)
-        end
+      def default_fixture_model(fs_name, config)
+        ActiveRecord::FixtureSet.default_fixture_model_name(fs_name, config)
+      end
     end
 
     def self.create_fixtures(fixtures_directory, fixture_set_names, class_names = {}, config = ActiveRecord::Base)
@@ -549,7 +549,8 @@ module ActiveRecord
             conn,
             fs_name,
             klass,
-            ::File.join(fixtures_directory, fs_name))
+            ::File.join(fixtures_directory, fs_name)
+          )
         end
 
         update_all_loaded_fixtures fixtures_map
@@ -598,9 +599,9 @@ module ActiveRecord
     attr_reader :table_name, :name, :fixtures, :model_class, :config
 
     def initialize(connection, name, class_name, path, config = ActiveRecord::Base)
-      @name     = name
-      @path     = path
-      @config   = config
+      @name = name
+      @path = path
+      @config = config
 
       self.model_class = class_name
 
@@ -737,77 +738,78 @@ module ActiveRecord
     end
 
     private
-      def primary_key_name
-        @primary_key_name ||= model_class && model_class.primary_key
+
+    def primary_key_name
+      @primary_key_name ||= model_class && model_class.primary_key
+    end
+
+    def primary_key_type
+      @primary_key_type ||= model_class && model_class.type_for_attribute(model_class.primary_key).type
+    end
+
+    def add_join_records(rows, row, association)
+      # This is the case when the join table has no fixtures file
+      if (targets = row.delete(association.name.to_s))
+        table_name = association.join_table
+        column_type = association.primary_key_type
+        lhs_key = association.lhs_key
+        rhs_key = association.rhs_key
+
+        targets = targets.is_a?(Array) ? targets : targets.split(/\s*,\s*/)
+        rows[table_name].concat targets.map { |target|
+          { lhs_key => row[primary_key_name],
+            rhs_key => ActiveRecord::FixtureSet.identify(target, column_type) }
+        }
       end
+    end
 
-      def primary_key_type
-        @primary_key_type ||= model_class && model_class.type_for_attribute(model_class.primary_key).type
+    def has_primary_key_column?
+      @has_primary_key_column ||= primary_key_name &&
+                                  model_class.columns.any? { |c| c.name == primary_key_name }
+    end
+
+    def timestamp_column_names
+      @timestamp_column_names ||=
+        %w(created_at created_on updated_at updated_on) & column_names
+    end
+
+    def inheritance_column_name
+      @inheritance_column_name ||= model_class && model_class.inheritance_column
+    end
+
+    def column_names
+      @column_names ||= @connection.columns(@table_name).collect(&:name)
+    end
+
+    def model_class=(class_name)
+      if class_name.is_a?(Class) # TODO: Should be an AR::Base type class, or any?
+        @model_class = class_name
+      else
+        @model_class = class_name.safe_constantize if class_name
       end
+    end
 
-      def add_join_records(rows, row, association)
-        # This is the case when the join table has no fixtures file
-        if (targets = row.delete(association.name.to_s))
-          table_name  = association.join_table
-          column_type = association.primary_key_type
-          lhs_key     = association.lhs_key
-          rhs_key     = association.rhs_key
+    # Loads the fixtures from the YAML file at +path+.
+    # If the file sets the +model_class+ and current instance value is not set,
+    # it uses the file value.
+    def read_fixture_files(path)
+      yaml_files = Dir["#{path}/{**,*}/*.yml"].select { |f|
+        ::File.file?(f)
+      } + [yaml_file_path(path)]
 
-          targets = targets.is_a?(Array) ? targets : targets.split(/\s*,\s*/)
-          rows[table_name].concat targets.map { |target|
-            { lhs_key => row[primary_key_name],
-              rhs_key => ActiveRecord::FixtureSet.identify(target, column_type) }
-          }
-        end
-      end
-
-      def has_primary_key_column?
-        @has_primary_key_column ||= primary_key_name &&
-          model_class.columns.any? { |c| c.name == primary_key_name }
-      end
-
-      def timestamp_column_names
-        @timestamp_column_names ||=
-          %w(created_at created_on updated_at updated_on) & column_names
-      end
-
-      def inheritance_column_name
-        @inheritance_column_name ||= model_class && model_class.inheritance_column
-      end
-
-      def column_names
-        @column_names ||= @connection.columns(@table_name).collect(&:name)
-      end
-
-      def model_class=(class_name)
-        if class_name.is_a?(Class) # TODO: Should be an AR::Base type class, or any?
-          @model_class = class_name
-        else
-          @model_class = class_name.safe_constantize if class_name
-        end
-      end
-
-      # Loads the fixtures from the YAML file at +path+.
-      # If the file sets the +model_class+ and current instance value is not set,
-      # it uses the file value.
-      def read_fixture_files(path)
-        yaml_files = Dir["#{path}/{**,*}/*.yml"].select { |f|
-          ::File.file?(f)
-        } + [yaml_file_path(path)]
-
-        yaml_files.each_with_object({}) do |file, fixtures|
-          FixtureSet::File.open(file) do |fh|
-            self.model_class ||= fh.model_class if fh.model_class
-            fh.each do |fixture_name, row|
-              fixtures[fixture_name] = ActiveRecord::Fixture.new(row, model_class)
-            end
+      yaml_files.each_with_object({}) do |file, fixtures|
+        FixtureSet::File.open(file) do |fh|
+          self.model_class ||= fh.model_class if fh.model_class
+          fh.each do |fixture_name, row|
+            fixtures[fixture_name] = ActiveRecord::Fixture.new(row, model_class)
           end
         end
       end
+    end
 
-      def yaml_file_path(path)
-        "#{path}.yml"
-      end
+    def yaml_file_path(path)
+      "#{path}.yml"
+    end
   end
 
   class Fixture #:nodoc:
@@ -822,7 +824,7 @@ module ActiveRecord
     attr_reader :model_class, :fixture
 
     def initialize(fixture, model_class)
-      @fixture     = fixture
+      @fixture = fixture
       @model_class = model_class
     end
 
@@ -1027,26 +1029,29 @@ module ActiveRecord
     end
 
     private
-      def load_fixtures(config)
-        fixtures = ActiveRecord::FixtureSet.create_fixtures(fixture_path, fixture_table_names, fixture_class_names, config)
-        Hash[fixtures.map { |f| [f.name, f] }]
-      end
 
-      def instantiate_fixtures
-        if pre_loaded_fixtures
-          raise RuntimeError, "Load fixtures before instantiating them." if ActiveRecord::FixtureSet.all_loaded_fixtures.empty?
-          ActiveRecord::FixtureSet.instantiate_all_loaded_fixtures(self, load_instances?)
-        else
-          raise RuntimeError, "Load fixtures before instantiating them." if @loaded_fixtures.nil?
-          @loaded_fixtures.each_value do |fixture_set|
-            ActiveRecord::FixtureSet.instantiate_fixtures(self, fixture_set, load_instances?)
-          end
+    def load_fixtures(config)
+      fixtures = ActiveRecord::FixtureSet.create_fixtures(fixture_path, fixture_table_names, fixture_class_names, config)
+      Hash[fixtures.map { |f| [f.name, f] }]
+    end
+
+    def instantiate_fixtures
+      if pre_loaded_fixtures
+        raise RuntimeError, "Load fixtures before instantiating them." if ActiveRecord::FixtureSet.all_loaded_fixtures.empty?
+
+        ActiveRecord::FixtureSet.instantiate_all_loaded_fixtures(self, load_instances?)
+      else
+        raise RuntimeError, "Load fixtures before instantiating them." if @loaded_fixtures.nil?
+
+        @loaded_fixtures.each_value do |fixture_set|
+          ActiveRecord::FixtureSet.instantiate_fixtures(self, fixture_set, load_instances?)
         end
       end
+    end
 
-      def load_instances?
-        use_instantiated_fixtures != :no_instances
-      end
+    def load_instances?
+      use_instantiated_fixtures != :no_instances
+    end
   end
 end
 

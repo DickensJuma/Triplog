@@ -9,6 +9,7 @@ module ActiveSupport
         object = args.first
 
         return object unless object
+
         super
       end
 
@@ -21,10 +22,11 @@ module ActiveSupport
       end
 
       private
-        def method_missing(called, *args, &block)
-          warn caller_locations, called, args
-          target.__send__(called, *args, &block)
-        end
+
+      def method_missing(called, *args, &block)
+        warn caller_locations, called, args
+        target.__send__(called, *args, &block)
+      end
     end
 
     # DeprecatedObjectProxy transforms an object into a deprecated one. It
@@ -46,13 +48,14 @@ module ActiveSupport
       end
 
       private
-        def target
-          @object
-        end
 
-        def warn(callstack, called, args)
-          @deprecator.warn(@message, callstack)
-        end
+      def target
+        @object
+      end
+
+      def warn(callstack, called, args)
+        @deprecator.warn(@message, callstack)
+      end
     end
 
     # DeprecatedInstanceVariableProxy transforms an instance variable into a
@@ -96,13 +99,14 @@ module ActiveSupport
       end
 
       private
-        def target
-          @instance.__send__(@method)
-        end
 
-        def warn(callstack, called, args)
-          @deprecator.warn("#{@var} is deprecated! Call #{@method}.#{called} instead of #{@var}.#{called}. Args: #{args.inspect}", callstack)
-        end
+      def target
+        @instance.__send__(@method)
+      end
+
+      def warn(callstack, called, args)
+        @deprecator.warn("#{@var} is deprecated! Call #{@method}.#{called} instead of #{@var}.#{called}. Args: #{args.inspect}", callstack)
+      end
     end
 
     # DeprecatedConstantProxy transforms a constant into a deprecated one. It
@@ -142,13 +146,14 @@ module ActiveSupport
       end
 
       private
-        def target
-          ActiveSupport::Inflector.constantize(@new_const.to_s)
-        end
 
-        def warn(callstack, called, args)
-          @deprecator.warn(@message, callstack)
-        end
+      def target
+        ActiveSupport::Inflector.constantize(@new_const.to_s)
+      end
+
+      def warn(callstack, called, args)
+        @deprecator.warn(@message, callstack)
+      end
     end
   end
 end

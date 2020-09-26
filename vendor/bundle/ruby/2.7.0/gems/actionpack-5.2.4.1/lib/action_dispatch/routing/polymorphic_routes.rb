@@ -101,7 +101,7 @@ module ActionDispatch
       def polymorphic_url(record_or_hash_or_array, options = {})
         if Hash === record_or_hash_or_array
           options = record_or_hash_or_array.merge(options)
-          record  = options.delete :id
+          record = options.delete :id
           return polymorphic_url record, options
         end
 
@@ -109,9 +109,9 @@ module ActionDispatch
           return mapping.call(self, [record_or_hash_or_array, options], false)
         end
 
-        opts   = options.dup
+        opts = options.dup
         action = opts.delete :action
-        type   = opts.delete(:routing_type) || :url
+        type = opts.delete(:routing_type) || :url
 
         HelperMethodBuilder.polymorphic_method self,
                                                record_or_hash_or_array,
@@ -125,7 +125,7 @@ module ActionDispatch
       def polymorphic_path(record_or_hash_or_array, options = {})
         if Hash === record_or_hash_or_array
           options = record_or_hash_or_array.merge(options)
-          record  = options.delete :id
+          record = options.delete :id
           return polymorphic_path record, options
         end
 
@@ -133,9 +133,9 @@ module ActionDispatch
           return mapping.call(self, [record_or_hash_or_array, options], true)
         end
 
-        opts   = options.dup
+        opts = options.dup
         action = opts.delete :action
-        type   = :path
+        type = :path
 
         HelperMethodBuilder.polymorphic_method self,
                                                record_or_hash_or_array,
@@ -158,150 +158,152 @@ module ActionDispatch
 
       private
 
-        def polymorphic_url_for_action(action, record_or_hash, options)
-          polymorphic_url(record_or_hash, options.merge(action: action))
+      def polymorphic_url_for_action(action, record_or_hash, options)
+        polymorphic_url(record_or_hash, options.merge(action: action))
+      end
+
+      def polymorphic_path_for_action(action, record_or_hash, options)
+        polymorphic_path(record_or_hash, options.merge(action: action))
+      end
+
+      def polymorphic_mapping(record)
+        if record.respond_to?(:to_model)
+          _routes.polymorphic_mappings[record.to_model.model_name.name]
+        else
+          _routes.polymorphic_mappings[record.class.name]
+        end
+      end
+
+      class HelperMethodBuilder # :nodoc:
+        CACHE = { "path" => {}, "url" => {} }
+
+        def self.get(action, type)
+          type = type.to_s
+          CACHE[type].fetch(action) { build action, type }
         end
 
-        def polymorphic_path_for_action(action, record_or_hash, options)
-          polymorphic_path(record_or_hash, options.merge(action: action))
-        end
+        def self.url; CACHE["url".freeze][nil]; end
 
-        def polymorphic_mapping(record)
-          if record.respond_to?(:to_model)
-            _routes.polymorphic_mappings[record.to_model.model_name.name]
+        def self.path; CACHE["path".freeze][nil]; end
+
+        def self.build(action, type)
+          prefix = action ? "#{action}_" : ""
+          suffix = type
+          if action.to_s == "new"
+            HelperMethodBuilder.singular prefix, suffix
           else
-            _routes.polymorphic_mappings[record.class.name]
+            HelperMethodBuilder.plural prefix, suffix
           end
         end
 
-        class HelperMethodBuilder # :nodoc:
-          CACHE = { "path" => {}, "url" => {} }
+        def self.singular(prefix, suffix)
+          new(->(name) { name.singular_route_key }, prefix, suffix)
+        end
 
-          def self.get(action, type)
-            type = type.to_s
-            CACHE[type].fetch(action) { build action, type }
-          end
+        def self.plural(prefix, suffix)
+          new(->(name) { name.route_key }, prefix, suffix)
+        end
 
-          def self.url;  CACHE["url".freeze][nil]; end
-          def self.path; CACHE["path".freeze][nil]; end
+        def self.polymorphic_method(recipient, record_or_hash_or_array, action, type, options)
+          builder = get action, type
 
-          def self.build(action, type)
-            prefix = action ? "#{action}_" : ""
-            suffix = type
-            if action.to_s == "new"
-              HelperMethodBuilder.singular prefix, suffix
-            else
-              HelperMethodBuilder.plural prefix, suffix
-            end
-          end
-
-          def self.singular(prefix, suffix)
-            new(->(name) { name.singular_route_key }, prefix, suffix)
-          end
-
-          def self.plural(prefix, suffix)
-            new(->(name) { name.route_key }, prefix, suffix)
-          end
-
-          def self.polymorphic_method(recipient, record_or_hash_or_array, action, type, options)
-            builder = get action, type
-
-            case record_or_hash_or_array
-            when Array
-              record_or_hash_or_array = record_or_hash_or_array.compact
-              if record_or_hash_or_array.empty?
-                raise ArgumentError, "Nil location provided. Can't build URI."
-              end
-              if record_or_hash_or_array.first.is_a?(ActionDispatch::Routing::RoutesProxy)
-                recipient = record_or_hash_or_array.shift
-              end
-
-              method, args = builder.handle_list record_or_hash_or_array
-            when String, Symbol
-              method, args = builder.handle_string record_or_hash_or_array
-            when Class
-              method, args = builder.handle_class record_or_hash_or_array
-
-            when nil
+          case record_or_hash_or_array
+          when Array
+            record_or_hash_or_array = record_or_hash_or_array.compact
+            if record_or_hash_or_array.empty?
               raise ArgumentError, "Nil location provided. Can't build URI."
-            else
-              method, args = builder.handle_model record_or_hash_or_array
             end
 
-            if options.empty?
-              recipient.send(method, *args)
-            else
-              recipient.send(method, *args, options)
-            end
-          end
-
-          attr_reader :suffix, :prefix
-
-          def initialize(key_strategy, prefix, suffix)
-            @key_strategy = key_strategy
-            @prefix       = prefix
-            @suffix       = suffix
-          end
-
-          def handle_string(record)
-            [get_method_for_string(record), []]
-          end
-
-          def handle_string_call(target, str)
-            target.send get_method_for_string str
-          end
-
-          def handle_class(klass)
-            [get_method_for_class(klass), []]
-          end
-
-          def handle_class_call(target, klass)
-            target.send get_method_for_class klass
-          end
-
-          def handle_model(record)
-            args  = []
-
-            model = record.to_model
-            named_route = if model.persisted?
-              args << model
-              get_method_for_string model.model_name.singular_route_key
-            else
-              get_method_for_class model
+            if record_or_hash_or_array.first.is_a?(ActionDispatch::Routing::RoutesProxy)
+              recipient = record_or_hash_or_array.shift
             end
 
-            [named_route, args]
+            method, args = builder.handle_list record_or_hash_or_array
+          when String, Symbol
+            method, args = builder.handle_string record_or_hash_or_array
+          when Class
+            method, args = builder.handle_class record_or_hash_or_array
+
+          when nil
+            raise ArgumentError, "Nil location provided. Can't build URI."
+          else
+            method, args = builder.handle_model record_or_hash_or_array
           end
 
-          def handle_model_call(target, record)
-            if mapping = polymorphic_mapping(target, record)
-              mapping.call(target, [record], suffix == "path")
+          if options.empty?
+            recipient.send(method, *args)
+          else
+            recipient.send(method, *args, options)
+          end
+        end
+
+        attr_reader :suffix, :prefix
+
+        def initialize(key_strategy, prefix, suffix)
+          @key_strategy = key_strategy
+          @prefix = prefix
+          @suffix = suffix
+        end
+
+        def handle_string(record)
+          [get_method_for_string(record), []]
+        end
+
+        def handle_string_call(target, str)
+          target.send get_method_for_string str
+        end
+
+        def handle_class(klass)
+          [get_method_for_class(klass), []]
+        end
+
+        def handle_class_call(target, klass)
+          target.send get_method_for_class klass
+        end
+
+        def handle_model(record)
+          args = []
+
+          model = record.to_model
+          named_route = if model.persisted?
+                          args << model
+                          get_method_for_string model.model_name.singular_route_key
+                        else
+                          get_method_for_class model
+                        end
+
+          [named_route, args]
+        end
+
+        def handle_model_call(target, record)
+          if mapping = polymorphic_mapping(target, record)
+            mapping.call(target, [record], suffix == "path")
+          else
+            method, args = handle_model(record)
+            target.send(method, *args)
+          end
+        end
+
+        def handle_list(list)
+          record_list = list.dup
+          record = record_list.pop
+
+          args = []
+
+          route = record_list.map { |parent|
+            case parent
+            when Symbol, String
+              parent.to_s
+            when Class
+              args << parent
+              parent.model_name.singular_route_key
             else
-              method, args = handle_model(record)
-              target.send(method, *args)
+              args << parent.to_model
+              parent.to_model.model_name.singular_route_key
             end
-          end
+          }
 
-          def handle_list(list)
-            record_list = list.dup
-            record      = record_list.pop
-
-            args = []
-
-            route = record_list.map { |parent|
-              case parent
-              when Symbol, String
-                parent.to_s
-              when Class
-                args << parent
-                parent.model_name.singular_route_key
-              else
-                args << parent.to_model
-                parent.to_model.model_name.singular_route_key
-              end
-            }
-
-            route <<
+          route <<
             case record
             when Symbol, String
               record.to_s
@@ -317,36 +319,36 @@ module ActionDispatch
               end
             end
 
-            route << suffix
+          route << suffix
 
-            named_route = prefix + route.join("_")
-            [named_route, args]
-          end
-
-          private
-
-            def polymorphic_mapping(target, record)
-              if record.respond_to?(:to_model)
-                target._routes.polymorphic_mappings[record.to_model.model_name.name]
-              else
-                target._routes.polymorphic_mappings[record.class.name]
-              end
-            end
-
-            def get_method_for_class(klass)
-              name = @key_strategy.call klass.model_name
-              get_method_for_string name
-            end
-
-            def get_method_for_string(str)
-              "#{prefix}#{str}_#{suffix}"
-            end
-
-            [nil, "new", "edit"].each do |action|
-              CACHE["url"][action]  = build action, "url"
-              CACHE["path"][action] = build action, "path"
-            end
+          named_route = prefix + route.join("_")
+          [named_route, args]
         end
+
+        private
+
+        def polymorphic_mapping(target, record)
+          if record.respond_to?(:to_model)
+            target._routes.polymorphic_mappings[record.to_model.model_name.name]
+          else
+            target._routes.polymorphic_mappings[record.class.name]
+          end
+        end
+
+        def get_method_for_class(klass)
+          name = @key_strategy.call klass.model_name
+          get_method_for_string name
+        end
+
+        def get_method_for_string(str)
+          "#{prefix}#{str}_#{suffix}"
+        end
+
+        [nil, "new", "edit"].each do |action|
+          CACHE["url"][action] = build action, "url"
+          CACHE["path"][action] = build action, "path"
+        end
+      end
     end
   end
 end

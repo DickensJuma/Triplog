@@ -6,7 +6,7 @@ module ActiveRecord
       include Enumerable
 
       def initialize(of: 1000, start: nil, finish: nil, relation:) #:nodoc:
-        @of       = of
+        @of = of
         @relation = relation
         @start = start
         @finish = finish
@@ -62,6 +62,7 @@ module ActiveRecord
       def each
         enum = @relation.to_enum(:in_batches, of: @of, start: @start, finish: @finish, load: false)
         return enum.each { |relation| yield relation } if block_given?
+
         enum
       end
     end

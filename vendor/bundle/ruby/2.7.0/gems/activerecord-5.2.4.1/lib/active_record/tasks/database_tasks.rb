@@ -55,7 +55,7 @@ module ActiveRecord
       def check_protected_environments!
         unless ENV["DISABLE_DATABASE_ENVIRONMENT_CHECK"]
           current = ActiveRecord::Base.connection.migration_context.current_environment
-          stored  = ActiveRecord::Base.connection.migration_context.last_stored_environment
+          stored = ActiveRecord::Base.connection.migration_context.last_stored_environment
 
           if ActiveRecord::Base.connection.migration_context.protected_environment?
             raise ActiveRecord::ProtectedEnvironmentError.new(stored)
@@ -73,9 +73,9 @@ module ActiveRecord
         @tasks[pattern] = task
       end
 
-      register_task(/mysql/,        "ActiveRecord::Tasks::MySQLDatabaseTasks")
-      register_task(/postgresql/,   "ActiveRecord::Tasks::PostgreSQLDatabaseTasks")
-      register_task(/sqlite/,       "ActiveRecord::Tasks::SQLiteDatabaseTasks")
+      register_task(/mysql/, "ActiveRecord::Tasks::MySQLDatabaseTasks")
+      register_task(/postgresql/, "ActiveRecord::Tasks::PostgreSQLDatabaseTasks")
+      register_task(/sqlite/, "ActiveRecord::Tasks::SQLiteDatabaseTasks")
 
       def db_dir
         @db_dir ||= Rails.application.config.paths["db"].first
@@ -87,10 +87,10 @@ module ActiveRecord
 
       def fixtures_path
         @fixtures_path ||= if ENV["FIXTURES_PATH"]
-          File.join(root, ENV["FIXTURES_PATH"])
-        else
-          File.join(root, "test", "fixtures")
-        end
+                             File.join(root, ENV["FIXTURES_PATH"])
+                           else
+                             File.join(root, "test", "fixtures")
+                           end
       end
 
       def root
@@ -298,40 +298,41 @@ module ActiveRecord
 
       private
 
-        def class_for_adapter(adapter)
-          _key, task = @tasks.each_pair.detect { |pattern, _task| adapter[pattern] }
-          unless task
-            raise DatabaseNotSupported, "Rake tasks not supported by '#{adapter}' adapter"
+      def class_for_adapter(adapter)
+        _key, task = @tasks.each_pair.detect { |pattern, _task| adapter[pattern] }
+        unless task
+          raise DatabaseNotSupported, "Rake tasks not supported by '#{adapter}' adapter"
+        end
+
+        task.is_a?(String) ? task.constantize : task
+      end
+
+      def each_current_configuration(environment)
+        environments = [environment]
+        environments << "test" if environment == "development"
+
+        ActiveRecord::Base.configurations.slice(*environments).each do |configuration_environment, configuration|
+          next unless configuration["database"]
+
+          yield configuration, configuration_environment
+        end
+      end
+
+      def each_local_configuration
+        ActiveRecord::Base.configurations.each_value do |configuration|
+          next unless configuration["database"]
+
+          if local_database?(configuration)
+            yield configuration
+          else
+            $stderr.puts "This task only modifies local databases. #{configuration['database']} is on a remote host."
           end
-          task.is_a?(String) ? task.constantize : task
         end
+      end
 
-        def each_current_configuration(environment)
-          environments = [environment]
-          environments << "test" if environment == "development"
-
-          ActiveRecord::Base.configurations.slice(*environments).each do |configuration_environment, configuration|
-            next unless configuration["database"]
-
-            yield configuration, configuration_environment
-          end
-        end
-
-        def each_local_configuration
-          ActiveRecord::Base.configurations.each_value do |configuration|
-            next unless configuration["database"]
-
-            if local_database?(configuration)
-              yield configuration
-            else
-              $stderr.puts "This task only modifies local databases. #{configuration['database']} is on a remote host."
-            end
-          end
-        end
-
-        def local_database?(configuration)
-          configuration["host"].blank? || LOCAL_HOSTS.include?(configuration["host"])
-        end
+      def local_database?(configuration)
+        configuration["host"].blank? || LOCAL_HOSTS.include?(configuration["host"])
+      end
     end
   end
 end

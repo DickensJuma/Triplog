@@ -49,7 +49,7 @@ module ActionView
       locales.uniq!
       locales
     end
-    register_detail(:formats) { ActionView::Base.default_formats || [:html, :text, :js, :css,  :xml, :json] }
+    register_detail(:formats) { ActionView::Base.default_formats || [:html, :text, :js, :css, :xml, :json] }
     register_detail(:variants) { [] }
     register_detail(:handlers) { Template::Handlers.extensions }
 
@@ -93,7 +93,7 @@ module ActionView
         @cache = old_value
       end
 
-    private
+      private
 
       def _set_detail(key, value) # :doc:
         @details = @details.dup if @details_key
@@ -141,6 +141,7 @@ module ActionView
         added_resolvers = 0
         self.class.fallbacks.each do |resolver|
           next if view_paths.include?(resolver)
+
           view_paths.push(resolver)
           added_resolvers += 1
         end
@@ -149,7 +150,7 @@ module ActionView
         added_resolvers.times { view_paths.pop }
       end
 
-    private
+      private
 
       def args_for_lookup(name, prefixes, partial, keys, details_options)
         name, prefixes = normalize_name(name, prefixes)
@@ -160,6 +161,7 @@ module ActionView
       # Compute details hash and key according to user options (e.g. passed from #render).
       def detail_args_for(options) # :doc:
         return @details, details_key if options.empty? # most common path.
+
         user_details = @details.merge(options)
 
         if @cache
@@ -202,13 +204,13 @@ module ActionView
       # name instead of the prefix.
       def normalize_name(name, prefixes)
         prefixes = prefixes.presence
-        parts    = name.to_s.split("/".freeze)
+        parts = name.to_s.split("/".freeze)
         parts.shift if parts.first.empty?
         name = parts.pop
 
         return name, prefixes || [""] if parts.empty?
 
-        parts    = parts.join("/".freeze)
+        parts = parts.join("/".freeze)
         prefixes = prefixes ? prefixes.map { |p| "#{p}/#{parts}" } : [parts]
 
         return name, prefixes

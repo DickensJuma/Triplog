@@ -9,7 +9,7 @@ module ActiveRecord
       def initialize(conn)
         @connection = conn
 
-        @columns      = {}
+        @columns = {}
         @columns_hash = {}
         @primary_keys = {}
         @data_sources = {}
@@ -17,7 +17,7 @@ module ActiveRecord
 
       def initialize_dup(other)
         super
-        @columns      = @columns.dup
+        @columns = @columns.dup
         @columns_hash = @columns_hash.dup
         @primary_keys = @primary_keys.dup
         @data_sources = @data_sources.dup
@@ -110,9 +110,9 @@ module ActiveRecord
 
       private
 
-        def prepare_data_sources
-          connection.data_sources.each { |source| @data_sources[source] = true }
-        end
+      def prepare_data_sources
+        connection.data_sources.each { |source| @data_sources[source] = true }
+      end
     end
   end
 end

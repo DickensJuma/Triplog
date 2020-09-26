@@ -31,6 +31,7 @@ class Date
     # Returns week start day symbol (e.g. :monday), or raises an +ArgumentError+ for invalid day symbol.
     def find_beginning_of_week!(week_start)
       raise ArgumentError, "Invalid beginning of week: #{week_start}" unless ::Date::DAYS_INTO_WEEK.key?(week_start)
+
       week_start
     end
 
@@ -113,9 +114,9 @@ class Date
     options = options.dup
     d = self
     d = d >> options.delete(:years) * 12 if options[:years]
-    d = d >> options.delete(:months)     if options[:months]
-    d = d +  options.delete(:weeks) * 7  if options[:weeks]
-    d = d +  options.delete(:days)       if options[:days]
+    d = d >> options.delete(:months) if options[:months]
+    d = d + options.delete(:weeks) * 7 if options[:weeks]
+    d = d + options.delete(:days) if options[:days]
     d
   end
 
