@@ -1,6 +1,6 @@
 /* Forked from the Darkfish templates rdoc.css file, much hacked, probably
  * imperfect */
- /* stylelint-disable no-descending-specificity */
+/* stylelint-disable no-descending-specificity */
 html {
   max-width: 960px;
   margin: 0 auto;
@@ -210,17 +210,6 @@ ul.link-list .type {
   font-size: 14px;
 }
 
-.note-list dd {
-}
-
-.label-list dt {
-  font-weight: bold;
-  background: #ddd;
-}
-
-.label-list dd {
-}
-
 .label-list dd + dt,
 .note-list dd + dt {
   margin-top: 0.7em;
@@ -265,7 +254,7 @@ ul.link-list .type {
 #constants-list > dl dt,
 #attributes-list > dl dt {
   font-weight: bold;
-  font-family: Monaco, "Andale Mono";
+  font-family: sans-serif, "Andale Mono";
   background: inherit;
 }
 
@@ -336,7 +325,6 @@ ul.link-list .type {
   visibility: hidden;
   background: url(images/zoom.png) no-repeat right 5px;
   padding-right: 20px;
-  overflow: show;
 }
 
 #documentation .method-heading:hover .method-click-advice {
@@ -398,16 +386,48 @@ ul.link-list .type {
 }
 
 /* Thanks GitHub!!! */
-.ruby-constant { color: #458; font-weight: bold; }
-.ruby-keyword { color: black; font-weight: bold; }
-.ruby-ivar { color: teal; }
-.ruby-operator { color: #000; }
-.ruby-identifier { color: black; }
-.ruby-node { color: red; }
-.ruby-comment { color: #998; font-weight: bold; }
-.ruby-regexp { color: #009926; }
-.ruby-value { color: #099; }
-.ruby-string { color: red; }
+.ruby-constant {
+  color: #458;
+  font-weight: bold;
+}
+
+.ruby-keyword {
+  color: black;
+  font-weight: bold;
+}
+
+.ruby-ivar {
+  color: teal;
+}
+
+.ruby-operator {
+  color: #000;
+}
+
+.ruby-identifier {
+  color: black;
+}
+
+.ruby-node {
+  color: red;
+}
+
+.ruby-comment {
+  color: #998;
+  font-weight: bold;
+}
+
+.ruby-regexp {
+  color: #009926;
+}
+
+.ruby-value {
+  color: #099;
+}
+
+.ruby-string {
+  color: red;
+}
 
 /* @group search results */
 
