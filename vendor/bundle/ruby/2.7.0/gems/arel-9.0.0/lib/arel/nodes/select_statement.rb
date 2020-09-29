@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Nodes
     class SelectStatement < Arel::Nodes::Node
@@ -7,17 +8,17 @@ module Arel
 
       def initialize cores = [SelectCore.new]
         super()
-        @cores          = cores
-        @orders         = []
-        @limit          = nil
-        @lock           = nil
-        @offset         = nil
-        @with           = nil
+        @cores = cores
+        @orders = []
+        @limit = nil
+        @lock = nil
+        @offset = nil
+        @with = nil
       end
 
       def initialize_copy other
         super
-        @cores  = @cores.map { |x| x.clone }
+        @cores = @cores.map { |x| x.clone }
         @orders = @orders.map { |x| x.clone }
       end
 

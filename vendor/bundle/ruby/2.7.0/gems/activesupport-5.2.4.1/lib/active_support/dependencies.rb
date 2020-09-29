@@ -163,9 +163,10 @@ module ActiveSupport #:nodoc:
       end
 
       private
-        def pop_modules(modules)
-          modules.each { |mod| @stack[mod].pop }
-        end
+
+      def pop_modules(modules)
+        modules.each { |mod| @stack[mod].pop }
+      end
     end
 
     # An internal stack used to record which constants are loaded by any block.
@@ -177,6 +178,7 @@ module ActiveSupport #:nodoc:
         base.class_eval do
           # Emulate #exclude via an ivar
           return if defined?(@_const_missing) && @_const_missing
+
           @_const_missing = instance_method(:const_missing)
           remove_method(:const_missing)
         end
@@ -256,7 +258,7 @@ module ActiveSupport #:nodoc:
         else
           yield
         end
-      rescue Exception => exception  # errors from loading file
+      rescue Exception => exception # errors from loading file
         exception.blame_file! file if exception.respond_to? :blame_file!
         raise
       end
@@ -280,17 +282,17 @@ module ActiveSupport #:nodoc:
 
       private
 
-        def load(file, wrap = false)
-          result = false
-          load_dependency(file) { result = super }
-          result
-        end
+      def load(file, wrap = false)
+        result = false
+        load_dependency(file) { result = super }
+        result
+      end
 
-        def require(file)
-          result = false
-          load_dependency(file) { result = super }
-          result
-        end
+      def require(file)
+        result = false
+        load_dependency(file) { result = super }
+        result
+      end
     end
 
     # Exception file-blaming.
@@ -305,6 +307,7 @@ module ActiveSupport #:nodoc:
 
       def describe_blame
         return nil if blamed_files.empty?
+
         "This error occurred while loading the following files:\n   #{blamed_files.join "\n   "}"
       end
 
@@ -452,6 +455,7 @@ module ActiveSupport #:nodoc:
     # set of constants that are to be unloaded.
     def autoload_module!(into, const_name, qualified_name, path_suffix)
       return nil unless base_path = autoloadable_module?(path_suffix)
+
       mod = Module.new
       into.const_set const_name, mod
       autoloaded_constants << qualified_name unless autoload_once_paths.include?(base_path)
@@ -509,12 +513,13 @@ module ActiveSupport #:nodoc:
         else
           require_or_load(expanded, qualified_name)
           raise LoadError, "Unable to autoload constant #{qualified_name}, expected #{file_path} to define it" unless from_mod.const_defined?(const_name, false)
+
           return from_mod.const_get(const_name)
         end
       elsif mod = autoload_module!(from_mod, const_name, qualified_name, path_suffix)
         return mod
       elsif (parent = from_mod.parent) && parent != from_mod &&
-            ! from_mod.parents.any? { |p| p.const_defined?(const_name, false) }
+            !from_mod.parents.any? { |p| p.const_defined?(const_name, false) }
         # If our parents do not have a constant named +const_name+ then we are free
         # to attempt to load upwards. If they do have such a constant, then this
         # const_missing must be due to from_mod::const_name, which should not
@@ -591,6 +596,7 @@ module ActiveSupport #:nodoc:
       def store(klass)
         return self unless klass.respond_to?(:name)
         raise(ArgumentError, "anonymous classes cannot be cached") if klass.name.empty?
+
         @store[klass.name] = klass
         self
       end
@@ -622,8 +628,10 @@ module ActiveSupport #:nodoc:
     # Determine if the given constant has been automatically loaded.
     def autoloaded?(desc)
       return false if desc.is_a?(Module) && desc.anonymous?
+
       name = to_constant_name desc
       return false unless qualified_const_defined?(name)
+
       autoloaded_constants.include?(name)
     end
 
@@ -711,6 +719,7 @@ module ActiveSupport #:nodoc:
         # trigger Kernel#autoloads, see the comment below.
         parent_name = constants.join("::")
         return unless qualified_const_defined?(parent_name)
+
         parent = constantize(parent_name)
       end
 

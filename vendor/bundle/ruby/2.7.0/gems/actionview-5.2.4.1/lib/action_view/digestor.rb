@@ -22,7 +22,7 @@ module ActionView
       # * <tt>dependencies</tt>  - An array of dependent views
       def digest(name:, finder:, dependencies: [])
         dependencies ||= []
-        cache_key = [ name, finder.rendered_format, dependencies ].flatten.compact.join(".")
+        cache_key = [name, finder.rendered_format, dependencies].flatten.compact.join(".")
 
         # this is a correctly done double-checked locking idiom
         # (Concurrent::Map's lookups have volatile semantics)
@@ -70,13 +70,14 @@ module ActionView
       end
 
       private
-        def find_template(finder, name, prefixes, partial, keys)
-          finder.disable_cache do
-            format = finder.rendered_format
-            result = finder.find_all(name, prefixes, partial, keys, formats: [format]).first if format
-            result || finder.find_all(name, prefixes, partial, keys).first
-          end
+
+      def find_template(finder, name, prefixes, partial, keys)
+        finder.disable_cache do
+          format = finder.rendered_format
+          result = finder.find_all(name, prefixes, partial, keys, formats: [format]).first if format
+          result || finder.find_all(name, prefixes, partial, keys).first
         end
+      end
     end
 
     class Node
@@ -88,10 +89,10 @@ module ActionView
       end
 
       def initialize(name, logical_name, template, children = [])
-        @name         = name
+        @name = name
         @logical_name = logical_name
-        @template     = template
-        @children     = children
+        @template = template
+        @children = children
       end
 
       def digest(finder, stack = [])
@@ -128,6 +129,7 @@ module ActionView
 
     class NullLogger
       def self.debug(_); end
+
       def self.error(_); end
     end
   end

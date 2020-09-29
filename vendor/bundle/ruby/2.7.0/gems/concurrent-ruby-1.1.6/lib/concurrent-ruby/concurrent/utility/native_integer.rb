@@ -10,6 +10,7 @@ module Concurrent
         if value > MAX_VALUE
           raise RangeError.new("#{value} is greater than the maximum value of #{MAX_VALUE}")
         end
+
         value
       end
 
@@ -17,6 +18,7 @@ module Concurrent
         if value < MIN_VALUE
           raise RangeError.new("#{value} is less than the maximum value of #{MIN_VALUE}")
         end
+
         value
       end
 
@@ -24,6 +26,7 @@ module Concurrent
         unless value.is_a?(Integer)
           raise ArgumentError.new("#{value} is not an Integer")
         end
+
         value
       end
 
@@ -37,6 +40,7 @@ module Concurrent
         if value < 0
           raise ArgumentError.new("#{value} cannot be negative")
         end
+
         value
       end
 
@@ -44,6 +48,7 @@ module Concurrent
         if value < 1
           raise ArgumentError.new("#{value} cannot be negative or zero")
         end
+
         value
       end
 

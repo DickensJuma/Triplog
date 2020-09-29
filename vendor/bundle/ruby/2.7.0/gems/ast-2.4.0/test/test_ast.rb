@@ -8,8 +8,8 @@ describe AST::Node do
   end
 
   before do
-    @node = AST::Node.new(:node, [ 0, 1 ])
-    @metanode = MetaNode.new(:node, [ 0, 1 ], :meta => 'value')
+    @node = AST::Node.new(:node, [0, 1])
+    @metanode = MetaNode.new(:node, [0, 1], :meta => 'value')
   end
 
   it 'should have accessors for type and children' do
@@ -56,44 +56,40 @@ describe AST::Node do
   end
 
   it 'should format to_sexp correctly' do
-    AST::Node.new(:a, [ :sym, [ 1, 2 ] ]).to_sexp.should.equal '(a :sym [1, 2])'
-    AST::Node.new(:a, [ :sym, @node ]).to_sexp.should.equal "(a :sym\n  (node 0 1))"
-    AST::Node.new(:a, [ :sym,
-      AST::Node.new(:b, [ @node, @node ])
-    ]).to_sexp.should.equal "(a :sym\n  (b\n    (node 0 1)\n    (node 0 1)))"
+    AST::Node.new(:a, [:sym, [1, 2]]).to_sexp.should.equal '(a :sym [1, 2])'
+    AST::Node.new(:a, [:sym, @node]).to_sexp.should.equal "(a :sym\n  (node 0 1))"
+    AST::Node.new(:a, [:sym,
+                       AST::Node.new(:b, [@node, @node])]).to_sexp.should.equal "(a :sym\n  (b\n    (node 0 1)\n    (node 0 1)))"
   end
 
   it 'should format to_s correctly' do
-    AST::Node.new(:a, [ :sym, [ 1, 2 ] ]).to_s.should.equal '(a :sym [1, 2])'
-    AST::Node.new(:a, [ :sym, @node ]).to_s.should.equal "(a :sym\n  (node 0 1))"
-    AST::Node.new(:a, [ :sym,
-      AST::Node.new(:b, [ @node, @node ])
-    ]).to_s.should.equal "(a :sym\n  (b\n    (node 0 1)\n    (node 0 1)))"
+    AST::Node.new(:a, [:sym, [1, 2]]).to_s.should.equal '(a :sym [1, 2])'
+    AST::Node.new(:a, [:sym, @node]).to_s.should.equal "(a :sym\n  (node 0 1))"
+    AST::Node.new(:a, [:sym,
+                       AST::Node.new(:b, [@node, @node])]).to_s.should.equal "(a :sym\n  (b\n    (node 0 1)\n    (node 0 1)))"
   end
 
   it 'should format inspect correctly' do
-    AST::Node.new(:a, [ :sym, [ 1, 2 ] ]).inspect.should.equal "s(:a, :sym, [1, 2])"
-    AST::Node.new(:a, [ :sym,
-      AST::Node.new(:b, [ @node, @node ])
-    ]).inspect.should.equal "s(:a, :sym,\n  s(:b,\n    s(:node, 0, 1),\n    s(:node, 0, 1)))"
+    AST::Node.new(:a, [:sym, [1, 2]]).inspect.should.equal "s(:a, :sym, [1, 2])"
+    AST::Node.new(:a, [:sym,
+                       AST::Node.new(:b, [@node, @node])]).inspect.should.equal "s(:a, :sym,\n  s(:b,\n    s(:node, 0, 1),\n    s(:node, 0, 1)))"
   end
 
   it 'should recreate inspect output' do
-    simple_node = AST::Node.new(:a, [ :sym, [ 1, 2 ] ])
+    simple_node = AST::Node.new(:a, [:sym, [1, 2]])
     eval(simple_node.inspect).should.equal simple_node
-    complex_node =  s(:a ,  :sym,  s(:b, s(:node,  0,  1),  s(:node,  0,  1)))
+    complex_node = s(:a, :sym, s(:b, s(:node, 0, 1), s(:node, 0, 1)))
     eval(complex_node.inspect).should.equal complex_node
   end
 
   it 'should return self in to_ast' do
     @node.to_ast.should.be.identical_to @node
   end
-  
+
   it 'should produce to_sexp_array correctly' do
-    AST::Node.new(:a, [ :sym, [ 1, 2 ] ]).to_sexp_array.should.equal [:a, :sym, [1, 2]]
-    AST::Node.new(:a, [ :sym,
-      AST::Node.new(:b, [ @node, @node ])
-    ]).to_sexp_array.should.equal [:a, :sym, [:b, [:node, 0, 1], [:node, 0, 1]]]
+    AST::Node.new(:a, [:sym, [1, 2]]).to_sexp_array.should.equal [:a, :sym, [1, 2]]
+    AST::Node.new(:a, [:sym,
+                       AST::Node.new(:b, [@node, @node])]).to_sexp_array.should.equal [:a, :sym, [:b, [:node, 0, 1], [:node, 0, 1]]]
   end
 
   it 'should only use type and children to compute #hash' do
@@ -124,7 +120,7 @@ describe AST::Node do
       end
 
       def obj.children
-        [ 0, 1 ]
+        [0, 1]
       end
     end
     @node.should.equal mock_node
@@ -141,13 +137,13 @@ describe AST::Node do
   it 'should concatenate with arrays' do
     node = s(:gasgn, :$foo)
     (node + [s(:integer, 1)]).
-        should.equal s(:gasgn, :$foo, s(:integer, 1))
+      should.equal s(:gasgn, :$foo, s(:integer, 1))
   end
 
   it 'should append elements' do
     node = s(:array)
     (node << s(:integer, 1) << s(:string, "foo")).
-        should.equal s(:array, s(:integer, 1), s(:string, "foo"))
+      should.equal s(:array, s(:integer, 1), s(:string, "foo"))
   end
 
   begin
@@ -187,7 +183,7 @@ describe AST::Processor do
     def on_def(node)
       count_node(node)
       name, arglist, body = node.children
-      node.updated(:def, [ name, process(arglist), process(body) ])
+      node.updated(:def, [name, process(arglist), process(body)])
     end
 
     def handler_missing(node)
@@ -201,14 +197,13 @@ describe AST::Processor do
 
   before do
     @ast = AST::Node.new(:root, [
-      AST::Node.new(:def, [ :func,
-        AST::Node.new(:arglist, [ :foo, :bar ]),
-        AST::Node.new(:body, [
-          AST::Node.new(:invoke, [ :puts, "Hello world" ])
-        ])
-      ]),
-      AST::Node.new(:invoke, [ :func ])
-    ])
+                           AST::Node.new(:def, [:func,
+                                                AST::Node.new(:arglist, [:foo, :bar]),
+                                                AST::Node.new(:body, [
+                                                                AST::Node.new(:invoke, [:puts, "Hello world"])
+                                                              ])]),
+                           AST::Node.new(:invoke, [:func])
+                         ])
 
     @processor = MockProcessor.new
   end
@@ -216,12 +211,12 @@ describe AST::Processor do
   it 'should visit every node' do
     @processor.process(@ast).should.equal @ast
     @processor.counts.should.equal({
-      :root    => 1,
-      :def     => 1,
-      :arglist => 1,
-      :body    => 1,
-      :invoke  => 2,
-    })
+                                     :root => 1,
+                                     :def => 1,
+                                     :arglist => 1,
+                                     :body => 1,
+                                     :invoke => 2,
+                                   })
   end
 
   it 'should be able to replace inner nodes' do
@@ -264,8 +259,8 @@ describe AST::Processor do
   it 'should allow to visit nodes with process_all(node)' do
     @processor.process_all s(:foo, s(:bar), s(:integer, 1))
     @processor.counts.should.equal({
-      :bar =>     1,
-      :integer => 1,
-    })
+                                     :bar => 1,
+                                     :integer => 1,
+                                   })
   end
 end

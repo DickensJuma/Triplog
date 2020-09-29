@@ -98,8 +98,8 @@ module ActiveSupport
         retval = yield
 
         expressions.zip(exps, before) do |(code, diff), exp, before_value|
-          error  = "#{code.inspect} didn't change by #{diff}"
-          error  = "#{message}.\n#{error}" if message
+          error = "#{code.inspect} didn't change by #{diff}"
+          error = "#{message}.\n#{error}" if message
           assert_equal(before_value + diff, exp.call, error)
         end
 

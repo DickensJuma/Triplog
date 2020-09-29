@@ -27,8 +27,8 @@ module ActionView
 
       TAG_PREFIXES = ["aria", "data", :aria, :data].to_set
 
-      PRE_CONTENT_STRINGS             = Hash.new { "" }
-      PRE_CONTENT_STRINGS[:textarea]  = "\n"
+      PRE_CONTENT_STRINGS = Hash.new { "" }
+      PRE_CONTENT_STRINGS[:textarea] = "\n"
       PRE_CONTENT_STRINGS["textarea"] = "\n"
 
       class TagBuilder #:nodoc:
@@ -52,18 +52,20 @@ module ActionView
 
         def content_tag_string(name, content, options, escape = true)
           tag_options = tag_options(options, escape) if options
-          content     = ERB::Util.unwrapped_html_escape(content) if escape
+          content = ERB::Util.unwrapped_html_escape(content) if escape
           "<#{name}#{tag_options}>#{PRE_CONTENT_STRINGS[name]}#{content}</#{name}>".html_safe
         end
 
         def tag_options(options, escape = true)
           return if options.blank?
+
           output = "".dup
-          sep    = " "
+          sep = " "
           options.each_pair do |key, value|
             if TAG_PREFIXES.include?(key) && value.is_a?(Hash)
               value.each_pair do |k, v|
                 next if v.nil?
+
                 output << sep
                 output << prefix_tag_option(key, k, v, escape)
               end
@@ -94,21 +96,22 @@ module ActionView
         end
 
         private
-          def prefix_tag_option(prefix, key, value, escape)
-            key = "#{prefix}-#{key.to_s.dasherize}"
-            unless value.is_a?(String) || value.is_a?(Symbol) || value.is_a?(BigDecimal)
-              value = value.to_json
-            end
-            tag_option(key, value, escape)
-          end
 
-          def respond_to_missing?(*args)
-            true
+        def prefix_tag_option(prefix, key, value, escape)
+          key = "#{prefix}-#{key.to_s.dasherize}"
+          unless value.is_a?(String) || value.is_a?(Symbol) || value.is_a?(BigDecimal)
+            value = value.to_json
           end
+          tag_option(key, value, escape)
+        end
 
-          def method_missing(called, *args, &block)
-            tag_string(called, *args, &block)
-          end
+        def respond_to_missing?(*args)
+          true
+        end
+
+        def method_missing(called, *args, &block)
+          tag_string(called, *args, &block)
+        end
       end
 
       # Returns an HTML tag.
@@ -305,9 +308,10 @@ module ActionView
       end
 
       private
-        def tag_builder
-          @tag_builder ||= TagBuilder.new(self)
-        end
+
+      def tag_builder
+        @tag_builder ||= TagBuilder.new(self)
+      end
     end
   end
 end

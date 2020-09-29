@@ -92,7 +92,7 @@ module ActionView
           super
         end
 
-      private
+        private
 
         def include_helper_modules!
           helper(helper_class) if helper_class
@@ -162,7 +162,7 @@ module ActionView
         ActiveSupport.run_load_hooks(:action_view_test_case, self)
       end
 
-    private
+      private
 
       # Need to experiment if this priority is the best one: rendered => output_buffer
       def document_root_element

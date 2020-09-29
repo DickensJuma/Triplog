@@ -50,6 +50,7 @@ module FFI
         unless native_type
           raise NotImplementedError, 'native_type method not overridden and no native_type set'
         end
+
         native_type
       end
     end

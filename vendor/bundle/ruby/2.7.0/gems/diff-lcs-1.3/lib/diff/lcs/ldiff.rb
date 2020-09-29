@@ -5,17 +5,17 @@ require 'ostruct'
 require 'diff/lcs/hunk'
 
 module Diff::LCS::Ldiff #:nodoc:
-  BANNER = <<-COPYRIGHT
-ldiff #{Diff::LCS::VERSION}
-  Copyright 2004-2014 Austin Ziegler
-
-  Part of Diff::LCS.
-  https://github.com/halostatue/diff-lcs
-
-  This program is free software. It may be redistributed and/or modified under
-  the terms of the GPL version 2 (or later), the Perl Artistic licence, or the
-  MIT licence.
-COPYRIGHT
+  BANNER = <<~COPYRIGHT
+    ldiff #{Diff::LCS::VERSION}
+      Copyright 2004-2014 Austin Ziegler
+    
+      Part of Diff::LCS.
+      https://github.com/halostatue/diff-lcs
+    
+      This program is free software. It may be redistributed and/or modified under
+      the terms of the GPL version 2 (or later), the Perl Artistic licence, or the
+      MIT licence.
+  COPYRIGHT
 end
 
 class << Diff::LCS::Ldiff
@@ -31,11 +31,11 @@ class << Diff::LCS::Ldiff
       o.separator ""
       o.on('-c', '-C', '--context [LINES]', Numeric, 'Displays a context diff with LINES lines', 'of context. Default 3 lines.') do |ctx|
         @format = :context
-        @lines  = ctx || 3
+        @lines = ctx || 3
       end
       o.on('-u', '-U', '--unified [LINES]', Numeric, 'Displays a unified diff with LINES lines', 'of context. Default 3 lines.') do |ctx|
         @format = :unified
-        @lines  = ctx || 3
+        @lines = ctx || 3
       end
       o.on('-e', 'Creates an \'ed\' script to change', 'oldfile to newfile.') do |ctx|
         @format = :ed
@@ -72,7 +72,7 @@ class << Diff::LCS::Ldiff
 
     # Defaults are for old-style diff
     @format ||= :old
-    @lines  ||= 0
+    @lines ||= 0
 
     file_old, file_new = *ARGV
 

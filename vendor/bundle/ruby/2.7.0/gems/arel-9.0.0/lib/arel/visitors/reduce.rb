@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'arel/visitors/visitor'
 
 module Arel
@@ -15,10 +16,12 @@ module Arel
         send dispatch_method, object, collector
       rescue NoMethodError => e
         raise e if respond_to?(dispatch_method, true)
+
         superklass = object.class.ancestors.find { |klass|
           respond_to?(dispatch[klass], true)
         }
         raise(TypeError, "Cannot visit #{object.class}") unless superklass
+
         dispatch[object.class] = dispatch[superklass]
         retry
       end

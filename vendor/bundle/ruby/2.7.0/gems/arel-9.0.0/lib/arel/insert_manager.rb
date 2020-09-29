@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   class InsertManager < Arel::TreeManager
     def initialize
@@ -12,6 +13,7 @@ module Arel
     end
 
     def columns; @ast.columns end
+
     def values= val; @ast.values = val; end
 
     def select select

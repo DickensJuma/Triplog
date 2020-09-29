@@ -276,25 +276,25 @@ module ActiveRecord
 
       private
 
-        def cached_find_by_statement(key, &block)
-          cache = @find_by_statement_cache[connection.prepared_statements]
-          cache.compute_if_absent(key) { StatementCache.create(connection, &block) }
-        end
+      def cached_find_by_statement(key, &block)
+        cache = @find_by_statement_cache[connection.prepared_statements]
+        cache.compute_if_absent(key) { StatementCache.create(connection, &block) }
+      end
 
-        def relation
-          relation = Relation.create(self)
+      def relation
+        relation = Relation.create(self)
 
-          if finder_needs_type_condition? && !ignore_default_scope?
-            relation.where!(type_condition)
-            relation.create_with!(inheritance_column.to_s => sti_name)
-          else
-            relation
-          end
+        if finder_needs_type_condition? && !ignore_default_scope?
+          relation.where!(type_condition)
+          relation.create_with!(inheritance_column.to_s => sti_name)
+        else
+          relation
         end
+      end
 
-        def table_metadata
-          TableMetadata.new(self, arel_table)
-        end
+      def table_metadata
+        TableMetadata.new(self, arel_table)
+      end
     end
 
     # New objects can be instantiated as either empty (pass no construction parameter) or pre-set with
@@ -383,10 +383,10 @@ module ActiveRecord
 
       _run_initialize_callbacks
 
-      @new_record               = true
-      @destroyed                = false
+      @new_record = true
+      @destroyed = false
       @_start_transaction_state = {}
-      @transaction_state        = nil
+      @transaction_state = nil
 
       super
     end
@@ -421,8 +421,8 @@ module ActiveRecord
     def ==(comparison_object)
       super ||
         comparison_object.instance_of?(self.class) &&
-        !id.nil? &&
-        comparison_object.id == id
+          !id.nil? &&
+          comparison_object.id == id
     end
     alias :eql? :==
 
@@ -478,14 +478,14 @@ module ActiveRecord
       # We check defined?(@attributes) not to issue warnings if the object is
       # allocated but not initialized.
       inspection = if defined?(@attributes) && @attributes
-        self.class.attribute_names.collect do |name|
-          if has_attribute?(name)
-            "#{name}: #{attribute_for_inspect(name)}"
-          end
-        end.compact.join(", ")
-      else
-        "not initialized"
-      end
+                     self.class.attribute_names.collect do |name|
+                       if has_attribute?(name)
+                         "#{name}: #{attribute_for_inspect(name)}"
+                       end
+                     end.compact.join(", ")
+                   else
+                     "not initialized"
+                   end
 
       "#<#{self.class} #{inspection}>"
     end
@@ -494,6 +494,7 @@ module ActiveRecord
     # when pp is required.
     def pretty_print(pp)
       return super if custom_inspect_method_defined?
+
       pp.object_address_group(self) do
         if defined?(@attributes) && @attributes
           column_names = self.class.column_names.select { |name| has_attribute?(name) || new_record? }
@@ -521,39 +522,39 @@ module ActiveRecord
 
     private
 
-      # +Array#flatten+ will call +#to_ary+ (recursively) on each of the elements of
-      # the array, and then rescues from the possible +NoMethodError+. If those elements are
-      # +ActiveRecord::Base+'s, then this triggers the various +method_missing+'s that we have,
-      # which significantly impacts upon performance.
-      #
-      # So we can avoid the +method_missing+ hit by explicitly defining +#to_ary+ as +nil+ here.
-      #
-      # See also https://tenderlovemaking.com/2011/06/28/til-its-ok-to-return-nil-from-to_ary.html
-      def to_ary
-        nil
-      end
+    # +Array#flatten+ will call +#to_ary+ (recursively) on each of the elements of
+    # the array, and then rescues from the possible +NoMethodError+. If those elements are
+    # +ActiveRecord::Base+'s, then this triggers the various +method_missing+'s that we have,
+    # which significantly impacts upon performance.
+    #
+    # So we can avoid the +method_missing+ hit by explicitly defining +#to_ary+ as +nil+ here.
+    #
+    # See also https://tenderlovemaking.com/2011/06/28/til-its-ok-to-return-nil-from-to_ary.html
+    def to_ary
+      nil
+    end
 
-      def init_internals
-        @readonly                 = false
-        @destroyed                = false
-        @marked_for_destruction   = false
-        @destroyed_by_association = nil
-        @new_record               = true
-        @_start_transaction_state = {}
-        @transaction_state        = nil
-      end
+    def init_internals
+      @readonly = false
+      @destroyed = false
+      @marked_for_destruction = false
+      @destroyed_by_association = nil
+      @new_record = true
+      @_start_transaction_state = {}
+      @transaction_state = nil
+    end
 
-      def initialize_internals_callback
-      end
+    def initialize_internals_callback
+    end
 
-      def thaw
-        if frozen?
-          @attributes = @attributes.dup
-        end
+    def thaw
+      if frozen?
+        @attributes = @attributes.dup
       end
+    end
 
-      def custom_inspect_method_defined?
-        self.class.instance_method(:inspect).owner != ActiveRecord::Base.instance_method(:inspect).owner
-      end
+    def custom_inspect_method_defined?
+      self.class.instance_method(:inspect).owner != ActiveRecord::Base.instance_method(:inspect).owner
+    end
   end
 end

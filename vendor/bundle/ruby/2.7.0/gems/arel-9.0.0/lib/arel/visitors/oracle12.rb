@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Visitors
     class Oracle12 < Arel::Visitors::ToSql
@@ -13,6 +14,7 @@ module Arel
             `SELECT FOR UPDATE and FETCH FIRST n ROWS` generates ORA-02014.`
           MSG
         end
+
         super
       end
 

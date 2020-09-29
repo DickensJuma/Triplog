@@ -15,7 +15,7 @@ module ActiveRecord
               when /^0x/i
                 value[2..-1].hex.to_s(2) # Hexadecimal notation
               else
-                value                    # Bit-string notation
+                value # Bit-string notation
               end
             else
               value.to_s
@@ -47,7 +47,7 @@ module ActiveRecord
             # Workaround for Ruby 2.2 "private attribute?" warning.
             protected
 
-              attr_reader :value
+            attr_reader :value
           end
         end
       end

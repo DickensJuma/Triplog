@@ -24,7 +24,7 @@ module ActionDispatch
           input = StringScanner.new(string)
           state = tt.eclosure(0)
           until input.eos?
-            sym   = input.scan(%r([/.?]|[^/.?]+))
+            sym = input.scan(%r([/.?]|[^/.?]+))
 
             # FIXME: tt.eclosure is not needed for the GTG
             state = tt.eclosure(tt.move(state, sym))
@@ -41,7 +41,7 @@ module ActionDispatch
           MatchData.new(memos)
         end
 
-        alias :=~    :simulate
+        alias :=~ :simulate
         alias :match :simulate
       end
     end

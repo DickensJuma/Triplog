@@ -3,7 +3,7 @@
 module ActiveRecord
   module Associations
     class JoinDependency # :nodoc:
-      autoload :JoinBase,        "active_record/associations/join_dependency/join_base"
+      autoload :JoinBase, "active_record/associations/join_dependency/join_base"
       autoload :JoinAssociation, "active_record/associations/join_dependency/join_association"
 
       class Aliases # :nodoc:
@@ -128,135 +128,137 @@ module ActiveRecord
       end
 
       protected
-        attr_reader :alias_tracker, :join_root
+
+      attr_reader :alias_tracker, :join_root
 
       private
-        def aliases
-          @aliases ||= Aliases.new join_root.each_with_index.map { |join_part, i|
-            columns = join_part.column_names.each_with_index.map { |column_name, j|
-              Aliases::Column.new column_name, "t#{i}_r#{j}"
-            }
-            Aliases::Table.new(join_part, columns)
+
+      def aliases
+        @aliases ||= Aliases.new join_root.each_with_index.map { |join_part, i|
+          columns = join_part.column_names.each_with_index.map { |column_name, j|
+            Aliases::Column.new column_name, "t#{i}_r#{j}"
           }
-        end
+          Aliases::Table.new(join_part, columns)
+        }
+      end
 
-        def construct_tables!(join_root)
-          join_root.each_children do |parent, child|
-            child.tables = table_aliases_for(parent, child)
+      def construct_tables!(join_root)
+        join_root.each_children do |parent, child|
+          child.tables = table_aliases_for(parent, child)
+        end
+      end
+
+      def make_join_constraints(join_root, join_type)
+        join_root.children.flat_map do |child|
+          make_constraints(join_root, child, join_type)
+        end
+      end
+
+      def make_constraints(parent, child, join_type = Arel::Nodes::OuterJoin)
+        foreign_table = parent.table
+        foreign_klass = parent.base_klass
+        joins = child.join_constraints(foreign_table, foreign_klass, join_type, alias_tracker)
+        joins.concat child.children.flat_map { |c| make_constraints(child, c, join_type) }
+      end
+
+      def table_aliases_for(parent, node)
+        node.reflection.chain.map { |reflection|
+          alias_tracker.aliased_table_for(
+            reflection.table_name,
+            table_alias_for(reflection, parent, reflection != node.reflection),
+            reflection.klass.type_caster
+          )
+        }
+      end
+
+      def table_alias_for(reflection, parent, join)
+        name = "#{reflection.plural_name}_#{parent.table_name}"
+        join ? "#{name}_join" : name
+      end
+
+      def walk(left, right)
+        intersection, missing = right.children.map { |node1|
+          [left.children.find { |node2| node1.match? node2 }, node1]
+        }.partition(&:first)
+
+        joins = intersection.flat_map { |l, r| r.table = l.table; walk(l, r) }
+        joins.concat missing.flat_map { |_, n| make_constraints(left, n) }
+      end
+
+      def find_reflection(klass, name)
+        klass._reflect_on_association(name) ||
+          raise(ConfigurationError, "Can't join '#{klass.name}' to association named '#{name}'; perhaps you misspelled it?")
+      end
+
+      def build(associations, base_klass)
+        associations.map do |name, right|
+          reflection = find_reflection base_klass, name
+          reflection.check_validity!
+          reflection.check_eager_loadable!
+
+          if reflection.polymorphic?
+            raise EagerLoadPolymorphicError.new(reflection)
           end
+
+          JoinAssociation.new(reflection, build(right, reflection.klass))
         end
+      end
 
-        def make_join_constraints(join_root, join_type)
-          join_root.children.flat_map do |child|
-            make_constraints(join_root, child, join_type)
-          end
-        end
+      def construct(ar_parent, parent, row, rs, seen, model_cache, aliases)
+        return if ar_parent.nil?
 
-        def make_constraints(parent, child, join_type = Arel::Nodes::OuterJoin)
-          foreign_table = parent.table
-          foreign_klass = parent.base_klass
-          joins = child.join_constraints(foreign_table, foreign_klass, join_type, alias_tracker)
-          joins.concat child.children.flat_map { |c| make_constraints(child, c, join_type) }
-        end
-
-        def table_aliases_for(parent, node)
-          node.reflection.chain.map { |reflection|
-            alias_tracker.aliased_table_for(
-              reflection.table_name,
-              table_alias_for(reflection, parent, reflection != node.reflection),
-              reflection.klass.type_caster
-            )
-          }
-        end
-
-        def table_alias_for(reflection, parent, join)
-          name = "#{reflection.plural_name}_#{parent.table_name}"
-          join ? "#{name}_join" : name
-        end
-
-        def walk(left, right)
-          intersection, missing = right.children.map { |node1|
-            [left.children.find { |node2| node1.match? node2 }, node1]
-          }.partition(&:first)
-
-          joins = intersection.flat_map { |l, r| r.table = l.table; walk(l, r) }
-          joins.concat missing.flat_map { |_, n| make_constraints(left, n) }
-        end
-
-        def find_reflection(klass, name)
-          klass._reflect_on_association(name) ||
-            raise(ConfigurationError, "Can't join '#{klass.name}' to association named '#{name}'; perhaps you misspelled it?")
-        end
-
-        def build(associations, base_klass)
-          associations.map do |name, right|
-            reflection = find_reflection base_klass, name
-            reflection.check_validity!
-            reflection.check_eager_loadable!
-
-            if reflection.polymorphic?
-              raise EagerLoadPolymorphicError.new(reflection)
-            end
-
-            JoinAssociation.new(reflection, build(right, reflection.klass))
-          end
-        end
-
-        def construct(ar_parent, parent, row, rs, seen, model_cache, aliases)
-          return if ar_parent.nil?
-
-          parent.children.each do |node|
-            if node.reflection.collection?
-              other = ar_parent.association(node.reflection.name)
-              other.loaded!
-            elsif ar_parent.association_cached?(node.reflection.name)
-              model = ar_parent.association(node.reflection.name).target
-              construct(model, node, row, rs, seen, model_cache, aliases)
-              next
-            end
-
-            key = aliases.column_alias(node, node.primary_key)
-            id = row[key]
-            if id.nil?
-              nil_association = ar_parent.association(node.reflection.name)
-              nil_association.loaded!
-              next
-            end
-
-            model = seen[ar_parent.object_id][node][id]
-
-            if model
-              construct(model, node, row, rs, seen, model_cache, aliases)
-            else
-              model = construct_model(ar_parent, node, row, model_cache, id, aliases)
-
-              if node.reflection.scope &&
-                  node.reflection.scope_for(node.base_klass.unscoped).readonly_value
-                model.readonly!
-              end
-
-              seen[ar_parent.object_id][node][id] = model
-              construct(model, node, row, rs, seen, model_cache, aliases)
-            end
-          end
-        end
-
-        def construct_model(record, node, row, model_cache, id, aliases)
-          other = record.association(node.reflection.name)
-
-          model = model_cache[node][id] ||=
-            node.instantiate(row, aliases.column_aliases(node)) do |m|
-              other.set_inverse_instance(m)
-            end
-
+        parent.children.each do |node|
           if node.reflection.collection?
-            other.target.push(model)
-          else
-            other.target = model
+            other = ar_parent.association(node.reflection.name)
+            other.loaded!
+          elsif ar_parent.association_cached?(node.reflection.name)
+            model = ar_parent.association(node.reflection.name).target
+            construct(model, node, row, rs, seen, model_cache, aliases)
+            next
           end
 
-          model
+          key = aliases.column_alias(node, node.primary_key)
+          id = row[key]
+          if id.nil?
+            nil_association = ar_parent.association(node.reflection.name)
+            nil_association.loaded!
+            next
+          end
+
+          model = seen[ar_parent.object_id][node][id]
+
+          if model
+            construct(model, node, row, rs, seen, model_cache, aliases)
+          else
+            model = construct_model(ar_parent, node, row, model_cache, id, aliases)
+
+            if node.reflection.scope &&
+               node.reflection.scope_for(node.base_klass.unscoped).readonly_value
+              model.readonly!
+            end
+
+            seen[ar_parent.object_id][node][id] = model
+            construct(model, node, row, rs, seen, model_cache, aliases)
+          end
         end
+      end
+
+      def construct_model(record, node, row, model_cache, id, aliases)
+        other = record.association(node.reflection.name)
+
+        model = model_cache[node][id] ||=
+          node.instantiate(row, aliases.column_aliases(node)) do |m|
+            other.set_inverse_instance(m)
+          end
+
+        if node.reflection.collection?
+          other.target.push(model)
+        else
+          other.target = model
+        end
+
+        model
+      end
     end
   end
 end

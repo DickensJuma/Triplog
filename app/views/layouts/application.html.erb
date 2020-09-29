@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>MileTourTracker</title>
+    <title>TripLog</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
@@ -9,7 +9,8 @@
   </head>
   <body>
     <nav class="nav">
-      <%= link_to 'Home', root_path %>
+    <%= image_tag 'https://pbs.twimg.com/profile_images/856695395770093568/UZGwYT5o_400x400.jpg',id: 'image_id'%>
+      <%= link_to 'Fleets', root_path %>
       <div class="menu">
        
         <div class="menu-item">
@@ -17,9 +18,11 @@
         </div>
       </div>
       <% if current_user %>
-        <%= link_to 'Sign out', destroy_user_session_path, method: :delete %>
+       <%= link_to current_user.name, current_user %>
+        <%= link_to 'Logout', '/logout', method: :delete %>
+      
       <% else %>
-        <%= link_to 'Sign in', user_session_path %>
+        <%= link_to 'Sign in', '/login' %>
       <% end %>
     </nav>
     <% if notice.present? %>

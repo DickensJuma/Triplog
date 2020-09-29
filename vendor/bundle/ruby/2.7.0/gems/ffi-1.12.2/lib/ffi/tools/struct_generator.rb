@@ -1,7 +1,6 @@
 require 'tempfile'
 
 module FFI
-
   ##
   # Generates an FFI Struct layout.
   #
@@ -34,7 +33,7 @@ module FFI
   class StructGenerator
     @options = {}
     attr_accessor :size
-    attr_reader   :fields
+    attr_reader :fields
 
     def initialize(name, options = {})
       @name = name
@@ -49,12 +48,15 @@ module FFI
         calculate self.class.options.merge(options)
       end
     end
+
     def self.options=(options)
       @options = options
     end
+
     def self.options
       @options
     end
+
     def calculate(options = {})
       binary = File.join Dir.tmpdir, "rb_struct_gen_bin_#{Process.pid}"
 
@@ -76,7 +78,7 @@ module FFI
           f.puts <<-EOF
     printf("#{field.name} %u %u\\n", (unsigned int) offsetof(#{@struct_name}, #{field.name}),
            (unsigned int) sizeof(s.#{field.name}));
-  EOF
+          EOF
         end
 
         f.puts "\n  return 0;\n}"
@@ -103,7 +105,7 @@ module FFI
       output.each do |line|
         md = line.match(/.+ (\d+) (\d+)/)
         @fields[line_no].offset = md[1].to_i
-        @fields[line_no].size   = md[2].to_i
+        @fields[line_no].size = md[2].to_i
 
         line_no += 1
       end
@@ -156,14 +158,12 @@ module FFI
     def name(n)
       @struct_name = n
     end
-
   end
 
   ##
   # A field in a Struct.
 
   class StructGenerator::Field
-
     attr_reader :name
     attr_reader :type
     attr_reader :offset
@@ -187,8 +187,5 @@ module FFI
       buf << "rbx.platform.#{name}.#{@name}.type = #{@type}" if @type
       buf
     end
-
   end
-
 end
-

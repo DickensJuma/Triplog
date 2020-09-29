@@ -34,7 +34,7 @@ else
 end
 
 desc "Build all packages"
-task :package => %w[ gem:java gem:windows ]
+task :package => %w[gem:java gem:windows]
 
 CLOBBER.include 'lib/ffi/types.conf'
 CLOBBER.include 'pkg'
@@ -53,8 +53,7 @@ CLEAN.include 'lib/2.*'
 task :distclean => :clobber
 
 desc "Test the extension"
-task :test => [ :spec ]
-
+task :test => [:spec]
 
 namespace :bench do
   ITER = ENV['ITER'] ? ENV['ITER'].to_i : 100000
@@ -78,7 +77,6 @@ task 'spec:specdoc' => TEST_DEPS
 task :default => :spec
 
 namespace 'java' do
-
   java_gem_spec = Gem::Specification.new do |s|
     s.name = gem_spec.name
     s.version = gem_spec.version
@@ -104,11 +102,11 @@ task 'gem:java' => 'java:gem'
 unless java?
   require 'rake/extensiontask'
   Rake::ExtensionTask.new('ffi_c', gem_spec) do |ext|
-    ext.name = 'ffi_c'                                        # indicate the name of the extension.
+    ext.name = 'ffi_c' # indicate the name of the extension.
     # ext.lib_dir = BUILD_DIR                                 # put binaries into this folder.
-    ext.tmp_dir = BUILD_DIR                                   # temporary folder used during compilation.
-    ext.cross_compile = true                                  # enable cross compilation (requires cross compile toolchain)
-    ext.cross_platform = %w[i386-mingw32 x64-mingw32]                     # forces the Windows platform instead of the default one
+    ext.tmp_dir = BUILD_DIR # temporary folder used during compilation.
+    ext.cross_compile = true # enable cross compilation (requires cross compile toolchain)
+    ext.cross_platform = %w[i386-mingw32 x64-mingw32] # forces the Windows platform instead of the default one
     ext.cross_compiling do |spec|
       spec.files.reject! { |path| File.fnmatch?('ext/*', path) }
     end
@@ -168,7 +166,7 @@ file types_conf => File.join("lib", "ffi", "version.rb") do |task|
   require 'ffi/tools/types_generator'
   options = {}
   FileUtils.mkdir_p(File.dirname(task.name), { :mode => 0755 })
-  File.open(task.name, File::CREAT|File::TRUNC|File::RDWR, 0644) do |f|
+  File.open(task.name, File::CREAT | File::TRUNC | File::RDWR, 0644) do |f|
     f.puts FFI::TypesGenerator.generate(options)
   end
   File.open(logfile, 'w') do |log|

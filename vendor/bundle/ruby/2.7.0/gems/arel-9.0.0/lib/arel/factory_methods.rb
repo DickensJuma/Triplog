@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   ###
   # Methods for creating various nodes

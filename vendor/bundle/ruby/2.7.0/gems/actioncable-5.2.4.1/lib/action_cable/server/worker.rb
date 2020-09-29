@@ -69,9 +69,9 @@ module ActionCable
 
       private
 
-        def logger
-          ActionCable.server.logger
-        end
+      def logger
+        ActionCable.server.logger
+      end
     end
   end
 end

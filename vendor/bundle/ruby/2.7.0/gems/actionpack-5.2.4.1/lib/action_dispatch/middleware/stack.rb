@@ -10,7 +10,7 @@ module ActionDispatch
 
       def initialize(klass, args, block)
         @klass = klass
-        @args  = args
+        @args = args
         @block = block
       end
 
@@ -103,14 +103,15 @@ module ActionDispatch
 
     private
 
-      def assert_index(index, where)
-        i = index.is_a?(Integer) ? index : middlewares.index { |m| m.klass == index }
-        raise "No such middleware to insert #{where}: #{index.inspect}" unless i
-        i
-      end
+    def assert_index(index, where)
+      i = index.is_a?(Integer) ? index : middlewares.index { |m| m.klass == index }
+      raise "No such middleware to insert #{where}: #{index.inspect}" unless i
 
-      def build_middleware(klass, args, block)
-        Middleware.new(klass, args, block)
-      end
+      i
+    end
+
+    def build_middleware(klass, args, block)
+      Middleware.new(klass, args, block)
+    end
   end
 end

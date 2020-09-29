@@ -2,8 +2,8 @@ require 'execjs'
 require 'coffee_script/source'
 
 module CoffeeScript
-  Error            = ExecJS::Error
-  EngineError      = ExecJS::RuntimeError
+  Error = ExecJS::Error
+  EngineError = ExecJS::RuntimeError
   CompilationError = ExecJS::ProgramError
 
   module Source

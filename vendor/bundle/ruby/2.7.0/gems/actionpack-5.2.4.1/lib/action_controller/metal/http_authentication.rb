@@ -202,7 +202,7 @@ module ActionController
       # First try the password as a ha1 digest password. If this fails, then try it as a plain
       # text password.
       def validate_digest_response(request, realm, &password_procedure)
-        secret_key  = secret_token(request)
+        secret_key = secret_token(request)
         credentials = decode_credentials_header(request)
         valid_nonce = validate_nonce(secret_key, request, credentials[:nonce])
 
@@ -211,7 +211,7 @@ module ActionController
           return false unless password
 
           method = request.get_header("rack.methodoverride.original_method") || request.get_header("REQUEST_METHOD")
-          uri    = credentials[:uri]
+          uri = credentials[:uri]
 
           [true, false].any? do |trailing_question_mark|
             [true, false].any? do |password_is_ha1|
@@ -267,7 +267,7 @@ module ActionController
       end
 
       def secret_token(request)
-        key_generator  = request.key_generator
+        key_generator = request.key_generator
         http_auth_salt = request.http_auth_salt
         key_generator.generate_key(http_auth_salt)
       end
@@ -318,6 +318,7 @@ module ActionController
       # username and password.
       def validate_nonce(secret_key, request, value, seconds_to_timeout = 5 * 60)
         return false if value.nil?
+
         t = ::Base64.decode64(value).split(":").first.to_i
         nonce(secret_key, t) == value && (t - Time.now.to_i).abs <= seconds_to_timeout
       end

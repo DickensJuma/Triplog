@@ -199,7 +199,7 @@ module ActionView #:nodoc:
       else
         lookup_context = context.is_a?(ActionView::LookupContext) ?
           context : ActionView::LookupContext.new(context)
-        lookup_context.formats  = formats if formats
+        lookup_context.formats = formats if formats
         lookup_context.prefixes = controller._prefixes if controller
         @view_renderer = ActionView::Renderer.new(lookup_context)
       end

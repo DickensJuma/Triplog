@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Attributes
     class Attribute < Struct.new :relation, :name
@@ -23,12 +24,12 @@ module Arel
       end
     end
 
-    class String    < Attribute; end
-    class Time      < Attribute; end
-    class Boolean   < Attribute; end
-    class Decimal   < Attribute; end
-    class Float     < Attribute; end
-    class Integer   < Attribute; end
+    class String < Attribute; end
+    class Time < Attribute; end
+    class Boolean < Attribute; end
+    class Decimal < Attribute; end
+    class Float < Attribute; end
+    class Integer < Attribute; end
     class Undefined < Attribute; end
   end
 

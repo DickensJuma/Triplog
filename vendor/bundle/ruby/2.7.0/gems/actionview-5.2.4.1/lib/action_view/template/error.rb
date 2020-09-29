@@ -33,19 +33,19 @@ module ActionView
       @path = path
       prefixes = Array(prefixes)
       template_type = if partial
-        "partial"
-      elsif /layouts/i.match?(path)
-        "layout"
-      else
-        "template"
-      end
+                        "partial"
+                      elsif /layouts/i.match?(path)
+                        "layout"
+                      else
+                        "template"
+                      end
 
       if partial && path.present?
         path = path.sub(%r{([^/]+)$}, "_\\1")
       end
       searched_paths = prefixes.map { |prefix| [prefix, path].join("/") }
 
-      out  = "Missing #{template_type} #{searched_paths.join(", ")} with #{details.inspect}. Searched in:\n"
+      out = "Missing #{template_type} #{searched_paths.join(", ")} with #{details.inspect}. Searched in:\n"
       out += paths.compact.map { |p| "  * #{p.to_s.inspect}\n" }.join
       super out
     end
@@ -75,7 +75,7 @@ module ActionView
       def sub_template_message
         if @sub_templates
           "Trace of template inclusion: " +
-          @sub_templates.collect(&:inspect).join(", ")
+            @sub_templates.collect(&:inspect).join(", ")
         else
           ""
         end
@@ -83,12 +83,13 @@ module ActionView
 
       def source_extract(indentation = 0, output = :console)
         return unless num = line_number
+
         num = num.to_i
 
         source_code = @template.source.split("\n")
 
-        start_on_line = [ num - SOURCE_CODE_RADIUS - 1, 0 ].max
-        end_on_line   = [ num + SOURCE_CODE_RADIUS - 1, source_code.length].min
+        start_on_line = [num - SOURCE_CODE_RADIUS - 1, 0].max
+        end_on_line = [num + SOURCE_CODE_RADIUS - 1, source_code.length].min
 
         indent = end_on_line.to_s.size + indentation
         return unless source_code = source_code[start_on_line..end_on_line]
@@ -115,25 +116,25 @@ module ActionView
 
       private
 
-        def source_location
-          if line_number
-            "on line ##{line_number} of "
-          else
-            "in "
-          end + file_name
-        end
+      def source_location
+        if line_number
+          "on line ##{line_number} of "
+        else
+          "in "
+        end + file_name
+      end
 
-        def formatted_code_for(source_code, line_counter, indent, output)
-          start_value = (output == :html) ? {} : []
-          source_code.inject(start_value) do |result, line|
-            line_counter += 1
-            if output == :html
-              result.update(line_counter.to_s => "%#{indent}s %s\n" % ["", line])
-            else
-              result << "%#{indent}s: %s" % [line_counter, line]
-            end
+      def formatted_code_for(source_code, line_counter, indent, output)
+        start_value = (output == :html) ? {} : []
+        source_code.inject(start_value) do |result, line|
+          line_counter += 1
+          if output == :html
+            result.update(line_counter.to_s => "%#{indent}s %s\n" % ["", line])
+          else
+            result << "%#{indent}s: %s" % [line_counter, line]
           end
         end
+      end
     end
   end
 

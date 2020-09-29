@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Expressions
     def count distinct = false
@@ -24,6 +25,5 @@ module Arel
     def extract field
       Nodes::Extract.new [self], field
     end
-
   end
 end

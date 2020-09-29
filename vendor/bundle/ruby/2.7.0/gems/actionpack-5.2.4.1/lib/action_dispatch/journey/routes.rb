@@ -10,11 +10,11 @@ module ActionDispatch
       attr_reader :routes, :custom_routes, :anchored_routes
 
       def initialize
-        @routes             = []
-        @ast                = nil
-        @anchored_routes    = []
-        @custom_routes      = []
-        @simulator          = nil
+        @routes = []
+        @ast = nil
+        @anchored_routes = []
+        @custom_routes = []
+        @simulator = nil
       end
 
       def empty?
@@ -57,6 +57,7 @@ module ActionDispatch
 
       def simulator
         return if ast.nil?
+
         @simulator ||= begin
           gtg = GTG::Builder.new(ast).transition_table
           GTG::Simulator.new(gtg)
@@ -73,10 +74,10 @@ module ActionDispatch
 
       private
 
-        def clear_cache!
-          @ast                = nil
-          @simulator          = nil
-        end
+      def clear_cache!
+        @ast = nil
+        @simulator = nil
+      end
     end
   end
 end

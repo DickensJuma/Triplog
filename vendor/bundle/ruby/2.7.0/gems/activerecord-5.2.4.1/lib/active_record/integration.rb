@@ -69,15 +69,15 @@ module ActiveRecord
           "#{model_name.cache_key}/#{id}"
         else
           timestamp = if timestamp_names.any?
-            ActiveSupport::Deprecation.warn(<<-MSG.squish)
+                        ActiveSupport::Deprecation.warn(<<-MSG.squish)
               Specifying a timestamp name for #cache_key has been deprecated in favor of
               the explicit #cache_version method that can be overwritten.
-            MSG
+                        MSG
 
-            max_updated_column_timestamp(timestamp_names)
-          else
-            max_updated_column_timestamp
-          end
+                        max_updated_column_timestamp(timestamp_names)
+                      else
+                        max_updated_column_timestamp
+                      end
 
           if timestamp
             timestamp = timestamp.utc.to_s(cache_timestamp_format)
@@ -141,8 +141,8 @@ module ActiveRecord
         else
           define_method :to_param do
             if (default = super()) &&
-                 (result = send(method_name).to_s).present? &&
-                   (param = result.squish.parameterize.truncate(20, separator: /-/, omission: "")).present?
+               (result = send(method_name).to_s).present? &&
+               (param = result.squish.parameterize.truncate(20, separator: /-/, omission: "")).present?
               "#{default}-#{param}"
             else
               default

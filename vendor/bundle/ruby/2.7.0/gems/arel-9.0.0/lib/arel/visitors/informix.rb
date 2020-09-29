@@ -1,13 +1,15 @@
 # frozen_string_literal: true
+
 module Arel
   module Visitors
     class Informix < Arel::Visitors::ToSql
       private
+
       def visit_Arel_Nodes_SelectStatement o, collector
         collector << "SELECT "
         collector = maybe_visit o.offset, collector
         collector = maybe_visit o.limit, collector
-        collector = o.cores.inject(collector) { |c,x|
+        collector = o.cores.inject(collector) { |c, x|
           visit_Arel_Nodes_SelectCore x, c
         }
         if o.orders.any?
@@ -16,6 +18,7 @@ module Arel
         end
         collector = maybe_visit o.lock, collector
       end
+
       def visit_Arel_Nodes_SelectCore o, collector
         collector = inject_join o.projections, collector, ", "
         if o.source && !o.source.empty?
@@ -44,6 +47,7 @@ module Arel
         collector << "SKIP "
         visit o.expr, collector
       end
+
       def visit_Arel_Nodes_Limit o, collector
         collector << "FIRST "
         visit o.expr, collector
@@ -52,4 +56,3 @@ module Arel
     end
   end
 end
-

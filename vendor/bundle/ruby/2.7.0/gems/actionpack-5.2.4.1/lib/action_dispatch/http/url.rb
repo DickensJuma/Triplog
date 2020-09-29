@@ -5,8 +5,8 @@ require "active_support/core_ext/module/attribute_accessors"
 module ActionDispatch
   module Http
     module URL
-      IP_HOST_REGEXP  = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
-      HOST_REGEXP     = /(^[^:]+:\/\/)?(\[[^\]]+\]|[^:]+)(?::(\d+$))?/
+      IP_HOST_REGEXP = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
+      HOST_REGEXP = /(^[^:]+:\/\/)?(\[[^\]]+\]|[^:]+)(?::(\d+$))?/
       PROTOCOL_REGEXP = /^([^:]+)(:)?(\/\/)?$/
 
       mattr_accessor :tld_length, default: 1
@@ -55,9 +55,9 @@ module ActionDispatch
         end
 
         def full_url_for(options)
-          host     = options[:host]
+          host = options[:host]
           protocol = options[:protocol]
-          port     = options[:port]
+          port = options[:port]
 
           unless host
             raise ArgumentError, "Missing host to link to! Please provide the :host parameter, set default_url_options[:host], or set :only_path to true"
@@ -112,12 +112,12 @@ module ActionDispatch
         def build_host_url(host, port, protocol, options, path)
           if match = host.match(HOST_REGEXP)
             protocol ||= match[1] unless protocol == false
-            host       = match[2]
-            port       = match[3] unless options.key? :port
+            host = match[2]
+            port = match[3] unless options.key? :port
           end
 
           protocol = normalize_protocol protocol
-          host     = normalize_host(host, options)
+          host = normalize_host(host, options)
 
           result = protocol.dup
 
@@ -154,8 +154,8 @@ module ActionDispatch
           return _host unless named_host?(_host)
 
           tld_length = options[:tld_length] || @@tld_length
-          subdomain  = options.fetch :subdomain, true
-          domain     = options[:domain]
+          subdomain = options.fetch :subdomain, true
+          domain = options[:domain]
 
           host = "".dup
           if subdomain == true
@@ -186,7 +186,7 @@ module ActionDispatch
       def initialize
         super
         @protocol = nil
-        @port     = nil
+        @port = nil
       end
 
       # Returns the complete URL used for this request.

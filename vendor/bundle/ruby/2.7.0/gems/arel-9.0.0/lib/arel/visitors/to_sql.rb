@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'bigdecimal'
 require 'date'
 require 'arel/visitors/reduce'
@@ -55,19 +56,19 @@ module Arel
       # specialized for specific databases when necessary.
       #
 
-      WHERE    = ' WHERE '    # :nodoc:
-      SPACE    = ' '          # :nodoc:
-      COMMA    = ', '         # :nodoc:
+      WHERE = ' WHERE ' # :nodoc:
+      SPACE = ' ' # :nodoc:
+      COMMA = ', ' # :nodoc:
       GROUP_BY = ' GROUP BY ' # :nodoc:
       ORDER_BY = ' ORDER BY ' # :nodoc:
-      WINDOW   = ' WINDOW '   # :nodoc:
-      AND      = ' AND '      # :nodoc:
+      WINDOW = ' WINDOW ' # :nodoc:
+      AND = ' AND ' # :nodoc:
 
-      DISTINCT = 'DISTINCT'   # :nodoc:
+      DISTINCT = 'DISTINCT' # :nodoc:
 
       def initialize connection
         super()
-        @connection     = connection
+        @connection = connection
       end
 
       def compile node, &block
@@ -89,13 +90,13 @@ module Arel
 
       # FIXME: we should probably have a 2-pass visitor for this
       def build_subselect key, o
-        stmt             = Nodes::SelectStatement.new
-        core             = stmt.cores.first
-        core.froms       = o.relation
-        core.wheres      = o.wheres
+        stmt = Nodes::SelectStatement.new
+        core = stmt.cores.first
+        core.froms = o.relation
+        core.wheres = o.wheres
         core.projections = [key]
-        stmt.limit       = o.limit
-        stmt.orders      = o.orders
+        stmt.limit = o.limit
+        stmt.orders = o.orders
         stmt
       end
 
@@ -213,7 +214,7 @@ module Arel
           collector << SPACE
         end
 
-        collector = o.cores.inject(collector) { |c,x|
+        collector = o.cores.inject(collector) { |c, x|
           visit_Arel_Nodes_SelectCore(x, c)
         }
 
@@ -742,9 +743,9 @@ module Arel
       end
 
       alias :visit_Arel_Nodes_SqlLiteral :literal
-      alias :visit_Bignum                :literal
-      alias :visit_Fixnum                :literal
-      alias :visit_Integer               :literal
+      alias :visit_Bignum :literal
+      alias :visit_Fixnum :literal
+      alias :visit_Integer :literal
 
       def quoted o, a
         if a && a.able_to_type_cast?
@@ -759,19 +760,19 @@ module Arel
       end
 
       alias :visit_ActiveSupport_Multibyte_Chars :unsupported
-      alias :visit_ActiveSupport_StringInquirer  :unsupported
-      alias :visit_BigDecimal                    :unsupported
-      alias :visit_Class                         :unsupported
-      alias :visit_Date                          :unsupported
-      alias :visit_DateTime                      :unsupported
-      alias :visit_FalseClass                    :unsupported
-      alias :visit_Float                         :unsupported
-      alias :visit_Hash                          :unsupported
-      alias :visit_NilClass                      :unsupported
-      alias :visit_String                        :unsupported
-      alias :visit_Symbol                        :unsupported
-      alias :visit_Time                          :unsupported
-      alias :visit_TrueClass                     :unsupported
+      alias :visit_ActiveSupport_StringInquirer :unsupported
+      alias :visit_BigDecimal :unsupported
+      alias :visit_Class :unsupported
+      alias :visit_Date :unsupported
+      alias :visit_DateTime :unsupported
+      alias :visit_FalseClass :unsupported
+      alias :visit_Float :unsupported
+      alias :visit_Hash :unsupported
+      alias :visit_NilClass :unsupported
+      alias :visit_String :unsupported
+      alias :visit_Symbol :unsupported
+      alias :visit_Time :unsupported
+      alias :visit_TrueClass :unsupported
 
       def visit_Arel_Nodes_InfixOperation o, collector
         collector = visit o.left, collector
@@ -779,10 +780,10 @@ module Arel
         visit o.right, collector
       end
 
-      alias :visit_Arel_Nodes_Addition       :visit_Arel_Nodes_InfixOperation
-      alias :visit_Arel_Nodes_Subtraction    :visit_Arel_Nodes_InfixOperation
+      alias :visit_Arel_Nodes_Addition :visit_Arel_Nodes_InfixOperation
+      alias :visit_Arel_Nodes_Subtraction :visit_Arel_Nodes_InfixOperation
       alias :visit_Arel_Nodes_Multiplication :visit_Arel_Nodes_InfixOperation
-      alias :visit_Arel_Nodes_Division       :visit_Arel_Nodes_InfixOperation
+      alias :visit_Arel_Nodes_Division :visit_Arel_Nodes_InfixOperation
 
       def visit_Arel_Nodes_UnaryOperation o, collector
         collector << " #{o.operator} "
@@ -796,28 +797,32 @@ module Arel
 
       def quote value
         return value if Arel::Nodes::SqlLiteral === value
+
         @connection.quote value
       end
 
       def quote_table_name name
         return name if Arel::Nodes::SqlLiteral === name
+
         @connection.quote_table_name(name)
       end
 
       def quote_column_name name
         return name if Arel::Nodes::SqlLiteral === name
+
         @connection.quote_column_name(name)
       end
 
       def maybe_visit thing, collector
         return collector unless thing
+
         collector << " "
         visit thing, collector
       end
 
       def inject_join list, collector, join_str
         len = list.length - 1
-        list.each_with_index.inject(collector) { |c, (x,i)|
+        list.each_with_index.inject(collector) { |c, (x, i)|
           if i == len
             visit x, c
           else

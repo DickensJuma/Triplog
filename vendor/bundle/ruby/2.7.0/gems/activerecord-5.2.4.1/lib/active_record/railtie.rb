@@ -19,10 +19,10 @@ module ActiveRecord
                                               timestamps: true
 
     config.action_dispatch.rescue_responses.merge!(
-      "ActiveRecord::RecordNotFound"   => :not_found,
+      "ActiveRecord::RecordNotFound" => :not_found,
       "ActiveRecord::StaleObjectError" => :conflict,
-      "ActiveRecord::RecordInvalid"    => :unprocessable_entity,
-      "ActiveRecord::RecordNotSaved"   => :unprocessable_entity
+      "ActiveRecord::RecordInvalid" => :unprocessable_entity,
+      "ActiveRecord::RecordNotSaved" => :unprocessable_entity
     )
 
     config.active_record.use_schema_cache_dump = true
@@ -80,7 +80,7 @@ module ActiveRecord
     initializer "active_record.migration_error" do
       if config.active_record.delete(:migration_error) == :page_load
         config.app_middleware.insert_after ::ActionDispatch::Callbacks,
-          ActiveRecord::Migration::CheckPending
+                                           ActiveRecord::Migration::CheckPending
       end
     end
 
@@ -135,15 +135,15 @@ module ActiveRecord
         begin
           establish_connection
         rescue ActiveRecord::NoDatabaseError
-          warn <<-end_warning
-Oops - You have a database configured, but it doesn't exist yet!
-
-Here's how to get started:
-
-  1. Configure your database in config/database.yml.
-  2. Run `bin/rails db:create` to create the database.
-  3. Run `bin/rails db:setup` to load your database schema.
-end_warning
+          warn <<~end_warning
+            Oops - You have a database configured, but it doesn't exist yet!
+            
+            Here's how to get started:
+            
+              1. Configure your database in config/database.yml.
+              2. Run `bin/rails db:create` to create the database.
+              3. Run `bin/rails db:setup` to load your database schema.
+          end_warning
           raise
         end
       end
@@ -203,21 +203,21 @@ end_warning
           end
 
           unless ActiveRecord::ConnectionAdapters::SQLite3Adapter.represent_boolean_as_integer
-            ActiveSupport::Deprecation.warn <<-MSG
-Leaving `ActiveRecord::ConnectionAdapters::SQLite3Adapter.represent_boolean_as_integer`
-set to false is deprecated. SQLite databases have used 't' and 'f' to serialize
-boolean values and must have old data converted to 1 and 0 (its native boolean
-serialization) before setting this flag to true. Conversion can be accomplished
-by setting up a rake task which runs
-
-  ExampleModel.where("boolean_column = 't'").update_all(boolean_column: 1)
-  ExampleModel.where("boolean_column = 'f'").update_all(boolean_column: 0)
-
-for all models and all boolean columns, after which the flag must be set to
-true by adding the following to your application.rb file:
-
-  Rails.application.config.active_record.sqlite3.represent_boolean_as_integer = true
-MSG
+            ActiveSupport::Deprecation.warn <<~MSG
+              Leaving `ActiveRecord::ConnectionAdapters::SQLite3Adapter.represent_boolean_as_integer`
+              set to false is deprecated. SQLite databases have used 't' and 'f' to serialize
+              boolean values and must have old data converted to 1 and 0 (its native boolean
+              serialization) before setting this flag to true. Conversion can be accomplished
+              by setting up a rake task which runs
+              
+                ExampleModel.where("boolean_column = 't'").update_all(boolean_column: 1)
+                ExampleModel.where("boolean_column = 'f'").update_all(boolean_column: 0)
+              
+              for all models and all boolean columns, after which the flag must be set to
+              true by adding the following to your application.rb file:
+              
+                Rails.application.config.active_record.sqlite3.represent_boolean_as_integer = true
+            MSG
           end
         end
       end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Nodes
     class SelectCore < Arel::Nodes::Node
@@ -7,16 +8,16 @@ module Arel
 
       def initialize
         super()
-        @source         = JoinSource.new nil
-        @top            = nil
+        @source = JoinSource.new nil
+        @top = nil
 
         # http://savage.net.au/SQL/sql-92.bnf.html#set%20quantifier
         @set_quantifier = nil
-        @projections    = []
-        @wheres         = []
-        @groups         = []
-        @havings        = []
-        @windows        = []
+        @projections = []
+        @wheres = []
+        @groups = []
+        @havings = []
+        @windows = []
       end
 
       def from
@@ -32,12 +33,12 @@ module Arel
 
       def initialize_copy other
         super
-        @source      = @source.clone if @source
+        @source = @source.clone if @source
         @projections = @projections.clone
-        @wheres      = @wheres.clone
-        @groups      = @groups.clone
-        @havings     = @havings.clone
-        @windows     = @windows.clone
+        @wheres = @wheres.clone
+        @groups = @groups.clone
+        @havings = @havings.clone
+        @windows = @windows.clone
       end
 
       def hash

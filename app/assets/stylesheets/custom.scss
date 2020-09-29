@@ -74,6 +74,12 @@ a {
   padding: 16px;
 }
 
+#image_id {
+  height: 50px;
+  width: 60px;
+  margin-right: 20px;
+}
+
 .notice,
 .alert {
   margin-bottom: 8px;
@@ -117,6 +123,7 @@ a {
     margin: 4px 0;
     border-radius: 4px;
   }
+
   .form-control-input {
     width: 30%;
     border: 1px solid $divider-color;
@@ -355,9 +362,9 @@ form {
     width: 50%;
   }
 }
-.icon{
-  height:150px;
-  border-radius:70%;
-  border: 5px solid #FEDE00;
 
+.icon {
+  height: 150px;
+  border-radius: 70%;
+  border: 5px solid #fede00;
 }

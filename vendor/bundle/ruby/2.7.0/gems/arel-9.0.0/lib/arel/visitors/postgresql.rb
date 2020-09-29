@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Visitors
     class PostgreSQL < Arel::Visitors::ToSql

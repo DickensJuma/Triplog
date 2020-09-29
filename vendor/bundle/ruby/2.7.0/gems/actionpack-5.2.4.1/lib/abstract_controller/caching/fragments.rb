@@ -88,7 +88,7 @@ module AbstractController
       def combined_fragment_cache_key(key)
         head = self.class.fragment_cache_keys.map { |k| instance_exec(&k) }
         tail = key.is_a?(Hash) ? url_for(key).split("://").last : key
-        [ :views, (ENV["RAILS_CACHE_ID"] || ENV["RAILS_APP_VERSION"]), *head, *tail ].compact
+        [:views, (ENV["RAILS_CACHE_ID"] || ENV["RAILS_APP_VERSION"]), *head, *tail].compact
       end
 
       # Writes +content+ to the location signified by
@@ -120,6 +120,7 @@ module AbstractController
       # +key+ exists (see +expire_fragment+ for acceptable formats).
       def fragment_exist?(key, options = nil)
         return unless cache_configured?
+
         key = combined_fragment_cache_key(key)
 
         instrument_fragment_cache :exist_fragment?, key do
@@ -147,6 +148,7 @@ module AbstractController
       # method (or <tt>delete_matched</tt>, for Regexp keys).
       def expire_fragment(key, options = nil)
         return unless cache_configured?
+
         key = combined_fragment_cache_key(key) unless key.is_a?(Regexp)
 
         instrument_fragment_cache :expire_fragment, key do

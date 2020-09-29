@@ -191,13 +191,14 @@ module ActiveRecord
 
         if defined?(@table_name)
           return if value == @table_name
+
           reset_column_information if connected?
         end
 
-        @table_name        = value
+        @table_name = value
         @quoted_table_name = nil
-        @arel_table        = nil
-        @sequence_name     = nil unless defined?(@explicit_sequence_name) && @explicit_sequence_name
+        @arel_table = nil
+        @sequence_name = nil unless defined?(@explicit_sequence_name) && @explicit_sequence_name
         @predicate_builder = nil
       end
 
@@ -209,12 +210,12 @@ module ActiveRecord
       # Computes the table name, (re)sets it internally, and returns it.
       def reset_table_name #:nodoc:
         self.table_name = if abstract_class?
-          superclass == Base ? nil : superclass.table_name
-        elsif superclass.abstract_class?
-          superclass.table_name || compute_table_name
-        else
-          compute_table_name
-        end
+                            superclass == Base ? nil : superclass.table_name
+                          elsif superclass.abstract_class?
+                            superclass.table_name || compute_table_name
+                          else
+                            compute_table_name
+                          end
       end
 
       def full_table_name_prefix #:nodoc:
@@ -285,7 +286,7 @@ module ActiveRecord
 
       def reset_sequence_name #:nodoc:
         @explicit_sequence_name = false
-        @sequence_name          = connection.default_sequence_name(table_name, primary_key)
+        @sequence_name = connection.default_sequence_name(table_name, primary_key)
       end
 
       # Sets the name of the sequence to use when generating ids to the given
@@ -303,7 +304,7 @@ module ActiveRecord
       #     self.sequence_name = "projectseq"   # default would have been "project_seq"
       #   end
       def sequence_name=(value)
-        @sequence_name          = value.to_s
+        @sequence_name = value.to_s
         @explicit_sequence_name = true
       end
 
@@ -393,9 +394,9 @@ module ActiveRecord
       def content_columns
         @content_columns ||= columns.reject do |c|
           c.name == primary_key ||
-          c.name == inheritance_column ||
-          c.name.end_with?("_id") ||
-          c.name.end_with?("_count")
+            c.name == inheritance_column ||
+            c.name.end_with?("_id") ||
+            c.name.end_with?("_count")
         end
       end
 
@@ -436,86 +437,87 @@ module ActiveRecord
 
       protected
 
-        def initialize_load_schema_monitor
-          @load_schema_monitor = Monitor.new
-        end
+      def initialize_load_schema_monitor
+        @load_schema_monitor = Monitor.new
+      end
 
       private
 
-        def inherited(child_class)
-          super
-          child_class.initialize_load_schema_monitor
+      def inherited(child_class)
+        super
+        child_class.initialize_load_schema_monitor
+      end
+
+      def schema_loaded?
+        defined?(@schema_loaded) && @schema_loaded
+      end
+
+      def load_schema
+        return if schema_loaded?
+
+        @load_schema_monitor.synchronize do
+          return if defined?(@columns_hash) && @columns_hash
+
+          load_schema!
+
+          @schema_loaded = true
         end
+      end
 
-        def schema_loaded?
-          defined?(@schema_loaded) && @schema_loaded
+      def load_schema!
+        @columns_hash = connection.schema_cache.columns_hash(table_name).except(*ignored_columns)
+        @columns_hash.each do |name, column|
+          define_attribute(
+            name,
+            connection.lookup_cast_type_from_column(column),
+            default: column.default,
+            user_provided_default: false
+          )
         end
+      end
 
-        def load_schema
-          return if schema_loaded?
-          @load_schema_monitor.synchronize do
-            return if defined?(@columns_hash) && @columns_hash
+      def reload_schema_from_cache
+        @arel_table = nil
+        @column_names = nil
+        @attribute_types = nil
+        @content_columns = nil
+        @default_attributes = nil
+        @column_defaults = nil
+        @inheritance_column = nil unless defined?(@explicit_inheritance_column) && @explicit_inheritance_column
+        @attributes_builder = nil
+        @columns = nil
+        @columns_hash = nil
+        @schema_loaded = false
+        @attribute_names = nil
+        @yaml_encoder = nil
+        direct_descendants.each do |descendant|
+          descendant.send(:reload_schema_from_cache)
+        end
+      end
 
-            load_schema!
+      # Guesses the table name, but does not decorate it with prefix and suffix information.
+      def undecorated_table_name(class_name = base_class.name)
+        table_name = class_name.to_s.demodulize.underscore
+        pluralize_table_names ? table_name.pluralize : table_name
+      end
 
-            @schema_loaded = true
+      # Computes and returns a table name according to default conventions.
+      def compute_table_name
+        base = base_class
+        if self == base
+          # Nested classes are prefixed with singular parent table name.
+          if parent < Base && !parent.abstract_class?
+            contained = parent.table_name
+            contained = contained.singularize if parent.pluralize_table_names
+            contained += "_"
           end
-        end
 
-        def load_schema!
-          @columns_hash = connection.schema_cache.columns_hash(table_name).except(*ignored_columns)
-          @columns_hash.each do |name, column|
-            define_attribute(
-              name,
-              connection.lookup_cast_type_from_column(column),
-              default: column.default,
-              user_provided_default: false
-            )
-          end
+          "#{full_table_name_prefix}#{contained}#{undecorated_table_name(name)}#{full_table_name_suffix}"
+        else
+          # STI subclasses always use their superclass' table.
+          base.table_name
         end
-
-        def reload_schema_from_cache
-          @arel_table = nil
-          @column_names = nil
-          @attribute_types = nil
-          @content_columns = nil
-          @default_attributes = nil
-          @column_defaults = nil
-          @inheritance_column = nil unless defined?(@explicit_inheritance_column) && @explicit_inheritance_column
-          @attributes_builder = nil
-          @columns = nil
-          @columns_hash = nil
-          @schema_loaded = false
-          @attribute_names = nil
-          @yaml_encoder = nil
-          direct_descendants.each do |descendant|
-            descendant.send(:reload_schema_from_cache)
-          end
-        end
-
-        # Guesses the table name, but does not decorate it with prefix and suffix information.
-        def undecorated_table_name(class_name = base_class.name)
-          table_name = class_name.to_s.demodulize.underscore
-          pluralize_table_names ? table_name.pluralize : table_name
-        end
-
-        # Computes and returns a table name according to default conventions.
-        def compute_table_name
-          base = base_class
-          if self == base
-            # Nested classes are prefixed with singular parent table name.
-            if parent < Base && !parent.abstract_class?
-              contained = parent.table_name
-              contained = contained.singularize if parent.pluralize_table_names
-              contained += "_"
-            end
-
-            "#{full_table_name_prefix}#{contained}#{undecorated_table_name(name)}#{full_table_name_suffix}"
-          else
-            # STI subclasses always use their superclass' table.
-            base.table_name
-          end
-        end
+      end
     end
   end
 end

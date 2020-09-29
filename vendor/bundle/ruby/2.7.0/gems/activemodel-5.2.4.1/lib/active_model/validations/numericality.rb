@@ -78,7 +78,7 @@ module ActiveModel
         end
       end
 
-    private
+      private
 
       def is_number?(raw_value)
         !parse_as_number(raw_value).nil?

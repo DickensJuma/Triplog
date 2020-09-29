@@ -56,7 +56,7 @@ module ActiveStorage
     def download_chunk(key, range)
       instrument :download_chunk, key: key, range: range do
         file = file_for(key)
-        uri  = URI(file.signed_url(expires: 30.seconds))
+        uri = URI(file.signed_url(expires: 30.seconds))
 
         Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") do |client|
           client.get(uri, "Range" => "bytes=#{range.begin}-#{range.exclude_end? ? range.end - 1 : range.end}").body
@@ -122,18 +122,19 @@ module ActiveStorage
     end
 
     private
-      attr_reader :config
 
-      def file_for(key)
-        bucket.file(key, skip_lookup: true)
-      end
+    attr_reader :config
 
-      def bucket
-        @bucket ||= client.bucket(config.fetch(:bucket))
-      end
+    def file_for(key)
+      bucket.file(key, skip_lookup: true)
+    end
 
-      def client
-        @client ||= Google::Cloud::Storage.new(config.except(:bucket))
-      end
+    def bucket
+      @bucket ||= client.bucket(config.fetch(:bucket))
+    end
+
+    def client
+      @client ||= Google::Cloud::Storage.new(config.except(:bucket))
+    end
   end
 end

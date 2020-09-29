@@ -44,7 +44,7 @@ module ActiveRecord
 
       # table_joins is an array of arel joins which might conflict with the aliases we assign here
       def initialize(connection, aliases)
-        @aliases    = aliases
+        @aliases = aliases
         @connection = connection
       end
 
@@ -61,10 +61,10 @@ module ActiveRecord
           aliases[aliased_name] += 1
 
           table_alias = if aliases[aliased_name] > 1
-            "#{truncate(aliased_name)}_#{aliases[aliased_name]}"
-          else
-            aliased_name
-          end
+                          "#{truncate(aliased_name)}_#{aliases[aliased_name]}"
+                        else
+                          aliased_name
+                        end
           Arel::Table.new(table_name, type_caster: type_caster).alias(table_alias)
         end
       end
@@ -73,9 +73,9 @@ module ActiveRecord
 
       private
 
-        def truncate(name)
-          name.slice(0, @connection.table_alias_length - 2)
-        end
+      def truncate(name)
+        name.slice(0, @connection.table_alias_length - 2)
+      end
     end
   end
 end

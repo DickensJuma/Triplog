@@ -59,8 +59,8 @@ module ActionController
       raise ActionControllerError.new("Cannot redirect to nil!") unless options
       raise AbstractController::DoubleRenderError if response_body
 
-      self.status        = _extract_redirect_to_status(options, response_status)
-      self.location      = _compute_redirect_to_location(request, options)
+      self.status = _extract_redirect_to_status(options, response_status)
+      self.location = _compute_redirect_to_location(request, options)
       self.response_body = "<html><body>You are being <a href=\"#{ERB::Util.unwrapped_html_escape(response.location)}\">redirected</a>.</body></html>"
     end
 
@@ -114,20 +114,21 @@ module ActionController
     public :_compute_redirect_to_location
 
     private
-      def _extract_redirect_to_status(options, response_status)
-        if options.is_a?(Hash) && options.key?(:status)
-          Rack::Utils.status_code(options.delete(:status))
-        elsif response_status.key?(:status)
-          Rack::Utils.status_code(response_status[:status])
-        else
-          302
-        end
-      end
 
-      def _url_host_allowed?(url)
-        URI(url.to_s).host == request.host
-      rescue ArgumentError, URI::Error
-        false
+    def _extract_redirect_to_status(options, response_status)
+      if options.is_a?(Hash) && options.key?(:status)
+        Rack::Utils.status_code(options.delete(:status))
+      elsif response_status.key?(:status)
+        Rack::Utils.status_code(response_status[:status])
+      else
+        302
       end
+    end
+
+    def _url_host_allowed?(url)
+      URI(url.to_s).host == request.host
+    rescue ArgumentError, URI::Error
+      false
+    end
   end
 end

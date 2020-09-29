@@ -33,7 +33,6 @@
 require 'ffi/platform'
 module FFI
   class Pointer
-
     # Pointer size
     SIZE = Platform::ADDRESS_SIZE / 8
 
@@ -45,11 +44,12 @@ module FFI
 
     # @param [nil,Numeric] len length of string to return
     # @return [String]
-    # Read pointer's contents as a string, or the first +len+ bytes of the 
+    # Read pointer's contents as a string, or the first +len+ bytes of the
     # equivalent string if +len+ is not +nil+.
     def read_string(len=nil)
       if len
         return ''.b if len == 0
+
         get_bytes(0, len)
       else
         get_string(0)
@@ -89,7 +89,7 @@ module FFI
     # @param [String] str string to write
     # @param [Numeric] len length of string to return
     # @return [self]
-    # Write +str+ in pointer's contents, or first +len+ bytes if 
+    # Write +str+ in pointer's contents, or first +len+ bytes if
     # +len+ is not +nil+.
     def write_string(str, len=nil)
       len = str.bytesize unless len
@@ -110,7 +110,7 @@ module FFI
       tmp = self
       length.times { |j|
         ary << tmp.send(reader)
-        tmp += size unless j == length-1 # avoid OOB
+        tmp += size unless j == length - 1 # avoid OOB
       }
       ary
     end
@@ -126,6 +126,7 @@ module FFI
       size = FFI.type_size(type)
       ary.each_with_index { |val, i|
         break unless i < self.size
+
         self.send(writer, i * size, val)
       }
       self

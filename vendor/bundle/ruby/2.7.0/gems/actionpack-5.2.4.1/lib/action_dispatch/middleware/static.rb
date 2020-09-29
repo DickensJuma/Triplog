@@ -16,9 +16,9 @@ module ActionDispatch
   # does not exist, a 404 "File not Found" response will be returned.
   class FileHandler
     def initialize(root, index: "index", headers: {})
-      @root          = root.chomp("/").b
-      @file_server   = ::Rack::File.new(@root, headers)
-      @index         = index
+      @root = root.chomp("/").b
+      @file_server = ::Rack::File.new(@root, headers)
+      @index = index
     end
 
     # Takes a path to a file. If the file is found, has valid encoding, and has
@@ -30,6 +30,7 @@ module ActionDispatch
     def match?(path)
       path = ::Rack::Utils.unescape_path path
       return false unless ::Rack::Utils.valid_path? path
+
       path = ::Rack::Utils.clean_path_info path
 
       paths = [path, "#{path}#{ext}", "#{path}/#{@index}#{ext}"]
@@ -41,7 +42,6 @@ module ActionDispatch
         rescue SystemCallError
           false
         end
-
       }
         return ::Rack::Utils.escape_path(match).b
       end
@@ -52,17 +52,18 @@ module ActionDispatch
     end
 
     def serve(request)
-      path      = request.path_info
+      path = request.path_info
       gzip_path = gzip_file_path(path)
 
       if gzip_path && gzip_encoding_accepted?(request)
-        request.path_info           = gzip_path
-        status, headers, body       = @file_server.call(request.env)
+        request.path_info = gzip_path
+        status, headers, body = @file_server.call(request.env)
         if status == 304
           return [status, headers, body]
         end
+
         headers["Content-Encoding"] = "gzip"
-        headers["Content-Type"]     = content_type(path)
+        headers["Content-Type"] = content_type(path)
       else
         status, headers, body = @file_server.call(request.env)
       end
@@ -75,27 +76,28 @@ module ActionDispatch
     end
 
     private
-      def ext
-        ::ActionController::Base.default_static_extension
-      end
 
-      def content_type(path)
-        ::Rack::Mime.mime_type(::File.extname(path), "text/plain".freeze)
-      end
+    def ext
+      ::ActionController::Base.default_static_extension
+    end
 
-      def gzip_encoding_accepted?(request)
-        request.accept_encoding.any? { |enc, quality| enc =~ /\bgzip\b/i }
-      end
+    def content_type(path)
+      ::Rack::Mime.mime_type(::File.extname(path), "text/plain".freeze)
+    end
 
-      def gzip_file_path(path)
-        can_gzip_mime = content_type(path) =~ /\A(?:text\/|application\/javascript)/
-        gzip_path     = "#{path}.gz"
-        if can_gzip_mime && File.exist?(File.join(@root, ::Rack::Utils.unescape_path(gzip_path).b))
-          gzip_path.b
-        else
-          false
-        end
+    def gzip_encoding_accepted?(request)
+      request.accept_encoding.any? { |enc, quality| enc =~ /\bgzip\b/i }
+    end
+
+    def gzip_file_path(path)
+      can_gzip_mime = content_type(path) =~ /\A(?:text\/|application\/javascript)/
+      gzip_path = "#{path}.gz"
+      if can_gzip_mime && File.exist?(File.join(@root, ::Rack::Utils.unescape_path(gzip_path).b))
+        gzip_path.b
+      else
+        false
       end
+    end
   end
 
   # This middleware will attempt to return the contents of a file's body from

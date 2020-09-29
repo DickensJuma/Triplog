@@ -13,8 +13,8 @@ module ActiveRecord
         value = self[attr_name]
 
         case value
-        when true        then true
-        when false, nil  then false
+        when true then true
+        when false, nil then false
         else
           column = self.class.columns_hash[attr_name]
           if column.nil?
@@ -22,6 +22,7 @@ module ActiveRecord
               !value.to_i.zero?
             else
               return false if ActiveModel::Type::Boolean::FALSE_VALUES.include?(value)
+
               !value.blank?
             end
           elsif value.respond_to?(:zero?)
@@ -33,10 +34,11 @@ module ActiveRecord
       end
 
       private
-        # Handle *? for method_missing.
-        def attribute?(attribute_name)
-          query_attribute(attribute_name)
-        end
+
+      # Handle *? for method_missing.
+      def attribute?(attribute_name)
+        query_attribute(attribute_name)
+      end
     end
   end
 end

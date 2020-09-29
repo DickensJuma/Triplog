@@ -9,6 +9,7 @@ module ActiveRecord
 
       def type_cast_for_database(attr_name, value)
         return value if value.is_a?(Arel::Nodes::BindParam)
+
         type = types.type_for_attribute(attr_name)
         type.serialize(value)
       end
@@ -17,7 +18,7 @@ module ActiveRecord
       # Workaround for Ruby 2.2 "private attribute?" warning.
       protected
 
-        attr_reader :types
+      attr_reader :types
     end
   end
 end

@@ -31,10 +31,8 @@
 #
 
 module FFI
-
   # An instance of this class permits to manage {Enum}s. In fact, Enums is a collection of {Enum}s.
   class Enums
-
     # @return [nil]
     def initialize
       @all_enums = Array.new
@@ -66,7 +64,6 @@ module FFI
     def __map_symbol(symbol)
       @symbol_map[symbol]
     end
-
   end
 
   # Represents a C enum.
@@ -105,12 +102,13 @@ module FFI
           case i
           when Symbol
             raise ArgumentError, "duplicate enum key" if @kv_map.has_key?(i)
+
             @kv_map[i] = value
             last_cst = i
             value += 1
           when Integer
             @kv_map[last_cst] = i
-            value = i+1
+            value = i + 1
           end
         end
       end
@@ -155,12 +153,12 @@ module FFI
     # @return [Integer] value of a enum symbol
     def to_native(val, ctx)
       @kv_map[val] || if val.is_a?(Integer)
-        val
-      elsif val.respond_to?(:to_int)
-        val.to_int
-      else
-        raise ArgumentError, "invalid enum value, #{val.inspect}"
-      end
+                        val
+                      elsif val.respond_to?(:to_int)
+                        val.to_int
+                      else
+                        raise ArgumentError, "invalid enum value, #{val.inspect}"
+                      end
     end
 
     # @param val
@@ -182,7 +180,6 @@ module FFI
   # Contrary to classical enums, bitmask values are usually combined
   # when used.
   class Bitmask < Enum
-
     # @overload initialize(info, tag=nil)
     #   @param [nil, Enumerable] info symbols and bit rank for new Bitmask
     #   @param [nil, Symbol] tag name of new Bitmask
@@ -201,13 +198,15 @@ module FFI
           case i
           when Symbol
             raise ArgumentError, "duplicate bitmask key" if @kv_map.has_key?(i)
+
             @kv_map[i] = 1 << value
             last_cst = i
             value += 1
           when Integer
-            raise ArgumentError, "bitmask index should be positive" if i<0
+            raise ArgumentError, "bitmask index should be positive" if i < 0
+
             @kv_map[last_cst] = 1 << i
-            value = i+1
+            value = i + 1
           end
         end
       end
@@ -236,6 +235,7 @@ module FFI
     def [](*query)
       flat_query = query.flatten
       raise ArgumentError, "query should be homogeneous, #{query.inspect}" unless flat_query.all? { |o| o.is_a?(Symbol) } || flat_query.all? { |o| o.is_a?(Integer) || o.respond_to?(:to_int) }
+
       case flat_query[0]
       when Symbol
         flat_query.inject(0) do |val, o|
@@ -259,12 +259,14 @@ module FFI
     #  @return [Integer] value of a bitmask
     def to_native(query, ctx)
       return 0 if query.nil?
+
       flat_query = [query].flatten
       flat_query.inject(0) do |val, o|
         case o
         when Symbol
           v = @kv_map[o]
           raise ArgumentError, "invalid bitmask value, #{o.inspect}" unless v
+
           val |= v
         when Integer
           val |= o

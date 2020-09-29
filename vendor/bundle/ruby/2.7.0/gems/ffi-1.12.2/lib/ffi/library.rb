@@ -87,7 +87,6 @@ module FFI
       raise RuntimeError.new("must only be extended by module") unless mod.kind_of?(Module)
     end
 
-
     # @param [Array] names names of libraries to load
     # @return [Array<DynamicLibrary>]
     # @raise {LoadError} if a library cannot be opened
@@ -97,12 +96,11 @@ module FFI
 
       lib_flags = defined?(@ffi_lib_flags) ? @ffi_lib_flags : FFI::DynamicLibrary::RTLD_LAZY | FFI::DynamicLibrary::RTLD_LOCAL
       ffi_libs = names.map do |name|
-
         if name == FFI::CURRENT_PROCESS
           FFI::DynamicLibrary.open(nil, FFI::DynamicLibrary::RTLD_LAZY | FFI::DynamicLibrary::RTLD_LOCAL)
 
         else
-          libnames = (name.is_a?(::Array) ? name : [ name ]).map(&:to_s).map { |n| [ n, FFI.map_library_name(n) ].uniq }.flatten.compact
+          libnames = (name.is_a?(::Array) ? name : [name]).map(&:to_s).map { |n| [n, FFI.map_library_name(n)].uniq }.flatten.compact
           lib = nil
           errors = {}
 
@@ -111,7 +109,6 @@ module FFI
               orig = libname
               lib = FFI::DynamicLibrary.open(libname, lib_flags)
               break if lib
-
             rescue Exception => ex
               ldscript = false
               if ex.message =~ /(([^ \t()])+\.so([^ \t:()])*):([ \t])*(invalid ELF header|file too short|invalid file format)/
@@ -126,7 +123,7 @@ module FFI
               else
                 # TODO better library lookup logic
                 unless libname.start_with?("/") || FFI::Platform.windows?
-                  path = ['/usr/lib/','/usr/local/lib/','/opt/local/lib/'].find do |pth|
+                  path = ['/usr/lib/', '/usr/local/lib/', '/opt/local/lib/'].find do |pth|
                     File.exist?(pth + libname)
                   end
                   if path
@@ -172,6 +169,7 @@ module FFI
     # Get FFI libraries loaded using {#ffi_lib}.
     def ffi_libraries
       raise LoadError.new("no library specified") if !defined?(@ffi_libs) || @ffi_libs.empty?
+
       @ffi_libs
     end
 
@@ -196,7 +194,6 @@ module FFI
     def ffi_lib_flags(*flags)
       @ffi_lib_flags = flags.inject(0) { |result, f| result | FlagsMap[f] }
     end
-
 
     ##
     # @overload attach_function(func, args, returns, options = {})
@@ -233,7 +230,7 @@ module FFI
     # @raise [FFI::NotFoundError] if +func+ cannot be found in the attached libraries (see {#ffi_lib})
     def attach_function(name, func, args, returns = nil, options = nil)
       mname, a2, a3, a4, a5 = name, func, args, returns, options
-      cname, arg_types, ret_type, opts = (a4 && (a2.is_a?(String) || a2.is_a?(Symbol))) ? [ a2, a3, a4, a5 ] : [ mname.to_s, a2, a3, a4 ]
+      cname, arg_types, ret_type, opts = (a4 && (a2.is_a?(String) || a2.is_a?(Symbol))) ? [a2, a3, a4, a5] : [mname.to_s, a2, a3, a4]
 
       # Convert :foo to the native type
       arg_types = arg_types.map { |e| find_type(e) }
@@ -259,12 +256,11 @@ module FFI
             raise LoadError unless function
 
             invokers << if arg_types.length > 0 && arg_types[arg_types.length - 1] == FFI::NativeType::VARARGS
-              VariadicInvoker.new(function, arg_types, find_type(ret_type), options)
+                          VariadicInvoker.new(function, arg_types, find_type(ret_type), options)
 
-            else
-              Function.new(find_type(ret_type), arg_types, function, options)
-            end
-
+                        else
+                          Function.new(find_type(ret_type), arg_types, function, options)
+                        end
           rescue LoadError
           end
         end
@@ -329,7 +325,7 @@ module FFI
     #
     # Attach C variable +cname+ to this module.
     def attach_variable(mname, a1, a2 = nil)
-      cname, type = a2 ? [ a1, a2 ] : [ mname.to_s, a1 ]
+      cname, type = a2 ? [a1, a2] : [mname.to_s, a1]
       address = nil
       ffi_libraries.each do |lib|
         begin
@@ -340,6 +336,7 @@ module FFI
       end
 
       raise FFI::NotFoundError.new(cname, ffi_libraries) if address.nil? || address.null?
+
       if type.is_a?(Class) && type < FFI::Struct
         # If it is a global struct, just attach directly to the pointer
         s = s = type.new(address) # Assigning twice to suppress unused variable warning
@@ -372,7 +369,6 @@ module FFI
       address
     end
 
-
     # @overload callback(name, params, ret)
     #   @param name callback name to add to type map
     #   @param [Array] params array of parameters' types
@@ -383,14 +379,16 @@ module FFI
     # @return [FFI::CallbackInfo]
     def callback(*args)
       raise ArgumentError, "wrong number of arguments" if args.length < 2 || args.length > 3
+
       name, params, ret = if args.length == 3
-        args
-      else
-        [ nil, args[0], args[1] ]
-      end
+                            args
+                          else
+                            [nil, args[0], args[1]]
+                          end
 
       native_params = params.map { |e| find_type(e) }
       raise ArgumentError, "callbacks cannot have variadic parameters" if native_params.include?(FFI::Type::VARARGS)
+
       options = Hash.new
       options[:convention] = ffi_convention
       options[:enums] = @ffi_enums if defined?(@ffi_enums)
@@ -425,39 +423,40 @@ module FFI
       @ffi_typedefs = Hash.new unless defined?(@ffi_typedefs)
 
       @ffi_typedefs[add] = if old.kind_of?(FFI::Type)
-        old
+                             old
 
-      elsif @ffi_typedefs.has_key?(old)
-        @ffi_typedefs[old]
+                           elsif @ffi_typedefs.has_key?(old)
+                             @ffi_typedefs[old]
 
-      elsif old.is_a?(DataConverter)
-        FFI::Type::Mapped.new(old)
+                           elsif old.is_a?(DataConverter)
+                             FFI::Type::Mapped.new(old)
 
-      elsif old == :enum
-        if add.kind_of?(Array)
-          self.enum(add)
-        else
-          self.enum(info, add)
-        end
+                           elsif old == :enum
+                             if add.kind_of?(Array)
+                               self.enum(add)
+                             else
+                               self.enum(info, add)
+                             end
 
-      else
-        FFI.find_type(old)
-      end
+                           else
+                             FFI.find_type(old)
+                           end
     end
 
     private
+
     # Generic enum builder
     #  @param [Class] klass can be one of FFI::Enum or FFI::Bitmask
     #  @param args (see #enum or #bitmask)
     def generic_enum(klass, *args)
       native_type = args.first.kind_of?(FFI::Type) ? args.shift : nil
       name, values = if args[0].kind_of?(Symbol) && args[1].kind_of?(Array)
-        [ args[0], args[1] ]
-      elsif args[0].kind_of?(Array)
-        [ nil, args[0] ]
-      else
-        [ nil, args ]
-      end
+                       [args[0], args[1]]
+                     elsif args[0].kind_of?(Array)
+                       [nil, args[0]]
+                     else
+                       [nil, args]
+                     end
       @ffi_enums = FFI::Enums.new unless defined?(@ffi_enums)
       @ffi_enums << (e = native_type ? klass.new(native_type, values, name) : klass.new(values, name))
 
@@ -467,6 +466,7 @@ module FFI
     end
 
     public
+
     # @overload enum(name, values)
     #  Create a named enum.
     #  @example

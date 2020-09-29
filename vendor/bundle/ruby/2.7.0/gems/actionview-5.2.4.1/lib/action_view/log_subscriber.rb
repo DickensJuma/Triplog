@@ -53,7 +53,7 @@ module ActionView
       ActionView::Base.logger
     end
 
-  private
+    private
 
     EMPTY = ""
     def from_rails_root(string) # :doc:

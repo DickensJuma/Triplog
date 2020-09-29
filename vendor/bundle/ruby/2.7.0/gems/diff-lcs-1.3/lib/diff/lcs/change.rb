@@ -38,7 +38,7 @@ class Diff::LCS::Change
   end
 
   def to_a
-    [ @action, @position, @element ]
+    [@action, @position, @element]
   end
 
   def self.from_a(arr)
@@ -57,9 +57,9 @@ class Diff::LCS::Change
 
   def ==(other)
     (self.class == other.class) and
-    (self.action == other.action) and
-    (self.position == other.position) and
-    (self.element == other.element)
+      (self.action == other.action) and
+      (self.position == other.position) and
+      (self.element == other.element)
   end
 
   def <=>(other)
@@ -126,10 +126,9 @@ class Diff::LCS::ContextChange < Diff::LCS::Change
   end
 
   def to_a
-    [ @action,
-      [ @old_position, @old_element ],
-      [ @new_position, @new_element ]
-    ]
+    [@action,
+     [@old_position, @old_element],
+     [@new_position, @new_element]]
   end
 
   def inspect(*args)
@@ -163,11 +162,11 @@ class Diff::LCS::ContextChange < Diff::LCS::Change
 
   def ==(other)
     (self.class == other.class) and
-    (@action == other.action) and
-    (@old_position == other.old_position) and
-    (@new_position == other.new_position) and
-    (@old_element == other.old_element) and
-    (@new_element == other.new_element)
+      (@action == other.action) and
+      (@old_position == other.old_position) and
+      (@new_position == other.new_position) and
+      (@old_element == other.old_element) and
+      (@new_element == other.new_element)
   end
 
   def <=>(other)

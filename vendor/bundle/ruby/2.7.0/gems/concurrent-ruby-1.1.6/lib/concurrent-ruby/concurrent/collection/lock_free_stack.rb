@@ -1,8 +1,6 @@
 module Concurrent
-
   # @!macro warn.edge
   class LockFreeStack < Synchronization::Object
-
     safe_initialization!
 
     class Node
@@ -19,7 +17,7 @@ module Concurrent
       attr_writer :value
 
       def initialize(value, next_node)
-        @value     = value
+        @value = value
         @next_node = next_node
       end
 
@@ -104,6 +102,7 @@ module Concurrent
     # @return [self]
     def each(head = nil)
       return to_enum(:each, head) unless block_given?
+
       it = head || peek
       until it.equal?(EMPTY)
         yield it.value
@@ -141,6 +140,7 @@ module Concurrent
       while true
         current_head = head
         return self if current_head == EMPTY
+
         if compare_and_set_head current_head, EMPTY
           each current_head, &block
           return self

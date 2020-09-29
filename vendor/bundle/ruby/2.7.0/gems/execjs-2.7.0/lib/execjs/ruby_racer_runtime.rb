@@ -68,36 +68,37 @@ module ExecJS
       end
 
       private
-        def lock
-          result, exception = nil, nil
-          V8::C::Locker() do
-            begin
-              result = yield
-            rescue Exception => e
-              exception = e
-            end
-          end
 
-          if exception
-            raise exception
-          else
-            result
+      def lock
+        result, exception = nil, nil
+        V8::C::Locker() do
+          begin
+            result = yield
+          rescue Exception => e
+            exception = e
           end
         end
 
-        def wrap_error(e)
-          error_class = e.value["name"] == "SyntaxError" ? RuntimeError : ProgramError
-
-          stack = e.value["stack"] || ""
-          stack = stack.split("\n")
-          stack.shift
-          stack = [e.message[/<eval>:\d+:\d+/, 0]].compact if stack.empty?
-          stack = stack.map { |line| line.sub(" at ", "").sub("<eval>", "(execjs)").strip }
-
-          error = error_class.new(e.value.to_s)
-          error.set_backtrace(stack + caller)
-          error
+        if exception
+          raise exception
+        else
+          result
         end
+      end
+
+      def wrap_error(e)
+        error_class = e.value["name"] == "SyntaxError" ? RuntimeError : ProgramError
+
+        stack = e.value["stack"] || ""
+        stack = stack.split("\n")
+        stack.shift
+        stack = [e.message[/<eval>:\d+:\d+/, 0]].compact if stack.empty?
+        stack = stack.map { |line| line.sub(" at ", "").sub("<eval>", "(execjs)").strip }
+
+        error = error_class.new(e.value.to_s)
+        error.set_backtrace(stack + caller)
+        error
+      end
     end
 
     def name

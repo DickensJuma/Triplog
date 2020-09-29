@@ -1,8 +1,8 @@
 class FleetsController < ApplicationController
-    before_action :authenticate_user!
-
+  before_action :authenticate_user!, only: [:index]
   def index
     @fleet = Fleet.new
+    @fleets = Fleet.includes(:mileages).order(created_at: :desc)
     timeline_fleets
   end
 
@@ -18,8 +18,6 @@ class FleetsController < ApplicationController
   end
 
   private
-
- 
 
   def timeline_fleets
     @timeline_fleets ||= Fleet.all.ordered_by_most_recent.includes(:user)

@@ -105,6 +105,7 @@ module ActiveSupport
 
     def initialize(secret, options = {})
       raise ArgumentError, "Secret should not be nil." unless secret
+
       @secret = secret
       @digest = options[:digest] || "SHA1"
       @serializer = options[:serializer] || Marshal
@@ -155,6 +156,7 @@ module ActiveSupport
           @serializer.load(message) if message
         rescue ArgumentError => argument_error
           return if argument_error.message.include?("invalid base64")
+
           raise
         end
       end
@@ -189,17 +191,18 @@ module ActiveSupport
     end
 
     private
-      def encode(data)
-        ::Base64.strict_encode64(data)
-      end
 
-      def decode(data)
-        ::Base64.strict_decode64(data)
-      end
+    def encode(data)
+      ::Base64.strict_encode64(data)
+    end
 
-      def generate_digest(data)
-        require "openssl" unless defined?(OpenSSL)
-        OpenSSL::HMAC.hexdigest(OpenSSL::Digest.const_get(@digest).new, @secret, data)
-      end
+    def decode(data)
+      ::Base64.strict_decode64(data)
+    end
+
+    def generate_digest(data)
+      require "openssl" unless defined?(OpenSSL)
+      OpenSSL::HMAC.hexdigest(OpenSSL::Digest.const_get(@digest).new, @secret, data)
+    end
   end
 end

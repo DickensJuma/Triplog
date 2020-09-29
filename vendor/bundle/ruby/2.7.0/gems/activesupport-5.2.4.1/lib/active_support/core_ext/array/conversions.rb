@@ -184,9 +184,9 @@ class Array
     require "active_support/builder" unless defined?(Builder)
 
     options = options.dup
-    options[:indent]  ||= 2
+    options[:indent] ||= 2
     options[:builder] ||= Builder::XmlMarkup.new(indent: options[:indent])
-    options[:root]    ||= \
+    options[:root] ||= \
       if first.class != Hash && all? { |e| e.is_a?(first.class) }
         underscored = ActiveSupport::Inflector.underscore(first.class.name)
         ActiveSupport::Inflector.pluralize(underscored).tr("/", "_")

@@ -10,9 +10,9 @@ class Diff::LCS::Hunk
   # the piece of data.
   def initialize(data_old, data_new, piece, flag_context, file_length_difference)
     # At first, a hunk will have just one Block in it
-    @blocks = [ Diff::LCS::Block.new(piece) ]
+    @blocks = [Diff::LCS::Block.new(piece)]
     if String.method_defined?(:encoding)
-      @preferred_data_encoding = data_old.fetch(0, data_new.fetch(0,'') ).encoding
+      @preferred_data_encoding = data_old.fetch(0, data_new.fetch(0, '')).encoding
     end
     @data_old = data_old
     @data_new = data_new
@@ -41,8 +41,8 @@ class Diff::LCS::Hunk
 
     @start_old = a1 || (b1 - before)
     @start_new = b1 || (a1 + before)
-    @end_old   = a2 || (b2 - after)
-    @end_new   = b2 || (a2 + after)
+    @end_old = a2 || (b2 - after)
+    @end_new = b2 || (a2 + after)
 
     self.flag_context = flag_context
   end
@@ -126,9 +126,9 @@ class Diff::LCS::Hunk
     s = encode("#{context_range(:old)}#{op_act[block.op]}#{context_range(:new)}\n")
     # If removing anything, just print out all the remove lines in the hunk
     # which is just all the remove lines in the block.
-    @data_old[@start_old .. @end_old].each { |e| s << encode("< ") + e + encode("\n") } unless block.remove.empty?
+    @data_old[@start_old..@end_old].each { |e| s << encode("< ") + e + encode("\n") } unless block.remove.empty?
     s << encode("---\n") if block.op == "!"
-    @data_new[@start_new .. @end_new].each { |e| s << encode("> ") + e + encode("\n") } unless block.insert.empty?
+    @data_new[@start_new..@end_new].each { |e| s << encode("> ") + e + encode("\n") } unless block.insert.empty?
     s
   end
   private :old_diff
@@ -148,17 +148,17 @@ class Diff::LCS::Hunk
     # file -- don't take removed items into account.
     lo, hi, num_added, num_removed = @start_old, @end_old, 0, 0
 
-    outlist = @data_old[lo .. hi].map { |e| e.insert(0, encode(' ')) }
+    outlist = @data_old[lo..hi].map { |e| e.insert(0, encode(' ')) }
 
     @blocks.each do |block|
       block.remove.each do |item|
-        op     = item.action.to_s # -
+        op = item.action.to_s # -
         offset = item.position - lo + num_added
         outlist[offset][0, 1] = encode(op)
         num_removed += 1
       end
       block.insert.each do |item|
-        op     = item.action.to_s # +
+        op = item.action.to_s # +
         offset = item.position - @start_new + num_removed
         outlist[offset, 0] = encode(op) + @data_new[item.position]
         num_added += 1
@@ -179,7 +179,7 @@ class Diff::LCS::Hunk
     lo, hi = @start_old, @end_old
     removes = @blocks.select { |e| not e.remove.empty? }
     if removes
-      outlist = @data_old[lo .. hi].map { |e| e.insert(0, encode(' ')) }
+      outlist = @data_old[lo..hi].map { |e| e.insert(0, encode(' ')) }
 
       removes.each do |block|
         block.remove.each do |item|
@@ -193,7 +193,7 @@ class Diff::LCS::Hunk
     lo, hi = @start_new, @end_new
     inserts = @blocks.select { |e| not e.insert.empty? }
     if inserts
-      outlist = @data_new[lo .. hi].collect { |e| e.insert(0, encode(' ')) }
+      outlist = @data_new[lo..hi].collect { |e| e.insert(0, encode(' ')) }
       inserts.each do |block|
         block.insert.each do |item|
           outlist[item.position - lo][0, 1] = encode(block.op) # + or !
@@ -216,7 +216,7 @@ class Diff::LCS::Hunk
     end
 
     unless @blocks[0].insert.empty?
-      @data_new[@start_new .. @end_new].each { |e| s << e + encode("\n") }
+      @data_new[@start_new..@end_new].each { |e| s << e + encode("\n") }
       s << encode(".\n")
     end
     s
@@ -266,6 +266,7 @@ class Diff::LCS::Hunk
     def encode(literal, target_encoding = nil)
       literal
     end
+
     def encode_as(string, *args)
       args
     end

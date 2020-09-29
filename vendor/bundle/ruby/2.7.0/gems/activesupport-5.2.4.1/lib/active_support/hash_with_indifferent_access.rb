@@ -295,38 +295,47 @@ module ActiveSupport
     end
 
     def stringify_keys!; self end
+
     def deep_stringify_keys!; self end
+
     def stringify_keys; dup end
+
     def deep_stringify_keys; dup end
     undef :symbolize_keys!
     undef :deep_symbolize_keys!
     def symbolize_keys; to_hash.symbolize_keys! end
     alias_method :to_options, :symbolize_keys
     def deep_symbolize_keys; to_hash.deep_symbolize_keys! end
+
     def to_options!; self end
 
     def select(*args, &block)
       return to_enum(:select) unless block_given?
+
       dup.tap { |hash| hash.select!(*args, &block) }
     end
 
     def reject(*args, &block)
       return to_enum(:reject) unless block_given?
+
       dup.tap { |hash| hash.reject!(*args, &block) }
     end
 
     def transform_values(*args, &block)
       return to_enum(:transform_values) unless block_given?
+
       dup.tap { |hash| hash.transform_values!(*args, &block) }
     end
 
     def transform_keys(*args, &block)
       return to_enum(:transform_keys) unless block_given?
+
       dup.tap { |hash| hash.transform_keys!(*args, &block) }
     end
 
     def transform_keys!
       return enum_for(:transform_keys!) { size } unless block_given?
+
       keys.each do |key|
         self[yield(key)] = delete(key)
       end
@@ -359,34 +368,35 @@ module ActiveSupport
     end
 
     private
-      def convert_key(key) # :doc:
-        key.kind_of?(Symbol) ? key.to_s : key
-      end
 
-      def convert_value(value, options = {}) # :doc:
-        if value.is_a? Hash
-          if options[:for] == :to_hash
-            value.to_hash
-          else
-            value.nested_under_indifferent_access
-          end
-        elsif value.is_a?(Array)
-          if options[:for] != :assignment || value.frozen?
-            value = value.dup
-          end
-          value.map! { |e| convert_value(e, options) }
-        else
-          value
-        end
-      end
+    def convert_key(key) # :doc:
+      key.kind_of?(Symbol) ? key.to_s : key
+    end
 
-      def set_defaults(target) # :doc:
-        if default_proc
-          target.default_proc = default_proc.dup
+    def convert_value(value, options = {}) # :doc:
+      if value.is_a? Hash
+        if options[:for] == :to_hash
+          value.to_hash
         else
-          target.default = default
+          value.nested_under_indifferent_access
         end
+      elsif value.is_a?(Array)
+        if options[:for] != :assignment || value.frozen?
+          value = value.dup
+        end
+        value.map! { |e| convert_value(e, options) }
+      else
+        value
       end
+    end
+
+    def set_defaults(target) # :doc:
+      if default_proc
+        target.default_proc = default_proc.dup
+      else
+        target.default = default
+      end
+    end
   end
 end
 

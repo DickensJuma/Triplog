@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Visitors
     class Oracle < Arel::Visitors::ToSql
@@ -17,9 +18,9 @@ module Arel
         end
 
         if o.limit && o.offset
-          o        = o.dup
-          limit    = o.limit.expr
-          offset   = o.offset
+          o = o.dup
+          limit = o.limit.expr
+          offset = o.offset
           o.offset = nil
           collector << "
               SELECT * FROM (
@@ -46,8 +47,8 @@ module Arel
         end
 
         if o.limit
-          o       = o.dup
-          limit   = o.limit.expr
+          o = o.dup
+          limit = o.limit.expr
           collector << "SELECT * FROM ("
           collector = super(o, collector)
           collector << ") WHERE ROWNUM <= "
@@ -55,8 +56,8 @@ module Arel
         end
 
         if o.offset
-          o        = o.dup
-          offset   = o.offset
+          o = o.dup
+          offset = o.offset
           o.offset = nil
           collector << "SELECT * FROM (
                 SELECT raw_sql_.*, rownum raw_rnum_
@@ -107,11 +108,12 @@ module Arel
             /FIRST_VALUE/ === projection
           end
         end
+
         # Previous version with join and split broke ORDER BY clause
         # if it contained functions with several arguments (separated by ',').
         #
         # orders   = o.orders.map { |x| visit x }.join(', ').split(',')
-        orders   = o.orders.map do |x|
+        orders = o.orders.map do |x|
           string = visit(x, Arel::Collectors::SQLString.new).value
           if string.include?(',')
             split_order_string(string)
@@ -147,7 +149,6 @@ module Arel
       def visit_Arel_Nodes_BindParam o, collector
         collector.add_bind(o.value) { |i| ":a#{i}" }
       end
-
     end
   end
 end

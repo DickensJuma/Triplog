@@ -55,10 +55,12 @@ module ActiveRecord
       # accessors, mutators and query methods.
       def define_attribute_methods # :nodoc:
         return false if @attribute_methods_generated
+
         # Use a mutex; we don't want two threads simultaneously trying to define
         # attribute methods.
         generated_attribute_methods.synchronize do
           return false if @attribute_methods_generated
+
           superclass.define_attribute_methods unless self == base_class
           super(attribute_names)
           @attribute_methods_generated = true
@@ -97,7 +99,7 @@ module ActiveRecord
           # If ThisClass < ... < SomeSuperClass < ... < Base and SomeSuperClass
           # defines its own attribute method, then we don't want to overwrite that.
           defined = method_defined_within?(method_name, superclass, Base) &&
-            ! superclass.instance_method(method_name).owner.is_a?(GeneratedAttributeMethods)
+                    !superclass.instance_method(method_name).owner.is_a?(GeneratedAttributeMethods)
           defined || super
         end
       end
@@ -161,10 +163,10 @@ module ActiveRecord
       #   # => ["id", "created_at", "updated_at", "name", "age"]
       def attribute_names
         @attribute_names ||= if !abstract_class? && table_exists?
-          attribute_types.keys
-        else
-          []
-        end
+                               attribute_types.keys
+                             else
+                               []
+                             end
       end
 
       # Regexp whitelist. Matches the following:
@@ -212,9 +214,8 @@ module ActiveRecord
           )
         else
           raise(ActiveRecord::UnknownAttributeReference,
-            "Query method called with non-attribute argument(s): " +
-            unexpected.map(&:inspect).join(", ")
-          )
+                "Query method called with non-attribute argument(s): " +
+                unexpected.map(&:inspect).join(", "))
         end
       end
 
@@ -445,48 +446,48 @@ module ActiveRecord
 
     protected
 
-      def attribute_method?(attr_name) # :nodoc:
-        # We check defined? because Syck calls respond_to? before actually calling initialize.
-        defined?(@attributes) && @attributes.key?(attr_name)
-      end
+    def attribute_method?(attr_name) # :nodoc:
+      # We check defined? because Syck calls respond_to? before actually calling initialize.
+      defined?(@attributes) && @attributes.key?(attr_name)
+    end
 
     private
 
-      def attributes_with_values_for_create(attribute_names)
-        attributes_with_values(attributes_for_create(attribute_names))
-      end
+    def attributes_with_values_for_create(attribute_names)
+      attributes_with_values(attributes_for_create(attribute_names))
+    end
 
-      def attributes_with_values_for_update(attribute_names)
-        attributes_with_values(attributes_for_update(attribute_names))
-      end
+    def attributes_with_values_for_update(attribute_names)
+      attributes_with_values(attributes_for_update(attribute_names))
+    end
 
-      def attributes_with_values(attribute_names)
-        attribute_names.each_with_object({}) do |name, attrs|
-          attrs[name] = _read_attribute(name)
-        end
+    def attributes_with_values(attribute_names)
+      attribute_names.each_with_object({}) do |name, attrs|
+        attrs[name] = _read_attribute(name)
       end
+    end
 
-      # Filters the primary keys and readonly attributes from the attribute names.
-      def attributes_for_update(attribute_names)
-        attribute_names.reject do |name|
-          readonly_attribute?(name)
-        end
+    # Filters the primary keys and readonly attributes from the attribute names.
+    def attributes_for_update(attribute_names)
+      attribute_names.reject do |name|
+        readonly_attribute?(name)
       end
+    end
 
-      # Filters out the primary keys, from the attribute names, when the primary
-      # key is to be generated (e.g. the id attribute has no value).
-      def attributes_for_create(attribute_names)
-        attribute_names.reject do |name|
-          pk_attribute?(name) && id.nil?
-        end
+    # Filters out the primary keys, from the attribute names, when the primary
+    # key is to be generated (e.g. the id attribute has no value).
+    def attributes_for_create(attribute_names)
+      attribute_names.reject do |name|
+        pk_attribute?(name) && id.nil?
       end
+    end
 
-      def readonly_attribute?(name)
-        self.class.readonly_attributes.include?(name)
-      end
+    def readonly_attribute?(name)
+      self.class.readonly_attributes.include?(name)
+    end
 
-      def pk_attribute?(name)
-        name == self.class.primary_key
-      end
+    def pk_attribute?(name)
+      name == self.class.primary_key
+    end
   end
 end

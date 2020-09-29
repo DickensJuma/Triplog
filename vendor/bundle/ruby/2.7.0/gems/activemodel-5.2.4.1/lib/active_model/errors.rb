@@ -72,14 +72,14 @@ module ActiveModel
     #     end
     #   end
     def initialize(base)
-      @base     = base
+      @base = base
       @messages = apply_default_array({})
       @details = apply_default_array({})
     end
 
     def initialize_dup(other) # :nodoc:
       @messages = other.messages.dup
-      @details  = other.details.deep_dup
+      @details = other.details.deep_dup
       super
     end
 
@@ -92,7 +92,7 @@ module ActiveModel
     #   person.errors.copy!(other)
     def copy!(other) # :nodoc:
       @messages = other.messages.dup
-      @details  = other.details.dup
+      @details = other.details.dup
     end
 
     # Merges the errors from <tt>other</tt>.
@@ -294,14 +294,14 @@ module ActiveModel
     #   # => {:base=>[{error: :name_or_email_blank}]}
     def add(attribute, message = :invalid, options = {})
       message = message.call if message.respond_to?(:call)
-      detail  = normalize_detail(message, options)
+      detail = normalize_detail(message, options)
       message = normalize_message(attribute, message, options)
       if exception = options[:strict]
         exception = ActiveModel::StrictValidationFailed if exception == true
         raise exception, full_message(attribute, message)
       end
 
-      details[attribute.to_sym]  << detail
+      details[attribute.to_sym] << detail
       messages[attribute.to_sym] << message
     end
 
@@ -366,12 +366,13 @@ module ActiveModel
     #   person.errors.full_message(:name, 'is invalid') # => "Name is invalid"
     def full_message(attribute, message)
       return message if attribute == :base
+
       attr_name = attribute.to_s.tr(".", "_").humanize
       attr_name = @base.class.human_attribute_name(attribute, default: attr_name)
       I18n.t(:"errors.format",
-        default:  "%{attribute} %{message}",
-        attribute: attr_name,
-        message:   message)
+             default: "%{attribute} %{message}",
+             attribute: attr_name,
+             message: message)
     end
 
     # Translates an error message in its default scope
@@ -404,8 +405,8 @@ module ActiveModel
       if @base.class.respond_to?(:i18n_scope)
         i18n_scope = @base.class.i18n_scope.to_s
         defaults = @base.class.lookup_ancestors.flat_map do |klass|
-          [ :"#{i18n_scope}.errors.models.#{klass.model_name.i18n_key}.attributes.#{attribute}.#{type}",
-            :"#{i18n_scope}.errors.models.#{klass.model_name.i18n_key}.#{type}" ]
+          [:"#{i18n_scope}.errors.models.#{klass.model_name.i18n_key}.attributes.#{attribute}.#{type}",
+           :"#{i18n_scope}.errors.models.#{klass.model_name.i18n_key}.#{type}"]
         end
         defaults << :"#{i18n_scope}.errors.messages.#{type}"
       else
@@ -447,7 +448,8 @@ module ActiveModel
       apply_default_array(@details)
     end
 
-  private
+    private
+
     def normalize_message(attribute, message, options)
       case message
       when Symbol

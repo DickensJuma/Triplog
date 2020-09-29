@@ -1,7 +1,7 @@
 # frozen_string_literal: true
+
 module Arel
   module Nodes
-
     class Over < Binary
       include Arel::AliasPredication
 
@@ -11,6 +11,5 @@ module Arel
 
       def operator; 'OVER' end
     end
-
   end
 end

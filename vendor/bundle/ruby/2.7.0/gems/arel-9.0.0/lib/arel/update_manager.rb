@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   class UpdateManager < Arel::TreeManager
     def initialize
@@ -45,7 +46,7 @@ module Arel
       if String === values
         @ast.values = [values]
       else
-        @ast.values = values.map { |column,value|
+        @ast.values = values.map { |column, value|
           Nodes::Assignment.new(
             Nodes::UnqualifiedColumn.new(column),
             value

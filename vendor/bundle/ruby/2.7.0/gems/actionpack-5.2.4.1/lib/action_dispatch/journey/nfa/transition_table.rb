@@ -12,10 +12,10 @@ module ActionDispatch
         attr_reader :memos
 
         def initialize
-          @table     = Hash.new { |h, f| h[f] = {} }
-          @memos     = {}
+          @table = Hash.new { |h, f| h[f] = {} }
+          @memos = {}
           @accepting = nil
-          @inverted  = nil
+          @inverted = nil
         end
 
         def accepting?(state)
@@ -71,7 +71,7 @@ module ActionDispatch
         # +t+ on nil-transitions alone.
         def eclosure(t)
           stack = Array(t)
-          seen  = {}
+          seen = {}
           children = []
 
           until stack.empty?
@@ -95,25 +95,25 @@ module ActionDispatch
 
         private
 
-          def inverted
-            return @inverted if @inverted
+        def inverted
+          return @inverted if @inverted
 
-            @inverted = Hash.new { |h, from|
-              h[from] = Hash.new { |j, s| j[s] = [] }
+          @inverted = Hash.new { |h, from|
+            h[from] = Hash.new { |j, s| j[s] = [] }
+          }
+
+          @table.each { |to, hash|
+            hash.each { |from, sym|
+              if sym
+                sym = Nodes::Symbol === sym ? sym.regexp : sym.left
+              end
+
+              @inverted[from][sym] << to
             }
+          }
 
-            @table.each { |to, hash|
-              hash.each { |from, sym|
-                if sym
-                  sym = Nodes::Symbol === sym ? sym.regexp : sym.left
-                end
-
-                @inverted[from][sym] << to
-              }
-            }
-
-            @inverted
-          end
+          @inverted
+        end
       end
     end
   end

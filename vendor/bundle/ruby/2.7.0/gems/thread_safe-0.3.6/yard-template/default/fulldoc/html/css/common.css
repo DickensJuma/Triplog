@@ -1,74 +1,92 @@
 /* Override this file with custom rules */
+/* stylelint-disable no-descending-specificity */
 
 body {
-    line-height: 18px;
+  line-height: 18px;
 }
 
-.docstring code, .docstring .object_link a, #filecontents code {
-    padding: 0px 3px 1px 3px;
-    border: 1px solid #eef;
-    background: #f5f5ff;
+pre.code {
+  color: #000;
 }
 
-#filecontents pre code, .docstring pre code {
-    border: none;
-    background: none;
-    padding: 0;
+pre.code a {
+  border-bottom: 1px dotted #bbf;
 }
 
-#filecontents pre.code, .docstring pre.code, .tags pre.example, .docstring code, .docstring .object_link a,
-#filecontents code {
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
+.docstring pre.code,
+.docstring code,
+#filecontents pre.code,
+#filecontents code,
+.tags pre.example,
+.docstring .object_link a {
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+}
+
+.docstring pre code,
+#filecontents pre code {
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+#filecontents code .docstring code,
+.docstring .object_link a {
+  padding: 0 3px 1px 3px;
+  border: 1px solid #eef;
+  background: #f5f5ff;
 }
 
 /* syntax highlighting */
 .source_code {
-    display: none;
-    padding: 3px 8px;
-    border-left: 8px solid #ddd;
-    margin-top: 5px;
+  display: none;
+  padding: 3px 8px;
+  border-left: 8px solid #ddd;
+  margin-top: 5px;
 }
 
-#filecontents pre.code, .docstring pre.code, .source_code pre {
-    font-family: monospace;
+.docstring pre.code,
+#filecontents pre.code,
+.source_code pre {
+  font-family: monospace;
 }
 
-#filecontents pre.code, .docstring pre.code {
-    display: block;
+#filecontents pre.code,
+.docstring pre.code {
+  display: block;
 }
 
 .source_code .lines {
-    padding-right: 12px;
-    color: #555;
-    text-align: right;
+  padding-right: 12px;
+  color: #555;
+  text-align: right;
 }
 
-#filecontents pre.code, .docstring pre.code,
+#filecontents pre.code,
+.docstring pre.code,
 .tags pre.example {
-    padding: 5px 12px;
-    margin-top: 4px;
-    border: 1px solid #eef;
-    background: #f5f5ff;
-}
-
-pre.code {
-    color: #000;
+  padding: 5px 12px;
+  margin-top: 4px;
+  border: 1px solid #eef;
+  background: #f5f5ff;
 }
 
 pre.code .info.file {
-    color: #555;
+  color: #555;
 }
 
 pre.code .val {
-    color: #036A07;
+  color: #036a07;
 }
 
 pre.code .tstring_content,
-pre.code .heredoc_beg, pre.code .heredoc_end,
-pre.code .qwords_beg, pre.code .qwords_end,
-pre.code .tstring, pre.code .dstring {
-    color: #036A07;
+pre.code .heredoc_beg,
+pre.code .heredoc_end,
+pre.code .qwords_beg,
+pre.code .qwords_end,
+pre.code .tstring,
+pre.code .dstring {
+  color: #036a07;
 }
 
 pre.code .fid,
@@ -78,23 +96,24 @@ pre.code .rubyid_to_sym,
 pre.code .rubyid_to_f,
 pre.code .rubyid_to_i,
 pre.code .rubyid_each {
-    color: inherit;
+  color: inherit;
 }
 
 pre.code .comment {
-    color: #777;
-    font-style: italic;
+  color: #777;
+  font-style: italic;
 }
 
-pre.code .const, pre.code .constant {
-    color: inherit;
-    font-weight: bold;
-    font-style: italic;
+pre.code .const,
+pre.code .constant {
+  color: inherit;
+  font-weight: bold;
+  font-style: italic;
 }
 
 pre.code .label,
 pre.code .symbol {
-    color: #C5060B;
+  color: #c5060b;
 }
 
 pre.code .kw,
@@ -102,24 +121,22 @@ pre.code .rubyid_require,
 pre.code .rubyid_extend,
 pre.code .rubyid_include,
 pre.code .int {
-    color: #0000FF;
+  color: #00f;
 }
 
 pre.code .ivar {
-    color: #660E7A;
+  color: #660e7a;
 }
 
 pre.code .gvar,
 pre.code .rubyid_backref,
 pre.code .rubyid_nth_ref {
-    color: #6D79DE;
+  color: #6d79de;
 }
 
-pre.code .regexp, .dregexp {
-    color: #036A07;
+pre.code .regexp,
+.dregexp {
+  color: #036a07;
 }
 
-pre.code a {
-    border-bottom: 1px dotted #bbf;
-}
-
+/* stylelint-enable no-descending-specificity */

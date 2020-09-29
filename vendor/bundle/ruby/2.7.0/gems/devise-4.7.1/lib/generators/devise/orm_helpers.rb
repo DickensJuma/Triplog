@@ -10,7 +10,7 @@ module Devise
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
-CONTENT
+        CONTENT
         buffer
       end
 

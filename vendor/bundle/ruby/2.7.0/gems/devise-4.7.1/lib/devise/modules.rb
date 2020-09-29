@@ -11,18 +11,18 @@ Devise.with_options model: true do |d|
   end
 
   # Other authentications
-  d.add_module :omniauthable, controller: :omniauth_callbacks,  route: :omniauth_callback
+  d.add_module :omniauthable, controller: :omniauth_callbacks, route: :omniauth_callback
 
   # Misc after
   routes = [nil, :new, :edit]
-  d.add_module :recoverable,  controller: :passwords,     route: { password: routes }
+  d.add_module :recoverable, controller: :passwords, route: { password: routes }
   d.add_module :registerable, controller: :registrations, route: { registration: (routes << :cancel) }
   d.add_module :validatable
 
   # The ones which can sign out after
   routes = [nil, :new]
-  d.add_module :confirmable,  controller: :confirmations, route: { confirmation: routes }
-  d.add_module :lockable,     controller: :unlocks,       route: { unlock: routes }
+  d.add_module :confirmable, controller: :confirmations, route: { confirmation: routes }
+  d.add_module :lockable, controller: :unlocks, route: { unlock: routes }
   d.add_module :timeoutable
 
   # Stats for last, so we make sure the user is really signed in

@@ -210,7 +210,7 @@ module ActiveRecord
 
       batch_limit = of
       if limit_value
-        remaining   = limit_value
+        remaining = limit_value
         batch_limit = remaining if remaining < batch_limit
       end
 
@@ -258,30 +258,30 @@ module ActiveRecord
 
     private
 
-      def apply_limits(relation, start, finish)
-        if start
-          attr = Relation::QueryAttribute.new(primary_key, start, klass.type_for_attribute(primary_key))
-          relation = relation.where(arel_attribute(primary_key).gteq(Arel::Nodes::BindParam.new(attr)))
-        end
-        if finish
-          attr = Relation::QueryAttribute.new(primary_key, finish, klass.type_for_attribute(primary_key))
-          relation = relation.where(arel_attribute(primary_key).lteq(Arel::Nodes::BindParam.new(attr)))
-        end
-        relation
+    def apply_limits(relation, start, finish)
+      if start
+        attr = Relation::QueryAttribute.new(primary_key, start, klass.type_for_attribute(primary_key))
+        relation = relation.where(arel_attribute(primary_key).gteq(Arel::Nodes::BindParam.new(attr)))
       end
-
-      def batch_order
-        arel_attribute(primary_key).asc
+      if finish
+        attr = Relation::QueryAttribute.new(primary_key, finish, klass.type_for_attribute(primary_key))
+        relation = relation.where(arel_attribute(primary_key).lteq(Arel::Nodes::BindParam.new(attr)))
       end
+      relation
+    end
 
-      def act_on_ignored_order(error_on_ignore)
-        raise_error = (error_on_ignore.nil? ? klass.error_on_ignored_order : error_on_ignore)
+    def batch_order
+      arel_attribute(primary_key).asc
+    end
 
-        if raise_error
-          raise ArgumentError.new(ORDER_IGNORE_MESSAGE)
-        elsif logger
-          logger.warn(ORDER_IGNORE_MESSAGE)
-        end
+    def act_on_ignored_order(error_on_ignore)
+      raise_error = (error_on_ignore.nil? ? klass.error_on_ignored_order : error_on_ignore)
+
+      if raise_error
+        raise ArgumentError.new(ORDER_IGNORE_MESSAGE)
+      elsif logger
+        logger.warn(ORDER_IGNORE_MESSAGE)
       end
+    end
   end
 end

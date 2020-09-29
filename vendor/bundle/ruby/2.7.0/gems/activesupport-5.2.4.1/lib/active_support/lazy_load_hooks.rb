@@ -26,8 +26,8 @@ module ActiveSupport
     def self.extended(base) # :nodoc:
       base.class_eval do
         @load_hooks = Hash.new { |h, k| h[k] = [] }
-        @loaded     = Hash.new { |h, k| h[k] = [] }
-        @run_once   = Hash.new { |h, k| h[k] = [] }
+        @loaded = Hash.new { |h, k| h[k] = [] }
+        @run_once = Hash.new { |h, k| h[k] = [] }
       end
     end
 
@@ -55,23 +55,23 @@ module ActiveSupport
 
     private
 
-      def with_execution_control(name, block, once)
-        unless @run_once[name].include?(block)
-          @run_once[name] << block if once
+    def with_execution_control(name, block, once)
+      unless @run_once[name].include?(block)
+        @run_once[name] << block if once
 
-          yield
+        yield
+      end
+    end
+
+    def execute_hook(name, base, options, block)
+      with_execution_control(name, block, options[:run_once]) do
+        if options[:yield]
+          block.call(base)
+        else
+          base.instance_eval(&block)
         end
       end
-
-      def execute_hook(name, base, options, block)
-        with_execution_control(name, block, options[:run_once]) do
-          if options[:yield]
-            block.call(base)
-          else
-            base.instance_eval(&block)
-          end
-        end
-      end
+    end
   end
 
   extend LazyLoadHooks

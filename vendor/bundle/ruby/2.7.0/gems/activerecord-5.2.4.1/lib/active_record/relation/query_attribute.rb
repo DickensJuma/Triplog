@@ -26,6 +26,7 @@ module ActiveRecord
 
       def boundable?
         return @_boundable if defined?(@_boundable)
+
         value_for_database unless value_before_type_cast.is_a?(StatementCache::Substitute)
         @_boundable = true
       rescue ::RangeError
@@ -37,9 +38,10 @@ module ActiveRecord
       end
 
       private
-        def _infinity?(value)
-          value.respond_to?(:infinite?) && value.infinite?
-        end
+
+      def _infinity?(value)
+        value.respond_to?(:infinite?) && value.infinite?
+      end
     end
   end
 end

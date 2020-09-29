@@ -8,9 +8,9 @@ module ActionController
       return unless logger.info?
 
       payload = event.payload
-      params  = payload[:params].except(*INTERNAL_PARAMS)
-      format  = payload[:format]
-      format  = format.to_s.upcase if format.is_a?(Symbol)
+      params = payload[:params].except(*INTERNAL_PARAMS)
+      format = payload[:format]
+      format = format.to_s.upcase if format.is_a?(Symbol)
 
       info "Processing by #{payload[:controller]}##{payload[:action]} as #{format}"
       info "  Parameters: #{params.inspect}" unless params.empty?
@@ -18,7 +18,7 @@ module ActionController
 
     def process_action(event)
       info do
-        payload   = event.payload
+        payload = event.payload
         additions = ActionController::Base.log_process_action(payload)
 
         status = payload[:status]

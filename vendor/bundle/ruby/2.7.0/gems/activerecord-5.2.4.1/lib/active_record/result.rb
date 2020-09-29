@@ -37,9 +37,9 @@ module ActiveRecord
     attr_reader :columns, :rows, :column_types
 
     def initialize(columns, rows, column_types = {})
-      @columns      = columns
-      @rows         = rows
-      @hash_rows    = nil
+      @columns = columns
+      @rows = rows
+      @hash_rows = nil
       @column_types = column_types
     end
 
@@ -86,6 +86,7 @@ module ActiveRecord
     # If the rows collection is empty, returns +nil+.
     def first
       return nil if @rows.empty?
+
       Hash[@columns.zip(@rows.first)]
     end
 
@@ -93,6 +94,7 @@ module ActiveRecord
     # If the rows collection is empty, returns +nil+.
     def last
       return nil if @rows.empty?
+
       Hash[@columns.zip(@rows.last)]
     end
 
@@ -106,44 +108,44 @@ module ActiveRecord
     end
 
     def initialize_copy(other)
-      @columns      = columns.dup
-      @rows         = rows.dup
+      @columns = columns.dup
+      @rows = rows.dup
       @column_types = column_types.dup
-      @hash_rows    = nil
+      @hash_rows = nil
     end
 
     private
 
-      def column_type(name, type_overrides = {})
-        type_overrides.fetch(name) do
-          column_types.fetch(name, Type.default_value)
+    def column_type(name, type_overrides = {})
+      type_overrides.fetch(name) do
+        column_types.fetch(name, Type.default_value)
+      end
+    end
+
+    def hash_rows
+      @hash_rows ||=
+        begin
+          # We freeze the strings to prevent them getting duped when
+          # used as keys in ActiveRecord::Base's @attributes hash
+          columns = @columns.map { |c| c.dup.freeze }
+          @rows.map { |row|
+            # In the past we used Hash[columns.zip(row)]
+            #  though elegant, the verbose way is much more efficient
+            #  both time and memory wise cause it avoids a big array allocation
+            #  this method is called a lot and needs to be micro optimised
+            hash = {}
+
+            index = 0
+            length = columns.length
+
+            while index < length
+              hash[columns[index]] = row[index]
+              index += 1
+            end
+
+            hash
+          }
         end
-      end
-
-      def hash_rows
-        @hash_rows ||=
-          begin
-            # We freeze the strings to prevent them getting duped when
-            # used as keys in ActiveRecord::Base's @attributes hash
-            columns = @columns.map { |c| c.dup.freeze }
-            @rows.map { |row|
-              # In the past we used Hash[columns.zip(row)]
-              #  though elegant, the verbose way is much more efficient
-              #  both time and memory wise cause it avoids a big array allocation
-              #  this method is called a lot and needs to be micro optimised
-              hash = {}
-
-              index = 0
-              length = columns.length
-
-              while index < length
-                hash[columns[index]] = row[index]
-                index += 1
-              end
-
-              hash
-            }
-          end
-      end
+    end
   end
 end

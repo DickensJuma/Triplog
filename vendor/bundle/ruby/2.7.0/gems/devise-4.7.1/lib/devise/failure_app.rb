@@ -53,20 +53,20 @@ module Devise
 
     def recall
       header_info = if relative_url_root?
-        base_path = Pathname.new(relative_url_root)
-        full_path = Pathname.new(attempted_path)
+                      base_path = Pathname.new(relative_url_root)
+                      full_path = Pathname.new(attempted_path)
 
-        { "SCRIPT_NAME" => relative_url_root,
-          "PATH_INFO" => '/' + full_path.relative_path_from(base_path).to_s }
-      else
-        { "PATH_INFO" => attempted_path }
-      end
+                      { "SCRIPT_NAME" => relative_url_root,
+                        "PATH_INFO" => '/' + full_path.relative_path_from(base_path).to_s }
+                    else
+                      { "PATH_INFO" => attempted_path }
+                    end
 
-      header_info.each do | var, value|
+      header_info.each do |var, value|
         if request.respond_to?(:set_header)
           request.set_header(var, value)
         else
-          request.env[var]  = value
+          request.env[var] = value
         end
       end
 
@@ -88,7 +88,7 @@ module Devise
       redirect_to redirect_url
     end
 
-  protected
+    protected
 
     def i18n_options(options)
       options
@@ -118,10 +118,10 @@ module Devise
         flash[:timedout] = true if is_flashing_format?
 
         path = if request.get?
-          attempted_path
-        else
-          request.referrer
-        end
+                 attempted_path
+               else
+                 request.referrer
+               end
 
         path || scope_url
       else
@@ -134,7 +134,7 @@ module Devise
     end
 
     def scope_url
-      opts  = {}
+      opts = {}
 
       # Initialize script_name with nil to prevent infinite loops in
       # authenticated mounted engines in rails 4.2 and 5.0
@@ -195,6 +195,7 @@ module Devise
 
     def http_auth_body
       return i18n_message unless request_format
+
       method = "to_#{request_format}"
       if method == "to_xml"
         { error: i18n_message }.to_xml(root: "errors")
@@ -207,7 +208,7 @@ module Devise
 
     def recall_app(app)
       controller, action = app.split("#")
-      controller_name  = ActiveSupport::Inflector.camelize(controller)
+      controller_name = ActiveSupport::Inflector.camelize(controller)
       controller_klass = ActiveSupport::Inflector.constantize("#{controller_name}Controller")
       controller_klass.action(action)
     end

@@ -34,13 +34,14 @@ module ActiveRecord
       end
 
       private
-        def concise_options(options)
-          if columns.size == options.size && options.values.uniq.size == 1
-            options.values.first
-          else
-            options
-          end
+
+      def concise_options(options)
+        if columns.size == options.size && options.values.uniq.size == 1
+          options.values.first
+        else
+          options
         end
+      end
     end
 
     # Abstract representation of a column definition. Instances of this type
@@ -111,9 +112,10 @@ module ActiveRecord
       end
 
       private
-        def default_primary_key
-          "id"
-        end
+
+      def default_primary_key
+        "id"
+      end
     end
 
     class ReferenceDefinition # :nodoc:
@@ -155,47 +157,47 @@ module ActiveRecord
       # Workaround for Ruby 2.2 "private attribute?" warning.
       protected
 
-        attr_reader :name, :polymorphic, :index, :foreign_key, :type, :options
+      attr_reader :name, :polymorphic, :index, :foreign_key, :type, :options
 
       private
 
-        def as_options(value)
-          value.is_a?(Hash) ? value : {}
-        end
+      def as_options(value)
+        value.is_a?(Hash) ? value : {}
+      end
 
-        def polymorphic_options
-          as_options(polymorphic).merge(options.slice(:null, :first, :after))
-        end
+      def polymorphic_options
+        as_options(polymorphic).merge(options.slice(:null, :first, :after))
+      end
 
-        def index_options
-          as_options(index)
-        end
+      def index_options
+        as_options(index)
+      end
 
-        def foreign_key_options
-          as_options(foreign_key).merge(column: column_name)
-        end
+      def foreign_key_options
+        as_options(foreign_key).merge(column: column_name)
+      end
 
-        def columns
-          result = [[column_name, type, options]]
-          if polymorphic
-            result.unshift(["#{name}_type", :string, polymorphic_options])
-          end
-          result
+      def columns
+        result = [[column_name, type, options]]
+        if polymorphic
+          result.unshift(["#{name}_type", :string, polymorphic_options])
         end
+        result
+      end
 
-        def column_name
-          "#{name}_id"
-        end
+      def column_name
+        "#{name}_id"
+      end
 
-        def column_names
-          columns.map(&:first)
-        end
+      def column_names
+        columns.map(&:first)
+      end
 
-        def foreign_table_name
-          foreign_key_options.fetch(:to_table) do
-            Base.pluralize_table_names ? name.to_s.pluralize : name
-          end
+      def foreign_table_name
+        foreign_key_options.fetch(:to_table) do
+          Base.pluralize_table_names ? name.to_s.pluralize : name
         end
+      end
     end
 
     module ColumnMethods
@@ -423,21 +425,22 @@ module ActiveRecord
       end
 
       private
-        def create_column_definition(name, type, options)
-          ColumnDefinition.new(name, type, options)
-        end
 
-        def aliased_types(name, fallback)
-          "timestamp" == name ? :datetime : fallback
-        end
+      def create_column_definition(name, type, options)
+        ColumnDefinition.new(name, type, options)
+      end
 
-        def integer_like_primary_key?(type, options)
-          options[:primary_key] && [:integer, :bigint].include?(type) && !options.key?(:default)
-        end
+      def aliased_types(name, fallback)
+        "timestamp" == name ? :datetime : fallback
+      end
 
-        def integer_like_primary_key_type(type, options)
-          type
-        end
+      def integer_like_primary_key?(type, options)
+        options[:primary_key] && [:integer, :bigint].include?(type) && !options.key?(:default)
+      end
+
+      def integer_like_primary_key_type(type, options)
+        type
+      end
     end
 
     class AlterTable # :nodoc:
@@ -446,7 +449,7 @@ module ActiveRecord
       attr_reader :foreign_key_drops
 
       def initialize(td)
-        @td   = td
+        @td = td
         @adds = []
         @foreign_key_adds = []
         @foreign_key_drops = []

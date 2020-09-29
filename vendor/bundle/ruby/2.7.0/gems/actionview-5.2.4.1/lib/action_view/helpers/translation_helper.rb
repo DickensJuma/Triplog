@@ -121,21 +121,22 @@ module ActionView
       alias :l :localize
 
       private
-        def scope_key_by_partial(key)
-          if key.to_s.first == "."
-            if @virtual_path
-              @virtual_path.gsub(%r{/_?}, ".") + key.to_s
-            else
-              raise "Cannot use t(#{key.inspect}) shortcut because path is not available"
-            end
-          else
-            key
-          end
-        end
 
-        def html_safe_translation_key?(key)
-          /(\b|_|\.)html$/.match?(key.to_s)
+      def scope_key_by_partial(key)
+        if key.to_s.first == "."
+          if @virtual_path
+            @virtual_path.gsub(%r{/_?}, ".") + key.to_s
+          else
+            raise "Cannot use t(#{key.inspect}) shortcut because path is not available"
+          end
+        else
+          key
         end
+      end
+
+      def html_safe_translation_key?(key)
+        /(\b|_|\.)html$/.match?(key.to_s)
+      end
     end
   end
 end

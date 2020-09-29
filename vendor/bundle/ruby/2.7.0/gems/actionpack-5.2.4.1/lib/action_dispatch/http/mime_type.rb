@@ -32,18 +32,20 @@ module Mime
     end
   end
 
-  SET              = Mimes.new
+  SET = Mimes.new
   EXTENSION_LOOKUP = {}
-  LOOKUP           = {}
+  LOOKUP = {}
 
   class << self
     def [](type)
       return type if type.is_a?(Type)
+
       Type.lookup_by_extension(type)
     end
 
     def fetch(type)
       return type if type.is_a?(Type)
+
       EXTENSION_LOOKUP.fetch(type.to_s) { |k| yield k }
     end
   end
@@ -98,11 +100,11 @@ module Mime
           text_xml = list[text_xml_idx]
 
           app_xml.q = [text_xml.q, app_xml.q].max # Set the q value to the max of the two.
-          if app_xml_idx > text_xml_idx  # Make sure app_xml is ahead of text_xml in the list.
+          if app_xml_idx > text_xml_idx # Make sure app_xml is ahead of text_xml in the list.
             list[app_xml_idx], list[text_xml_idx] = text_xml, app_xml
             app_xml_idx, text_xml_idx = text_xml_idx, app_xml_idx
           end
-          list.delete_at(text_xml_idx)  # Delete text_xml from the list.
+          list.delete_at(text_xml_idx) # Delete text_xml from the list.
         elsif text_xml_idx
           list[text_xml_idx].name = Mime[:xml].to_s
         end
@@ -179,6 +181,7 @@ module Mime
             params, q = header.split(PARAMETER_SEPARATOR_REGEXP)
 
             next unless params
+
             params.strip!
             next if params.empty?
 
@@ -247,7 +250,7 @@ module Mime
 
     def ===(list)
       if list.is_a?(Array)
-        (@synonyms + [ self ]).any? { |synonym| list.include?(synonym) }
+        (@synonyms + [self]).any? { |synonym| list.include?(synonym) }
       else
         super
       end
@@ -255,20 +258,22 @@ module Mime
 
     def ==(mime_type)
       return false unless mime_type
-      (@synonyms + [ self ]).any? do |synonym|
+
+      (@synonyms + [self]).any? do |synonym|
         synonym.to_s == mime_type.to_s || synonym.to_sym == mime_type.to_sym
       end
     end
 
     def eql?(other)
       super || (self.class == other.class &&
-                @string    == other.string &&
-                @synonyms  == other.synonyms &&
-                @symbol    == other.symbol)
+                @string == other.string &&
+                @synonyms == other.synonyms &&
+                @symbol == other.symbol)
     end
 
     def =~(mime_type)
       return false unless mime_type
+
       regexp = Regexp.new(Regexp.quote(mime_type.to_s))
       @synonyms.any? { |synonym| synonym.to_s =~ regexp } || @string =~ regexp
     end
@@ -283,24 +288,25 @@ module Mime
     # Workaround for Ruby 2.2 "private attribute?" warning.
     protected
 
-      attr_reader :string, :synonyms
+    attr_reader :string, :synonyms
 
     private
 
-      def to_ary; end
-      def to_a; end
+    def to_ary; end
 
-      def method_missing(method, *args)
-        if method.to_s.ends_with? "?"
-          method[0..-2].downcase.to_sym == to_sym
-        else
-          super
-        end
-      end
+    def to_a; end
 
-      def respond_to_missing?(method, include_private = false)
-        (method.to_s.ends_with? "?") || super
+    def method_missing(method, *args)
+      if method.to_s.ends_with? "?"
+        method[0..-2].downcase.to_sym == to_sym
+      else
+        super
       end
+    end
+
+    def respond_to_missing?(method, include_private = false)
+      (method.to_s.ends_with? "?") || super
+    end
   end
 
   class AllType < Type
@@ -311,6 +317,7 @@ module Mime
     end
 
     def all?; true; end
+
     def html?; true; end
   end
 
@@ -329,13 +336,14 @@ module Mime
     def ref; end
 
     private
-      def respond_to_missing?(method, _)
-        method.to_s.ends_with? "?"
-      end
 
-      def method_missing(method, *args)
-        false if method.to_s.ends_with? "?"
-      end
+    def respond_to_missing?(method, _)
+      method.to_s.ends_with? "?"
+    end
+
+    def method_missing(method, *args)
+      false if method.to_s.ends_with? "?"
+    end
   end
 end
 

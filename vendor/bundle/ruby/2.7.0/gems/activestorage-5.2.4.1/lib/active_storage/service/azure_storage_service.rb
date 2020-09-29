@@ -118,32 +118,33 @@ module ActiveStorage
     end
 
     private
-      def uri_for(key)
-        blobs.generate_uri("#{container}/#{key}")
+
+    def uri_for(key)
+      blobs.generate_uri("#{container}/#{key}")
+    end
+
+    def blob_for(key)
+      blobs.get_blob_properties(container, key)
+    rescue Azure::Core::Http::HTTPError
+      false
+    end
+
+    def format_expiry(expires_in)
+      expires_in ? Time.now.utc.advance(seconds: expires_in).iso8601 : nil
+    end
+
+    # Reads the object for the given key in chunks, yielding each to the block.
+    def stream(key)
+      blob = blob_for(key)
+
+      chunk_size = 5.megabytes
+      offset = 0
+
+      while offset < blob.properties[:content_length]
+        _, chunk = blobs.get_blob(container, key, start_range: offset, end_range: offset + chunk_size - 1)
+        yield chunk.force_encoding(Encoding::BINARY)
+        offset += chunk_size
       end
-
-      def blob_for(key)
-        blobs.get_blob_properties(container, key)
-      rescue Azure::Core::Http::HTTPError
-        false
-      end
-
-      def format_expiry(expires_in)
-        expires_in ? Time.now.utc.advance(seconds: expires_in).iso8601 : nil
-      end
-
-      # Reads the object for the given key in chunks, yielding each to the block.
-      def stream(key)
-        blob = blob_for(key)
-
-        chunk_size = 5.megabytes
-        offset = 0
-
-        while offset < blob.properties[:content_length]
-          _, chunk = blobs.get_blob(container, key, start_range: offset, end_range: offset + chunk_size - 1)
-          yield chunk.force_encoding(Encoding::BINARY)
-          offset += chunk_size
-        end
-      end
+    end
   end
 end

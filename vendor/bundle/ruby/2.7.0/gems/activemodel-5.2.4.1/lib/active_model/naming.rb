@@ -9,8 +9,8 @@ module ActiveModel
     include Comparable
 
     attr_reader :singular, :plural, :element, :collection,
-      :singular_route_key, :route_key, :param_key, :i18n_key,
-      :name
+                :singular_route_key, :route_key, :param_key, :i18n_key,
+                :name
 
     alias_method :cache_key, :collection
 
@@ -151,16 +151,16 @@ module ActiveModel
       raise ArgumentError, "Class name cannot be blank. You need to supply a name argument when anonymous class given" if @name.blank?
 
       @unnamespaced = @name.sub(/^#{namespace.name}::/, "") if namespace
-      @klass        = klass
-      @singular     = _singularize(@name)
-      @plural       = ActiveSupport::Inflector.pluralize(@singular)
-      @element      = ActiveSupport::Inflector.underscore(ActiveSupport::Inflector.demodulize(@name))
-      @human        = ActiveSupport::Inflector.humanize(@element)
-      @collection   = ActiveSupport::Inflector.tableize(@name)
-      @param_key    = (namespace ? _singularize(@unnamespaced) : @singular)
-      @i18n_key     = @name.underscore.to_sym
+      @klass = klass
+      @singular = _singularize(@name)
+      @plural = ActiveSupport::Inflector.pluralize(@singular)
+      @element = ActiveSupport::Inflector.underscore(ActiveSupport::Inflector.demodulize(@name))
+      @human = ActiveSupport::Inflector.humanize(@element)
+      @collection = ActiveSupport::Inflector.tableize(@name)
+      @param_key = (namespace ? _singularize(@unnamespaced) : @singular)
+      @i18n_key = @name.underscore.to_sym
 
-      @route_key          = (namespace ? ActiveSupport::Inflector.pluralize(@param_key) : @plural.dup)
+      @route_key = (namespace ? ActiveSupport::Inflector.pluralize(@param_key) : @plural.dup)
       @singular_route_key = ActiveSupport::Inflector.singularize(@route_key)
       @route_key << "_index" if @plural == @singular
     end
@@ -192,9 +192,9 @@ module ActiveModel
 
     private
 
-      def _singularize(string)
-        ActiveSupport::Inflector.underscore(string).tr("/".freeze, "_".freeze)
-      end
+    def _singularize(string)
+      ActiveSupport::Inflector.underscore(string).tr("/".freeze, "_".freeze)
+    end
   end
 
   # == Active \Model \Naming

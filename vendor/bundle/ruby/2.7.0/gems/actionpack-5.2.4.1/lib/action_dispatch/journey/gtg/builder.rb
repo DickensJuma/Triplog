@@ -11,21 +11,22 @@ module ActionDispatch
         attr_reader :root, :ast, :endpoints
 
         def initialize(root)
-          @root      = root
-          @ast       = Nodes::Cat.new root, DUMMY
+          @root = root
+          @ast = Nodes::Cat.new root, DUMMY
           @followpos = nil
         end
 
         def transition_table
-          dtrans   = TransitionTable.new
-          marked   = {}
+          dtrans = TransitionTable.new
+          marked = {}
           state_id = Hash.new { |h, k| h[k] = h.length }
 
-          start   = firstpos(root)
+          start = firstpos(root)
           dstates = [start]
           until dstates.empty?
             s = dstates.shift
             next if marked[s]
+
             marked[s] = true # mark s
 
             s.group_by { |state| symbol(state) }.each do |sym, ps|
@@ -34,7 +35,7 @@ module ActionDispatch
 
               if u.uniq == [DUMMY]
                 from = state_id[s]
-                to   = state_id[Object.new]
+                to = state_id[Object.new]
                 dtrans[from, to] = sym
 
                 dtrans.add_accepting(to)
@@ -129,35 +130,35 @@ module ActionDispatch
 
         private
 
-          def followpos_table
-            @followpos ||= build_followpos
-          end
+        def followpos_table
+          @followpos ||= build_followpos
+        end
 
-          def build_followpos
-            table = Hash.new { |h, k| h[k] = [] }
-            @ast.each do |n|
-              case n
-              when Nodes::Cat
-                lastpos(n.left).each do |i|
-                  table[i] += firstpos(n.right)
-                end
-              when Nodes::Star
-                lastpos(n).each do |i|
-                  table[i] += firstpos(n)
-                end
+        def build_followpos
+          table = Hash.new { |h, k| h[k] = [] }
+          @ast.each do |n|
+            case n
+            when Nodes::Cat
+              lastpos(n.left).each do |i|
+                table[i] += firstpos(n.right)
+              end
+            when Nodes::Star
+              lastpos(n).each do |i|
+                table[i] += firstpos(n)
               end
             end
-            table
           end
+          table
+        end
 
-          def symbol(edge)
-            case edge
-            when Journey::Nodes::Symbol
-              edge.regexp
-            else
-              edge.left
-            end
+        def symbol(edge)
+          case edge
+          when Journey::Nodes::Symbol
+            edge.regexp
+          else
+            edge.left
           end
+        end
       end
     end
   end

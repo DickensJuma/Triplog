@@ -44,7 +44,7 @@ module ActiveModel
       extend ActiveModel::Callbacks
       extend ActiveModel::Translation
 
-      extend  HelperMethods
+      extend HelperMethods
       include HelperMethods
 
       attr_accessor :validation_context
@@ -403,7 +403,7 @@ module ActiveModel
     #   end
     alias :read_attribute_for_validation :send
 
-  private
+    private
 
     def run_validations!
       _run_validate_callbacks

@@ -13,8 +13,8 @@ module ActionDispatch
         def initialize
           @regexp_states = {}
           @string_states = {}
-          @accepting     = {}
-          @memos         = Hash.new { |h, k| h[k] = [] }
+          @accepting = {}
+          @memos = Hash.new { |h, k| h[k] = [] }
         end
 
         def add_accepting(state)
@@ -69,7 +69,7 @@ module ActionDispatch
           {
             regexp_states: simple_regexp,
             string_states: @string_states,
-            accepting:     @accepting
+            accepting: @accepting
           }
         end
 
@@ -84,11 +84,11 @@ module ActionDispatch
         end
 
         def visualizer(paths, title = "FSM")
-          viz_dir   = File.join __dir__, "..", "visualizer"
-          fsm_js    = File.read File.join(viz_dir, "fsm.js")
-          fsm_css   = File.read File.join(viz_dir, "fsm.css")
-          erb       = File.read File.join(viz_dir, "index.html.erb")
-          states    = "function tt() { return #{to_json}; }"
+          viz_dir = File.join __dir__, "..", "visualizer"
+          fsm_js = File.read File.join(viz_dir, "fsm.js")
+          fsm_css = File.read File.join(viz_dir, "fsm.css")
+          erb = File.read File.join(viz_dir, "index.html.erb")
+          states = "function tt() { return #{to_json}; }"
 
           fun_routes = paths.sample(3).map do |ast|
             ast.map { |n|
@@ -96,7 +96,7 @@ module ActionDispatch
               when Nodes::Symbol
                 case n.left
                 when ":id" then rand(100).to_s
-                when ":format" then %w{ xml json }.sample
+                when ":format" then %w{xml json}.sample
                 else
                   "omg"
                 end
@@ -108,12 +108,12 @@ module ActionDispatch
           end
 
           stylesheets = [fsm_css]
-          svg         = to_svg
+          svg = to_svg
           javascripts = [states, fsm_js]
 
-          fun_routes  = fun_routes
+          fun_routes = fun_routes
           stylesheets = stylesheets
-          svg         = svg
+          svg = svg
           javascripts = javascripts
 
           require "erb"
@@ -142,16 +142,16 @@ module ActionDispatch
 
         private
 
-          def states_hash_for(sym)
-            case sym
-            when String
-              @string_states
-            when Regexp
-              @regexp_states
-            else
-              raise ArgumentError, "unknown symbol: %s" % sym.class
-            end
+        def states_hash_for(sym)
+          case sym
+          when String
+            @string_states
+          when Regexp
+            @regexp_states
+          else
+            raise ArgumentError, "unknown symbol: %s" % sym.class
           end
+        end
       end
     end
   end

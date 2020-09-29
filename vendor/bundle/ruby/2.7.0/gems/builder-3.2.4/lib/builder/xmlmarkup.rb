@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
+
 #--
 # Copyright 2004, 2005 by Jim Weirich (jim@weirichhouse.org).
 # All rights reserved.
@@ -15,7 +16,6 @@
 require 'builder/xmlbase'
 
 module Builder
-
   # Create XML markup easily.  All (well, almost all) methods sent to
   # an XmlMarkup object will be translated to the equivalent XML
   # markup.  Any method with a block will be treated as an XML markup
@@ -159,7 +159,6 @@ module Builder
   #     }
   #
   class XmlMarkup < XmlBase
-
     # Create an XML markup builder.  Parameters are specified by an
     # option hash.
     #
@@ -248,16 +247,17 @@ module Builder
     def instruct!(directive_tag=:xml, attrs={})
       _ensure_no_block ::Kernel::block_given?
       if directive_tag == :xml
-        a = { :version=>"1.0", :encoding=>"UTF-8" }
+        a = { :version => "1.0", :encoding => "UTF-8" }
         attrs = a.merge attrs
-	@encoding = attrs[:encoding].downcase
+        @encoding = attrs[:encoding].downcase
       end
       _special(
         "<?#{directive_tag}",
         "?>",
         nil,
         attrs,
-        [:version, :encoding, :standalone])
+        [:version, :encoding, :standalone]
+      )
     end
 
     # Insert a CDATA section into the XML markup.
@@ -314,6 +314,7 @@ module Builder
     # Insert the attributes (given in the hash).
     def _insert_attributes(attrs, order=[])
       return if attrs.nil?
+
       order.each do |k|
         v = attrs[k]
         @target << %{ #{k}=#{@quote}#{_attr_value(v)}#{@quote}} if v
@@ -339,7 +340,5 @@ module Builder
         )
       end
     end
-
   end
-
 end

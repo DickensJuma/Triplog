@@ -5,10 +5,10 @@ AllCops:
   Exclude:
     - 'vendor/**/*'
     - 'tmp/**/*'
-  TargetRubyVersion: '2.3'
+  TargetRubyVersion: '2.7'
 
 # This doesn't take into account retrying from an exception
-Lint/HandleExceptions:
+Lint/SuppressedException:
   Enabled: false
 
 # allow String.new to create mutable strings

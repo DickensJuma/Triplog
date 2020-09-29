@@ -46,6 +46,7 @@ module ActiveModel
       def test_to_param
         assert_respond_to model, :to_param
         def model.to_key() [1] end
+
         def model.persisted?() false end
         assert model.to_param.nil?, "to_param should return nil when `persisted?` returns false"
       end
@@ -105,14 +106,15 @@ module ActiveModel
       end
 
       private
-        def model
-          assert_respond_to @model, :to_model
-          @model.to_model
-        end
 
-        def assert_boolean(result, name)
-          assert result == true || result == false, "#{name} should be a boolean"
-        end
+      def model
+        assert_respond_to @model, :to_model
+        @model.to_model
+      end
+
+      def assert_boolean(result, name)
+        assert result == true || result == false, "#{name} should be a boolean"
+      end
     end
   end
 end

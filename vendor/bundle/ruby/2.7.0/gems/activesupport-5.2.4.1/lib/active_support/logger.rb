@@ -86,6 +86,7 @@ module ActiveSupport
 
     def add(severity, message = nil, progname = nil, &block)
       return true if @logdev.nil? || (severity || UNKNOWN) < level
+
       super
     end
 

@@ -36,7 +36,8 @@ module RuboCop
       'Style/UnneededCondition' => 'Style/RedundantCondition',
       'Style/UnneededInterpolation' => 'Style/RedundantInterpolation',
       'Style/UnneededPercentQ' => 'Style/RedundantPercentQ',
-      'Style/UnneededSort' => 'Style/RedundantSort'
+      'Style/UnneededSort' => 'Style/RedundantSort',
+      'Layout/Tab' => 'Layout/IndentationStyle'
     }.map do |old_name, new_name|
       [old_name, "The `#{old_name}` cop has been renamed to `#{new_name}`."]
     end

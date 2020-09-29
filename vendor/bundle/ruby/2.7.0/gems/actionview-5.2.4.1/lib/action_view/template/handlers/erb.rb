@@ -52,7 +52,7 @@ module ActionView
           ).src
         end
 
-      private
+        private
 
         def valid_encoding(string, encoding)
           # If a magic encoding comment was found, tag the

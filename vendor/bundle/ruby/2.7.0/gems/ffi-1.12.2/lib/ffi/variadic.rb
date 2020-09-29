@@ -31,7 +31,7 @@
 #
 
 module FFI
-  class VariadicInvoker    
+  class VariadicInvoker
     def init(arg_types, type_map)
       @fixed = Array.new
       @type_map = type_map
@@ -39,7 +39,6 @@ module FFI
         @fixed << type unless type == Type::VARARGS
       end
     end
-
 
     def call(*args, &block)
       param_types = Array.new(@fixed)

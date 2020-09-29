@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   module Visitors
     class MSSQL < Arel::Visitors::ToSql
@@ -45,7 +46,7 @@ module Arel
         end
 
         collector << "SELECT _t.* FROM ("
-        collector = o.cores.inject(collector) { |c,x|
+        collector = o.cores.inject(collector) { |c, x|
           visit_Arel_Nodes_SelectCore x, c
         }
         collector << ") as _t WHERE #{get_offset_limit_clause(o)}"
@@ -59,7 +60,7 @@ module Arel
 
       def get_offset_limit_clause o
         first_row = o.offset ? o.offset.expr.to_i + 1 : 1
-        last_row  = o.limit ? o.limit.expr.to_i - 1 + first_row : nil
+        last_row = o.limit ? o.limit.expr.to_i - 1 + first_row : nil
         if last_row
           " _row_num BETWEEN #{first_row} AND #{last_row}"
         else

@@ -127,7 +127,7 @@ describe "Diff::LCS.traverse_sequences" do
     end
 
     it "has done markers differently-sized sequences" do
-      expect(@callback_s1_s2.done_a).to eq([[ "p", 9, "s", 10 ]])
+      expect(@callback_s1_s2.done_a).to eq([["p", 9, "s", 10]])
       expect(@callback_s1_s2.done_b).to be_empty
 
       # 20110731 I don't yet understand why this particular behaviour

@@ -7,7 +7,7 @@ CLEAN.include ["#{NAME}-*.gem", "rdoc", "coverage"]
 # Gem Packaging and Release
 
 desc "Packages #{NAME}"
-task :package=>[:clean] do |p|
+task :package => [:clean] do |p|
   sh %{gem build #{NAME}.gemspec}
 end
 
@@ -24,9 +24,9 @@ end
 rdoc_task_class = begin
   require "rdoc/task"
   RDoc::Task
-rescue LoadError
-  require "rake/rdoctask"
-  Rake::RDocTask
+                  rescue LoadError
+                    require "rake/rdoctask"
+                    Rake::RDocTask
 end
 
 RDOC_OPTS = RDOC_DEFAULT_OPTS + ['--main', 'README.rdoc']
@@ -41,9 +41,9 @@ end
 ### Specs
 
 spec = proc do |env|
-  env.each{|k,v| ENV[k] = v}
+  env.each { |k, v| ENV[k] = v}
   sh "#{FileUtils::RUBY} test/test.rb"
-  env.each{|k,v| ENV.delete(k)}
+  env.each { |k, v| ENV.delete(k)}
 end
 
 desc "Run specs"
@@ -51,13 +51,13 @@ task "spec" do
   spec.call({})
 end
 
-task :default=>:spec
+task :default => :spec
 
 desc "Run specs with coverage"
 task "spec_cov" do
-  spec.call('COVERAGE'=>'1')
+  spec.call('COVERAGE' => '1')
 end
-  
+
 desc "Run specs with -w, some warnings filtered"
 task "spec_w" do
   ENV['RUBYOPT'] ? (ENV['RUBYOPT'] += " -w") : (ENV['RUBYOPT'] = '-w')
@@ -74,5 +74,3 @@ task :irb do
   irb = ENV['IRB'] || File.join(RbConfig::CONFIG['bindir'], File.basename(ruby).sub('ruby', 'irb'))
   sh %{#{irb} -I lib -r #{NAME}}
 end
-
-

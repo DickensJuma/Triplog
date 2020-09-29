@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'arel/collectors/sql_string'
 
 module Arel
@@ -9,8 +10,8 @@ module Arel
 
     def initialize table = nil
       super()
-      @ast   = Nodes::SelectStatement.new
-      @ctx    = @ast.cores.last
+      @ast = Nodes::SelectStatement.new
+      @ctx = @ast.cores.last
       from table
     end
 
@@ -108,6 +109,7 @@ module Arel
       case relation
       when String, Nodes::SqlLiteral
         raise EmptyJoinError if relation.empty?
+
         klass = Nodes::StringJoin
       end
 
@@ -218,10 +220,10 @@ module Arel
     def take limit
       if limit
         @ast.limit = Nodes::Limit.new(limit)
-        @ctx.top   = Nodes::Top.new(limit)
+        @ctx.top = Nodes::Top.new(limit)
       else
         @ast.limit = nil
-        @ctx.top   = nil
+        @ctx.top = nil
       end
       self
     end
@@ -243,11 +245,13 @@ module Arel
       def method_missing(name, *args)
         name = name.to_s
         return data[name] if data.key?(name)
+
         super
       end
     end
 
     private
+
     def collapse exprs, existing = nil
       exprs = exprs.unshift(existing.expr) if existing
       exprs = exprs.compact.map { |expr|

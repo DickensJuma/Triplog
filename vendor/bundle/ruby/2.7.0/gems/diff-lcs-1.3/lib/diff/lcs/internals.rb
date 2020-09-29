@@ -65,10 +65,10 @@ class << Diff::LCS::Internals
     b_matches = position_hash(b, b_start..b_finish)
 
     thresh = []
-    links  = []
+    links = []
     string = a.kind_of?(String)
 
-    (a_start .. a_finish).each do |i|
+    (a_start..a_finish).each do |i|
       ai = string ? a[i, 1] : a[i]
       bm = b_matches[ai]
       k = nil
@@ -78,7 +78,7 @@ class << Diff::LCS::Internals
         else
           k = replace_next_larger(thresh, j, k)
         end
-        links[k] = [ (k > 0) ? links[k - 1] : nil, i, j ] unless k.nil?
+        links[k] = [(k > 0) ? links[k - 1] : nil, i, j] unless k.nil?
       end
     end
 
@@ -132,7 +132,7 @@ class << Diff::LCS::Internals
       end
     end
 
-    [ has_changes, patchset.flatten(1) ]
+    [has_changes, patchset.flatten(1)]
   end
 
   # Examine the patchset and the source to see in which direction the
@@ -215,10 +215,10 @@ class << Diff::LCS::Internals
     no_left = (left_match == 0) && (left_miss > 0)
     no_right = (right_match == 0) && (right_miss > 0)
 
-    case [ no_left, no_right ]
-    when [ false, true ]
+    case [no_left, no_right]
+    when [false, true]
       :patch
-    when [ true, false ]
+    when [true, false]
       :unpatch
     else
       case left_match <=> right_match

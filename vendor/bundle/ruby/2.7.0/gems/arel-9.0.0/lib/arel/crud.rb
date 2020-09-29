@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Arel
   ###
   # FIXME hopefully we can remove this
@@ -37,6 +38,5 @@ module Arel
       dm.from @ctx.froms
       dm
     end
-
   end
 end
